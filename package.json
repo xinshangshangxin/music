@@ -12,7 +12,12 @@
     "build": "npm run build:dist"
   },
   "dependencies": {
-    "@babel/runtime": "^7.1.2"
+    "@babel/runtime": "^7.1.2",
+    "@types/request-promise": "^4.1.42",
+    "NeteaseCloudMusicApi": "Binaryify/NeteaseCloudMusicApi",
+    "lodash": "^4.17.11",
+    "request": "^2.88.0",
+    "request-promise": "^4.2.2"
   },
   "devDependencies": {
     "@babel/cli": "^7.1.2",
@@ -24,6 +29,7 @@
     "@babel/preset-env": "^7.1.0",
     "@babel/preset-typescript": "^7.1.0",
     "@s4p/eslint-config": "^1.0.0",
+    "@types/lodash": "^4.14.117",
     "@types/node": "^10.11.7",
     "babel-eslint": "^10.0.1",
     "del": "^3.0.0",

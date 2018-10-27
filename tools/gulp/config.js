@@ -17,8 +17,8 @@ const config = {
   },
   replace: {
     src: ['index.js'],
-    regexp: '../package.json',
-    newSubstr: './package.json',
+    regexp: '',
+    newSubstr: '',
   },
   cp: {
     src: ['package.json'],
