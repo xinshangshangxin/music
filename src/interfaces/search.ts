@@ -25,9 +25,9 @@ export interface ISearchSong {
   // eslint-disable-next-line no-restricted-globals
   name: string;
   artists: IArtist[];
-  album: IAlbum;
-  duration: number;
-  mvId: number;
+  album?: IAlbum;
+  duration?: number;
+  mvId?: number;
 }
 
 export interface ISearchItem extends ISearchSong {
