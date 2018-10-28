@@ -1,8 +1,8 @@
 {
   "dev": {
-    "url": "",
-    "remote": "",
-    "branch": ""
+    "url": "git@github.com:xinshangshangxin/music.git",
+    "remote": "dev",
+    "branch": "api"
   },
   "prod": {
     "url": "git@gitlab.com:demoshang/server-projects.git",
