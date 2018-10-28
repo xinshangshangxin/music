@@ -12,6 +12,13 @@ const ts = require('gulp-typescript');
 const { spawn } = require('child_process');
 
 const tsProject = ts.createProject('tsconfig.json');
+const tsDeclarationProject = ts.createProject('tsconfig.json', {
+  allowJs: false,
+  declaration: true,
+  declarationMap: true,
+  outDir: './dist',
+  noEmit: false,
+});
 
 const utilities = require('./utilities');
 
@@ -179,8 +186,15 @@ gulp.task('cp', () => {
   return gulp.src(config.cp.src, config.cp.opt).pipe(gulp.dest(config.cp.dest));
 });
 
+gulp.task('types', () => {
+  return tsDeclarationProject
+    .src()
+    .pipe(tsDeclarationProject(ts.reporter.longReporter()))
+    .dts.pipe(gulp.dest('dist'));
+});
+
 gulp.task('default', gulp.parallel('nodemon', 'wlint'));
 
-gulp.task('build:dist', gulp.series('clean', gulp.parallel('lint', gulp.series('babel', 'cp'))));
+gulp.task('build:dist', gulp.series('clean', gulp.parallel('lint', 'types', gulp.series('babel', 'cp'))));
 
 gulp.task('build', gulp.series('build:dist'));
