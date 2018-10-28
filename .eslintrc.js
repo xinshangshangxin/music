@@ -1,5 +1,5 @@
 module.exports = {
-  globals: {  },
+  globals: {},
   extends: ['@s4p/eslint-config'],
   rules: {},
 };

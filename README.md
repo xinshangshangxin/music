@@ -2,17 +2,20 @@
 
 ## how to use
 
+`npm install @s4p/music-api`
+
 ```ts
-enum Provider {
-  kugou = 'kugou',
-  netease = 'netease',
-  xiami = 'xiami',
-}
+import { search, getSong } from '@s4p/music-api';
 
-function search(
-  query: string | { keyword: string; skip?: number; limit?: number },
-  provider?: Provider | Provider[]
-): Promise<ISearchItem[]>;
+search({ keyword: 'gakki' })
+  .then((data) => {
+    console.info(JSON.stringify(data));
+  })
+  .catch(console.warn);
 
-function getSong(id: string, provider: Provider): Promise<ISong>;
+getSong('f3205f0ff2f4891a2c344086b74b6d6e', 'kugou')
+  .then((data) => {
+    console.info(JSON.stringify(data));
+  })
+  .catch(console.warn);
 ```

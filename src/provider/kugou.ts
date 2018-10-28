@@ -5,7 +5,7 @@ import get from 'lodash/get';
 import { ISearchQuery, ISearchSong } from '../interfaces/search';
 import { ISong } from '../interfaces/song';
 
-class KuGou {
+class Kugou {
   private request: typeof rp;
 
   constructor() {
@@ -92,4 +92,4 @@ class KuGou {
   }
 }
 
-export { KuGou };
+export { Kugou };
