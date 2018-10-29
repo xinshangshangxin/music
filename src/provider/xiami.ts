@@ -91,16 +91,16 @@ class Xiami {
 
     return songs.map((song: any) => {
       return {
-        id: song.song_id,
+        id: `${song.song_id}`,
         name: song.song_name,
         artists: [
           {
-            id: song.artist_id,
+            id: `${song.artist_id}`,
             name: song.artist_name,
           },
         ],
         album: {
-          id: song.album_id,
+          id: `${song.album_id}`,
           name: song.album_name,
         },
       };
@@ -115,18 +115,18 @@ class Xiami {
     let song = get(result, 'data.trackList[0]', {});
 
     return {
-      id: song.songId,
+      id: `${song.songId}`,
       name: song.songName,
       url: Xiami.handleProtocolRelativeUrl(Xiami.caesar(song.location)),
       lrc: Xiami.handleProtocolRelativeUrl(song.lyric_url),
       artists: get(song, 'artistVOs', []).map((item: any) => {
         return {
-          id: item.artistId,
+          id: `${item.artistId}`,
           name: item.artistName,
         };
       }),
       album: {
-        id: song.album_id,
+        id: `${song.album_id}`,
         name: song.album_name,
         img: Xiami.handleProtocolRelativeUrl(`${song.album_pic}`),
       },

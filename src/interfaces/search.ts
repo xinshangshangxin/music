@@ -1,5 +1,3 @@
-import { IArtist, IAlbum } from './song';
-
 // 1: 单曲, 10: 专辑, 100: 歌手, 1000: 歌单, 1002: 用户, 1004: MV, 1006: 歌词, 1009: 电台, 1014: 视频
 export enum NeteaseSearchType {
   single = 1,
@@ -20,14 +18,27 @@ export interface INeteaseSearch extends ISearchQuery {
   type?: NeteaseSearchType;
 }
 
+interface ISearchArtist {
+  id?: string;
+  // eslint-disable-next-line no-restricted-globals
+  name: string;
+}
+
+interface ISearchAlbum {
+  id: string;
+  // eslint-disable-next-line no-restricted-globals
+  name: string;
+  img?: string;
+}
+
 export interface ISearchSong {
   id: string;
   // eslint-disable-next-line no-restricted-globals
   name: string;
-  artists: IArtist[];
-  album?: IAlbum;
+  artists: ISearchArtist[];
+  album?: ISearchAlbum;
   duration?: number;
-  mvId?: number;
+  mvId?: string;
 }
 
 export interface ISearchItem extends ISearchSong {

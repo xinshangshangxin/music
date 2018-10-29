@@ -44,7 +44,7 @@ class Kugou {
 
     return songs.map((song: any) => {
       return {
-        id: song.hash,
+        id: song.sqhash || song['320hash'] || song.hash,
         name: song.songname,
         artists: get(song, 'singername', '')
           .split('、')

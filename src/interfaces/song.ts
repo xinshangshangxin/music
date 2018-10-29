@@ -20,6 +20,6 @@ export interface ISong {
   album: IAlbum;
   artists?: IArtist[];
   duration?: number;
-  mvId?: number;
+  mvId?: string;
   klyric?: string;
 }

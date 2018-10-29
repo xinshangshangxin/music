@@ -53,20 +53,20 @@ export class Netease {
 
     return songs.map((song: any) => {
       return {
-        id: song.id,
+        id: `${song.id}`,
         name: song.name,
         artists: get(song, 'artists', []).map((item: any) => {
           return {
-            id: item.id,
+            id: `${item.id}`,
             name: item.name,
           };
         }),
         album: {
-          id: get(song, 'album.id'),
+          id: `${get(song, 'album.id')}`,
           name: get(song, 'album.name'),
         },
         duration: song.duration,
-        mvId: song.mvid,
+        mvId: `${song.mvid}`,
       };
     });
   }
@@ -76,21 +76,21 @@ export class Netease {
     let song = get(result, 'body.songs[0]');
 
     return {
-      id: song.id,
+      id: `${song.id}`,
       name: song.name,
       artists: get(song, 'ar', []).map((item: any) => {
         return {
-          id: item.id,
+          id: `${item.id}`,
           name: item.name,
         };
       }),
       album: {
-        id: get(song, 'al.id'),
+        id: `${get(song, 'al.id')}`,
         name: get(song, 'al.name'),
         img: get(song, 'al.picUrl'),
       },
       duration: song.dt,
-      mvId: song.mv,
+      mvId: `${song.mv}`,
     };
   }
 
