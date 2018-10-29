@@ -4,11 +4,11 @@ variables:
   PUBLISH_PATH: 'dist/'
 
 stages:
-  - build
+  - test-build
   - release
 
-build:
-  stage: build
+test-build:
+  stage: test-build
   artifacts:
     name: 'music-api-${CI_COMMIT_SHA}'
     paths:
@@ -16,6 +16,7 @@ build:
   script:
     - yarn
     - yarn run build
+    - yarn run test
 
 release:
   stage: release

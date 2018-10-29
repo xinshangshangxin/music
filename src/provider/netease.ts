@@ -95,9 +95,16 @@ export class Netease {
   }
 
   private async songUrl(id: string) {
-    let result = await neteaseSongUrl({ id, cookie: {} }, this.request);
-
-    let url = get(result, 'body.data[0].url');
+    let url;
+    try {
+      let result = await neteaseSongUrl({ id, cookie: {} }, this.request);
+      url = await get(result, 'body.data[0].url');
+    } catch (e) {
+      url = `http://music.163.com/song/media/outer/url?id=${id}.mp3`;
+    }
+    if (!url) {
+      url = `http://music.163.com/song/media/outer/url?id=${id}.mp3`;
+    }
     return { url };
   }
 

@@ -9,7 +9,7 @@
     "lint-fix": "./node_modules/.bin/eslint src/**/*.ts --fix",
     "watch": "gulp",
     "build": "gulp build",
-    "test": "ava"
+    "test": "ava --fail-fast -v"
   },
   "dependencies": {
     "@babel/runtime": "^7.1.2",

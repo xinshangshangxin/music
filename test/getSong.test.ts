@@ -17,10 +17,11 @@ const testCases = [
   },
 ];
 
-test('getSong kugou', async (t) => {
+test('getSong', async (t) => {
   await Promise.all(
     testCases.map(async ({ id, provider }) => {
       let data = await getSong(id, provider);
+      console.info('provider: ', provider);
       console.info(JSON.stringify(data));
 
       let {
