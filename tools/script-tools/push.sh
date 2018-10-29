@@ -38,8 +38,8 @@ function push() {
 	  git push ${pushRemote} ${currentBranch}:${pushBranch}\(${nodeEnv}\) -f
   else
     echo "run cmd at $(pwd)"
-    echo "git push ${pushRemote} ${currentBranch}:${pushBranch}"
-	  git push ${pushRemote} ${currentBranch}:${pushBranch}
+    echo "git push ${pushRemote} ${currentBranch}:${pushBranch} --tag"
+    git push ${pushRemote} ${currentBranch}:${pushBranch} --tag
 	fi
 }
 
