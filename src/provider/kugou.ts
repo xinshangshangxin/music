@@ -73,18 +73,18 @@ class Kugou {
     });
 
     return {
-      id: get(result, 'data.hash', ''),
+      id: `${get(result, 'data.hash', '')}`,
       name: get(result, 'data.song_name'),
       url: get(result, 'data.play_url'),
       lrc: get(result, 'data.lyrics'),
       artists: get(result, 'data.authors', []).map((item: any) => {
         return {
-          id: item.author_id,
+          id: `${item.author_id}`,
           name: item.author_name,
         };
       }),
       album: {
-        id: get(result, 'data.album_id'),
+        id: `${get(result, 'data.album_id')}`,
         name: get(result, 'data.album_name'),
         img: get(result, 'data.img'),
       },

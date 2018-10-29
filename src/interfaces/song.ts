@@ -1,18 +1,18 @@
 export interface IArtist {
-  id: number;
+  id: string;
   // eslint-disable-next-line no-restricted-globals
   name: string;
 }
 
 export interface IAlbum {
-  id: number;
+  id: string;
   // eslint-disable-next-line no-restricted-globals
   name: string;
   img: string;
 }
 
 export interface ISong {
-  id: number;
+  id: string;
   // eslint-disable-next-line no-restricted-globals
   name: string;
   url: string;

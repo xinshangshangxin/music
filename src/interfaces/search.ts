@@ -21,7 +21,7 @@ export interface INeteaseSearch extends ISearchQuery {
 }
 
 export interface ISearchSong {
-  id: number;
+  id: string;
   // eslint-disable-next-line no-restricted-globals
   name: string;
   artists: IArtist[];
