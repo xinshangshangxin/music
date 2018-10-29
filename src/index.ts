@@ -2,6 +2,7 @@ import isArray from 'lodash/isArray';
 import maxBy from 'lodash/maxBy';
 import isUndefined from 'lodash/isUndefined';
 import get from 'lodash/get';
+import forEach from 'lodash/forEach';
 
 import { Netease } from './provider/netease';
 import { Kugou } from './provider/kugou';
@@ -59,8 +60,13 @@ async function search(
   let len = get(maxBy(arr, 'length'), 'length', 0);
 
   for (let i = 0; i < len; i += 1) {
-    providers.forEach((name, index) => {
-      result.push({ provider: name, ...arr[index][i] });
+    forEach(providers, (providerName, index) => {
+      if (i >= arr[index].length) {
+        return true;
+      }
+
+      result.push({ provider: providerName, ...arr[index][i] });
+      return true;
     });
   }
 
@@ -80,4 +86,6 @@ async function getSong(id: string, provider: Provider): Promise<ISong> {
   throw new Error(`${provider} not support`);
 }
 
-export { search, getSong };
+export {
+  search, getSong, Provider, ISearchItem, ISong
+};

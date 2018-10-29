@@ -7,7 +7,7 @@
 ```ts
 import { search, getSong } from '@s4p/music-api';
 
-search({ keyword: 'gakki' })
+search({ keyword: 'Aragaki Yui' })
   .then((data) => {
     console.info(JSON.stringify(data));
   })
