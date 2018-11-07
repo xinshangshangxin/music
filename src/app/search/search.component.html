@@ -1,0 +1,17 @@
+<mat-form-field class="search">
+  <input matInput type="text" placeholder="search" [(ngModel)]="searchValue" (keyup)="inputKeyup($event)">
+  <button mat-button *ngIf="searchValue" matSuffix mat-icon-button aria-label="Clear" (click)="clear()">
+    <mat-icon>close</mat-icon>
+  </button>
+</mat-form-field>
+
+<app-controls></app-controls>
+
+<mat-list role="list">
+  <mat-list-item *ngFor="let song of songList" (click)="play(song)">
+    [{{song.provider}}]{{song.name}}
+    <span *ngFor="let artist of song.artists">
+      {{artist.name}}
+    </span>
+  </mat-list-item>
+</mat-list>

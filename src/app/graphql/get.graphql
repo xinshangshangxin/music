@@ -1,0 +1,17 @@
+query get($id: ID!, $provider:String!) {
+  get(id: $id, provider: $provider) {
+    id
+    name
+    url
+    lrc
+    klyric
+    artists {
+      id
+      name
+    }
+    album {
+      name
+      img
+    }
+  }
+}

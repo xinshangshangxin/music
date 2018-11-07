@@ -1,0 +1,13 @@
+query search($keyword: String!, $providers: [String]) {
+  search(keyword: $keyword, providers: $providers) {
+    id
+    name
+    provider
+    artists {
+      name
+    }
+    album {
+      name
+    }
+  }
+}
