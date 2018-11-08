@@ -53,6 +53,8 @@ export interface SongDetail {
 
   lrc: string;
 
+  provider: string;
+
   artists: (ISearchArtist | null)[];
 
   klyric?: string | null;
@@ -114,6 +116,8 @@ export namespace Get {
 
   export type Get = {
     __typename?: 'SongDetail';
+
+    provider: string;
 
     id: string;
 
@@ -207,6 +211,7 @@ export class GetGQL extends Apollo.Query<Get.Query, Get.Variables> {
   document: any = gql`
     query get($id: ID!, $provider: String!) {
       get(id: $id, provider: $provider) {
+        provider
         id
         name
         url

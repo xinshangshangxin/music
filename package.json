@@ -42,7 +42,6 @@
     "@angular/language-service": "^6.1.0",
     "@types/jasmine": "~2.8.8",
     "@types/jasminewd2": "~2.0.3",
-    "@types/node": "~8.9.4",
     "@types/webaudioapi": "^0.0.27",
     "codelyzer": "~4.3.0",
     "graphql-code-generator": "^0.13.0",

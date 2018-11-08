@@ -1,5 +1,6 @@
 query get($id: ID!, $provider:String!) {
   get(id: $id, provider: $provider) {
+    provider
     id
     name
     url

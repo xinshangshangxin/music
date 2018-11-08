@@ -10,7 +10,7 @@ import {
   tap,
 } from 'rxjs/operators';
 
-import { SearchGQL, ISearchItem, GetGQL } from '../graphql/generated';
+import { SearchGQL, ISearchItem, GetGQL, SongDetail } from '../graphql/generated';
 import { PlayerService, IPlayerState } from '../services/player.service';
 import { AudioPeakService } from '../services/audio-peak.service';
 
@@ -24,7 +24,7 @@ export class SearchComponent implements OnInit {
   private providersSubject = new Subject<string[]>();
   public searchValue = '田馥甄';
 
-  public songList: ISearchItem[];
+  public searchList: ISearchItem[];
 
   constructor(
     private searchGQL: SearchGQL,
@@ -34,18 +34,39 @@ export class SearchComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.search();
+    try {
+      this.playerService.songList = JSON.parse(localStorage.getItem('songList')) || [];
+    } catch (e) {
+      this.playerService.songList = [];
+    }
 
-    this.playerService.playPeak({
-      url:
-        'http://fs.w.kugou.com/201811071506/f435dde2d7ca2c165bb639757e591301/G020/M00/14/18/tIYBAFWefNSAWNYZAbwpBMYEjsE47.flac',
+    this.playerService.endedSubject.subscribe(() => {
+      console.info('ended');
+      this.playerService.next();
     });
 
-    // this.playerService.getState().subscribe((data) => {
-    //   console.info(data);
-    // });
+    this.playerService.layoutTouchSubject.subscribe(async () => {
+      await this.playerService.layOutPause();
+    });
 
-    // this.playerService.loadAnalyser();
+    this.playerService.errorSubject.subscribe(() => {
+      let song = this.playerService.getCurrent();
+      this.getGQL
+        .fetch({
+          id: song.id,
+          provider: song.provider,
+        })
+        .pipe(
+          map((result) => {
+            return result.data.get;
+          })
+        )
+        .subscribe((playSong) => {
+          song.url = playSong.url;
+          this.playerService.playCurrent();
+          this.saveSongList();
+        });
+    });
   }
 
   test() {
@@ -98,7 +119,7 @@ export class SearchComponent implements OnInit {
       )
       .subscribe((songList) => {
         console.log('songList: ', songList);
-        this.songList = songList;
+        this.searchList = songList;
       });
   }
 
@@ -111,7 +132,11 @@ export class SearchComponent implements OnInit {
     this.searchSubject.next(this.searchValue);
   }
 
-  play(song) {
+  play() {
+    this.playerService.next();
+  }
+
+  add(song: ISearchItem) {
     this.getGQL
       .fetch({
         id: song.id,
@@ -123,8 +148,14 @@ export class SearchComponent implements OnInit {
         })
       )
       .subscribe((playSong) => {
+        this.playerService.add(playSong);
+        this.saveSongList();
         // this.playerService.addAndPlay(playSong);
-        this.playerService.playPeak(playSong);
+        // this.playerService.playPeak(playSong);
       });
+  }
+
+  saveSongList() {
+    localStorage.setItem('songList', JSON.stringify(this.playerService.songList));
   }
 }

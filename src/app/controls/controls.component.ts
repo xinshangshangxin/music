@@ -13,17 +13,5 @@ export class ControlsComponent implements OnInit {
   public bufferedPercent = 0;
   public currentPercent = 0;
 
-  ngOnInit() {
-    this.playerService
-      .getState()
-      .pipe(
-        map((state) => {
-          this.bufferedPercent = (state.bufferedTime / state.duration) * 100;
-          this.currentPercent = (state.currentTime / state.duration) * 100;
-
-          return state;
-        })
-      )
-      .subscribe(() => {});
-  }
+  ngOnInit() {}
 }

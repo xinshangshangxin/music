@@ -9,7 +9,6 @@ import { HttpClientModule } from '@angular/common/http';
 import { GraphQLModule } from './graphql/graphql.module';
 import { SearchComponent } from './search/search.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { AudioService } from './services/audio.service';
 import { PlayerService } from './services/player.service';
 import { ControlsComponent } from './controls/controls.component';
 import { AudioPeakService } from './services/audio-peak.service';
@@ -26,7 +25,7 @@ import { AudioPeakService } from './services/audio-peak.service';
     HttpClientModule,
     GraphQLModule,
   ],
-  providers: [AudioService, PlayerService, AudioPeakService],
+  providers: [PlayerService, AudioPeakService],
   bootstrap: [AppComponent],
 })
 export class AppModule {}

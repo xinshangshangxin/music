@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
-import { AudioService } from './audio.service';
 import { SongDetail } from '../graphql/generated';
 import { merge, Subject, Observable, fromEvent, Subscription } from 'rxjs';
-import { tap, catchError, takeUntil, switchMap } from 'rxjs/operators';
+import { tap, catchError, takeUntil, switchMap, mergeAll } from 'rxjs/operators';
 import { AudioPeakService } from './audio-peak.service';
+import { MyAudio } from './my-audio';
 
 export interface IPlayerState {
   playing: boolean;
@@ -16,9 +16,10 @@ export interface IPlayerState {
 @Injectable({
   providedIn: 'root',
 })
-export class PlayerService extends AudioService {
-  private list: SongDetail[] = [];
+export class PlayerService {
+  public songList: SongDetail[] = [];
 
+  private isPeak = true;
   private state: IPlayerState = {
     playing: false,
     currentIndex: -1,
@@ -27,49 +28,97 @@ export class PlayerService extends AudioService {
     duration: 0,
   };
 
-  private stateChange: Subject<IPlayerState> = new Subject();
-  private peakTimeSubscription: Subscription;
+  public errorSubject: Subject<Error> = new Subject<Error>();
+  public endedSubject: Subject<void> = new Subject();
+  public layoutTouchSubject: Subject<void> = new Subject();
+
+  private audio: MyAudio;
 
   constructor(private audioPeakService: AudioPeakService) {
-    super();
+    this.audio = new MyAudio();
 
-    this.loadState();
-  }
+    this.audio.on('error', (e) => {
+      this.errorSubject.next(e);
+    });
 
-  getState() {
-    return this.stateChange;
+    this.audio.on('ended', () => {
+      this.audio.pause();
+
+      this.endedSubject.next();
+    });
+
+    this.audio.on('layoutTouch', (e) => {
+      this.layoutTouchSubject.next(e);
+    });
   }
 
   async playPeak(song: SongDetail) {
     console.info('song: ', song);
+    let url = `http://127.0.0.1:12345/api/v1/music/play?id=${song.id}&type=2&name=${
+      song.name
+    }&url=${encodeURIComponent(song.url)}`;
 
-    this.audio.pause();
-    let seconds = await this.audioPeakService.get(song.url, 30);
-    let endTime = seconds + 30;
+    let startTime;
+    let audioBuffer;
+    try {
+      ({ startTime, audioBuffer } = await this.audioPeakService.get(url, 30));
 
-    if (this.peakTimeSubscription) {
-      this.peakTimeSubscription.unsubscribe();
+      let endTime = startTime + 30;
+
+      this.playWithAudioBuffer({
+        audioBuffer,
+        startTime,
+        endTime,
+        song,
+      });
+    } catch (e) {
+      this.audio.emit('error', e);
     }
+  }
 
-    this.peakTimeSubscription = fromEvent(this.audio, 'timeupdate').subscribe(() => {
-      if (this.audio.currentTime >= endTime) {
-        this.audio.pause();
-        this.peakTimeSubscription.unsubscribe();
-      }
-    });
+  async playWithAudioBuffer({
+    audioBuffer,
+    startTime = 0,
+    endTime = Number.MAX_VALUE,
+  }: {
+    audioBuffer: AudioBuffer;
+    startTime: number;
+    endTime: number;
+    song?: SongDetail;
+  }) {
+    fromEvent(this.audio, 'timeupdate')
+      .pipe(
+        takeUntil(fromEvent(this.audio, 'ended')),
+        takeUntil(fromEvent(this.audio, 'error'))
+      )
+      .subscribe(async () => {
+        if (this.audio.currentTime >= endTime - 5) {
+          // 片段结尾
+          this.audio.emit('layoutTouch');
+        } else if (this.audio.currentTime >= this.audio.duration - 5) {
+          // 整首歌结尾
+          this.audio.emit('layoutTouch');
+        }
+      });
 
-    this.audio.src = song.url;
-    this.seekTo(seconds);
-    this.audio.play();
+    this.audio.layInPlayWithBuffer(audioBuffer, startTime);
+  }
+
+  async layOutPause() {
+    return this.audio.layOutPause();
   }
 
   addAndPlay(song: SongDetail) {
-    this.list.push(song);
-    this.playAt(this.list.length - 1);
+    this.songList.push(song);
+    this.playAt(this.songList.length - 1);
+  }
+
+  add(song: SongDetail) {
+    this.songList.push(song);
   }
 
   playAt(index: number) {
-    if (index < 0 || index >= this.list.length) {
+    if (index < 0 || index >= this.songList.length) {
       throw new Error('over length');
     }
 
@@ -78,75 +127,37 @@ export class PlayerService extends AudioService {
   }
 
   next() {
-    if (!this.list.length) {
+    if (!this.songList.length) {
       return null;
     }
 
-    this.state.currentIndex = (this.state.currentIndex + 1) % this.list.length;
+    this.state.currentIndex = (this.state.currentIndex + 1) % this.songList.length;
     this.playCurrent();
+  }
+
+  getCurrent() {
+    return this.songList[this.state.currentIndex];
   }
 
   previous() {
-    if (!this.list.length) {
+    if (!this.songList.length) {
       return null;
     }
 
-    this.state.currentIndex = (this.state.currentIndex - 1 + this.list.length) % this.list.length;
+    this.state.currentIndex =
+      (this.state.currentIndex - 1 + this.songList.length) % this.songList.length;
     this.playCurrent();
   }
 
-  private playCurrent() {
-    let song = this.list[this.state.currentIndex];
+  playCurrent() {
+    let song = this.songList[this.state.currentIndex];
 
     if (!song) {
       return null;
     }
 
-    this.play(song.url);
-  }
-
-  private loadState() {
-    let arr = ['canplay', 'playing', 'pause', 'progress', 'timeupdate', 'error'];
-
-    merge(
-      ...arr.map((name) => {
-        return fromEvent(this.audio, name);
-      })
-    )
-      .pipe(
-        tap((event) => {
-          switch (event.type) {
-            case 'canplay':
-              this.state.duration = this.audio.duration;
-              this.state.playing = false;
-              break;
-            case 'playing':
-              this.state.playing = true;
-              break;
-            case 'pause':
-              this.state.playing = false;
-              break;
-            case 'progress':
-              this.state.bufferedTime = this.audio.buffered.end(0);
-              break;
-            case 'timeupdate':
-              this.state.currentTime = this.audio.currentTime;
-              break;
-
-            case 'error':
-              this.state.playing = false;
-              this.state.currentTime = 0;
-              this.state.duration = 0;
-              break;
-          }
-        }),
-        catchError((e, caught) => {
-          console.warn(e);
-          return caught;
-        })
-      )
-      .subscribe(() => {
-        this.stateChange.next(this.state);
-      });
+    if (this.isPeak) {
+      this.playPeak(song);
+    }
   }
 }

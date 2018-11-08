@@ -4,7 +4,7 @@ import { Injectable } from '@angular/core';
 export class AudioPeakService {
   private audioCtx: AudioContext;
   constructor() {
-    this.audioCtx = new window.AudioContext();
+    this.audioCtx = new AudioContext();
   }
 
   private accumulate(arr) {
@@ -62,7 +62,7 @@ export class AudioPeakService {
     return peaks;
   }
 
-  async get(audioUrl: string, seconds: number) {
+  async get(audioUrl: string, cutSeconds: number) {
     let response = await fetch(audioUrl);
     let audioData = await response.arrayBuffer();
     let audioBuffer = await this.audioCtx.decodeAudioData(audioData);
@@ -70,7 +70,10 @@ export class AudioPeakService {
 
     let peaks = this.getPeaks(parseInt(`${audioBuffer.duration + 1}`, 10), channelData);
 
-    let maxIndex = this.findMaxIndex(peaks, seconds);
-    return maxIndex;
+    let startTime = this.findMaxIndex(peaks, cutSeconds);
+    return {
+      startTime,
+      audioBuffer,
+    };
   }
 }

@@ -5,10 +5,12 @@
   </button>
 </mat-form-field>
 
-<app-controls></app-controls>
+<!-- <app-controls></app-controls> -->
+<button mat-button (click)="play()">播放</button>
+
 
 <mat-list role="list">
-  <mat-list-item *ngFor="let song of songList" (click)="play(song)">
+  <mat-list-item *ngFor="let song of searchList" (click)="add(song)">
     [{{song.provider}}]{{song.name}}
     <span *ngFor="let artist of song.artists">
       {{artist.name}}
