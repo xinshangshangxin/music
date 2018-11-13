@@ -8,7 +8,7 @@ import { Netease } from './provider/netease';
 import { Kugou } from './provider/kugou';
 import { Xiami } from './provider/xiami';
 import { ISearchQuery, ISearchSong, ISearchItem } from './interfaces/search';
-import { ISong } from './interfaces/song';
+import { ISong, IBitRate } from './interfaces/song';
 
 enum Provider {
   kugou = 'kugou',
@@ -73,12 +73,12 @@ async function search(
   return result;
 }
 
-async function getSong(id: string, provider: Provider): Promise<ISong> {
+async function getSong(id: string, provider: Provider, br?: IBitRate): Promise<ISong> {
   if (provider === Provider.kugou) {
-    return kugouMusic.getSong(id);
+    return kugouMusic.getSong(id, br);
   }
   if (provider === Provider.netease) {
-    return neteaseMusic.getSong(id);
+    return neteaseMusic.getSong(id, br);
   }
   if (provider === Provider.xiami) {
     return xiamiMusic.getSong(id);
@@ -87,5 +87,5 @@ async function getSong(id: string, provider: Provider): Promise<ISong> {
 }
 
 export {
-  search, getSong, Provider, ISearchItem, ISong
+  search, getSong, Provider, ISearchItem, ISong, IBitRate
 };

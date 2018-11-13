@@ -13,7 +13,7 @@ search({ keyword: 'Aragaki Yui' })
   })
   .catch(console.warn);
 
-getSong('f3205f0ff2f4891a2c344086b74b6d6e', 'kugou')
+getSong('f3205f0ff2f4891a2c344086b74b6d6e', 'kugou', '128')
   .then((data) => {
     console.info(JSON.stringify(data));
   })

@@ -6,11 +6,18 @@ import neteaseSongDetail from 'NeteaseCloudMusicApi/module/song_detail';
 import neteaseSongUrl from 'NeteaseCloudMusicApi/module/song_url';
 import neteaseLyric from 'NeteaseCloudMusicApi/module/lyric';
 
-import { ISong } from '../interfaces/song';
+import { ISong, IBitRate } from '../interfaces/song';
 import { INeteaseSearch, ISearchSong } from '../interfaces/search';
 
 export class Netease {
   private request: any;
+
+  private bitRateMap = {
+    [IBitRate.mid]: 128000,
+    [IBitRate.high]: 320000,
+    [IBitRate.sq]: 440000,
+    [IBitRate.hq]: 880000,
+  };
 
   constructor() {
     this.request = neteaseRequest;
@@ -23,10 +30,10 @@ export class Netease {
     return this.searchList({ keyword: query as string });
   }
 
-  async getSong(id: string): Promise<ISong> {
+  async getSong(id: string, br?: IBitRate): Promise<ISong> {
     let [detailResult, songUrlResult, lyricResult] = await Promise.all([
       this.detail(id),
-      this.songUrl(id),
+      this.songUrl(id, br),
       this.lyric(id),
     ]);
 
@@ -94,10 +101,10 @@ export class Netease {
     };
   }
 
-  private async songUrl(id: string) {
+  private async songUrl(id: string, br: IBitRate = IBitRate.mid) {
     let url;
     try {
-      let result = await neteaseSongUrl({ id, cookie: {} }, this.request);
+      let result = await neteaseSongUrl({ id, cookie: {}, br: this.bitRateMap[br] }, this.request);
       url = await get(result, 'body.data[0].url');
     } catch (e) {
       url = `http://music.163.com/song/media/outer/url?id=${id}.mp3`;

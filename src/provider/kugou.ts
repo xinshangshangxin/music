@@ -1,12 +1,18 @@
 import rp from 'request-promise';
-import isPlainObject from 'lodash/isPlainObject';
 import get from 'lodash/get';
 
 import { ISearchQuery, ISearchSong } from '../interfaces/search';
-import { ISong } from '../interfaces/song';
+import { ISong, IBitRate } from '../interfaces/song';
 
 class Kugou {
   private request: typeof rp;
+
+  private bitRateMap = {
+    [IBitRate.mid]: 128,
+    [IBitRate.high]: 320,
+    [IBitRate.sq]: 'sq',
+    [IBitRate.hq]: 'hq',
+  };
 
   constructor() {
     this.request = rp.defaults({
@@ -15,14 +21,20 @@ class Kugou {
   }
 
   async search(query: string | ISearchQuery): Promise<ISearchSong[]> {
-    if (isPlainObject(query)) {
-      return this.searchList(query as ISearchQuery);
+    if (typeof query === 'string') {
+      return this.searchList({ keyword: query });
     }
-    return this.searchList({ keyword: query as string });
+    if (typeof query === 'object') {
+      if (!query.keyword) {
+        throw new Error('query need keyword');
+      }
+      return this.searchList(query);
+    }
+    throw new Error('query not support');
   }
 
-  async getSong(id: string): Promise<ISong> {
-    return this.getDetail(id);
+  async getSong(id: string, br?: IBitRate): Promise<ISong> {
+    return this.getDetail(id, br);
   }
 
   private async searchList({
@@ -44,7 +56,7 @@ class Kugou {
 
     return songs.map((song: any) => {
       return {
-        id: song.sqhash || song['320hash'] || song.hash,
+        id: song.hash || song['320hash'] || song.sqhash,
         name: song.songname,
         artists: get(song, 'singername', '')
           .split('、')
@@ -63,12 +75,27 @@ class Kugou {
     });
   }
 
-  private async getDetail(id: string): Promise<ISong> {
+  private async getDetail(id: string, br: IBitRate = IBitRate.mid): Promise<ISong> {
+    let hash = id;
+
+    let idInfo = await this.request({
+      url: 'http://m.kugou.com/app/i/getSongInfo.php',
+      qs: {
+        cmd: 'playInfo',
+        hash: id,
+      },
+    });
+
+    let brHash = get(idInfo, `extra.${this.bitRateMap[br]}hash`);
+    if (brHash) {
+      hash = brHash;
+    }
+
     let result = await this.request({
       url: 'http://www.kugou.com/yy/index.php',
       qs: {
         r: 'play/getdata',
-        hash: id,
+        hash,
       },
     });
 

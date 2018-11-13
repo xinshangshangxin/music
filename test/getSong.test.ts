@@ -4,7 +4,8 @@ import { getSong, Provider } from '../dist/index';
 
 const testCases = [
   {
-    id: 'a781023e25c4d09eabcb307be8bd12e8',
+    id: 'A781023E25C4D09EABCB307BE8BD12E8',
+    hash128: 'F3205F0FF2F4891A2C344086B74B6D6E',
     provider: Provider.kugou,
   },
   {
@@ -19,7 +20,7 @@ const testCases = [
 
 test('getSong', async (t) => {
   await Promise.all(
-    testCases.map(async ({ id, provider }) => {
+    testCases.map(async ({ id, provider, hash128 }) => {
       let data = await getSong(id, provider);
       console.info('provider: ', provider);
       console.info(JSON.stringify(data));
@@ -28,7 +29,12 @@ test('getSong', async (t) => {
         id: resultId, name, url, lrc,
       } = data;
 
-      t.is(resultId, id);
+      if (hash128) {
+        t.is(resultId, hash128);
+      } else {
+        t.is(resultId, id);
+      }
+
       t.true(!!name);
       t.true(!!url);
       t.true(!!lrc);
