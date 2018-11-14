@@ -1,13 +1,16 @@
 import get from 'lodash/get';
 import isPlainObject from 'lodash/isPlainObject';
-import neteaseRequest from 'NeteaseCloudMusicApi/util/request';
+import neteaseLyric from 'NeteaseCloudMusicApi/module/lyric';
 import neteaseSearch from 'NeteaseCloudMusicApi/module/search';
 import neteaseSongDetail from 'NeteaseCloudMusicApi/module/song_detail';
 import neteaseSongUrl from 'NeteaseCloudMusicApi/module/song_url';
-import neteaseLyric from 'NeteaseCloudMusicApi/module/lyric';
+import neteaseRequest from 'NeteaseCloudMusicApi/util/request';
+import request from 'request';
 
-import { ISong, IBitRate } from '../interfaces/song';
 import { INeteaseSearch, ISearchSong } from '../interfaces/search';
+import { IBitRate, ISong } from '../interfaces/song';
+
+request.debug = false;
 
 export class Netease {
   private request: any;
