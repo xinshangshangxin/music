@@ -5,7 +5,7 @@ import { search, Provider } from '../dist/index';
 const searchResultMap = {
   kugou: {
     provider: 'kugou',
-    id: 'a781023e25c4d09eabcb307be8bd12e8',
+    id: 'f3205f0ff2f4891a2c344086b74b6d6e',
     name: '小さな恋のうた',
     artists: [
       {
