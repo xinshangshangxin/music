@@ -5,8 +5,15 @@ import { getSong, Provider } from '../dist/index';
 const testCases = [
   {
     id: 'A781023E25C4D09EABCB307BE8BD12E8',
-    hash128: 'F3205F0FF2F4891A2C344086B74B6D6E',
     provider: Provider.kugou,
+    extra: {
+      '320filesize': 12980894,
+      sqfilesize: 40487869,
+      sqhash: 'A781023E25C4D09EABCB307BE8BD12E8',
+      '128hash': 'F3205F0FF2F4891A2C344086B74B6D6E',
+      '320hash': '2CA89833D8CF56C154A0E7C183C887F2',
+      '128filesize': 5192434,
+    },
   },
   {
     id: '29829683',
@@ -20,24 +27,23 @@ const testCases = [
 
 test('getSong', async (t) => {
   await Promise.all(
-    testCases.map(async ({ id, provider, hash128 }) => {
+    testCases.map(async ({ id, provider, extra }) => {
       let data = await getSong(id, provider);
       console.info('provider: ', provider);
       console.info(JSON.stringify(data));
 
       let {
-        id: resultId, name, url, lrc,
+        id: resultId, name, url, lrc, extra: realExtra,
       } = data;
 
-      if (hash128) {
-        t.is(resultId, hash128);
-      } else {
-        t.is(resultId, id);
-      }
-
+      t.is(resultId, id);
       t.true(!!name);
       t.true(!!url);
       t.true(!!lrc);
+
+      if (extra) {
+        t.deepEqual(realExtra, extra);
+      }
     })
   );
 });

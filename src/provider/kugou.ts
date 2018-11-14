@@ -86,7 +86,8 @@ class Kugou {
       },
     });
 
-    let brHash = get(idInfo, `extra.${this.bitRateMap[br]}hash`);
+    let extra = get(idInfo, 'extra', {});
+    let brHash = get(extra, `${this.bitRateMap[br]}hash`);
     if (brHash) {
       hash = brHash;
     }
@@ -100,7 +101,7 @@ class Kugou {
     });
 
     return {
-      id: `${get(result, 'data.hash', '')}`,
+      id,
       name: get(result, 'data.song_name'),
       url: get(result, 'data.play_url'),
       lrc: get(result, 'data.lyrics'),
@@ -115,6 +116,7 @@ class Kugou {
         name: get(result, 'data.album_name'),
         img: get(result, 'data.img'),
       },
+      extra,
     };
   }
 }
