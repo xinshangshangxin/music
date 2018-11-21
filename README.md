@@ -2,20 +2,14 @@
 
 ## how to use
 
+**see [test](https://github.com/xinshangshangxin/music/tree/api/test) folder to learn more**
+
 `npm install @s4p/music-api`
 
 ```ts
-import { search, getSong } from '@s4p/music-api';
+declare function search(query: string | ISearchQuery, provider?: Provider | Provider[]): Promise<ISearchItem[]>;
 
-search({ keyword: 'Aragaki Yui' })
-  .then((data) => {
-    console.info(JSON.stringify(data));
-  })
-  .catch(console.warn);
+declare function getSong(id: string, provider: Provider, br?: BitRate): Promise<ISong>;
 
-getSong('f3205f0ff2f4891a2c344086b74b6d6e', 'kugou', '128')
-  .then((data) => {
-    console.info(JSON.stringify(data));
-  })
-  .catch(console.warn);
+declare function rank(provider: Provider, rankType: RankType, limit?: number, skip?: number): Promise<ISearchItem[]>;
 ```
