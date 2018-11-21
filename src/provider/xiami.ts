@@ -2,9 +2,9 @@ import rp from 'request-promise';
 import isPlainObject from 'lodash/isPlainObject';
 import get from 'lodash/get';
 
-import { ISearchQuery, ISearchSong } from '../interfaces/search';
-import { ISong } from '../interfaces/song';
-import { RankType } from '../interfaces/rank';
+import { ISearchQuery, ISearchSong } from '../common/search';
+import { ISong } from '../common/song';
+import { RankType } from '../common/rank';
 
 class Xiami {
   private request: typeof rp;

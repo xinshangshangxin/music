@@ -55,7 +55,6 @@ const searchResultMap = {
 
 test('search "Aragaki Yui" limit 5', async (t) => {
   let arr = await search({ keyword: 'Aragaki Yui', limit: 5 });
-  console.info(JSON.stringify(arr));
 
   t.is(arr.length, 3 * 5);
 
@@ -84,7 +83,6 @@ test('search "Aragaki Yui" with kugou', async (t) => {
 
 test('search "Aragaki Yui" with netease', async (t) => {
   let arr = await search({ keyword: 'Aragaki Yui', limit: 1 }, Provider.netease);
-  console.info(JSON.stringify(arr));
 
   t.is(arr.length, 1);
 
@@ -93,7 +91,6 @@ test('search "Aragaki Yui" with netease', async (t) => {
 
 test('search "Aragaki Yui" with xiami', async (t) => {
   let arr = await search({ keyword: 'Aragaki Yui', limit: 1 }, Provider.xiami);
-  console.info(JSON.stringify(arr));
 
   t.is(arr.length, 1);
 

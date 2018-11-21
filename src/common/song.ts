@@ -1,8 +1,8 @@
-export enum IBitRate {
-  mid = 128,
-  high = 320,
-  sq = 440,
-  hq = 880,
+export enum BitRate {
+  mid = 'mid',
+  high = 'high',
+  sq = 'sq',
+  hq = 'hq',
 }
 
 export interface IArtist {

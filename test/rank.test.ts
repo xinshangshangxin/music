@@ -1,7 +1,7 @@
 import test from 'ava';
 
 import { rank, Provider } from '../dist/index';
-import { RankType } from '../dist/interfaces/rank';
+import { RankType } from '../dist/common/rank';
 
 test('new rank kugou', async (t) => {
   try {

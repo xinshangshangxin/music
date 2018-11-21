@@ -1,18 +1,18 @@
-import rp from 'request-promise';
 import get from 'lodash/get';
+import rp from 'request-promise';
 
-import { ISearchQuery, ISearchSong } from '../interfaces/search';
-import { ISong, IBitRate } from '../interfaces/song';
-import { RankType } from '../interfaces/rank';
+import { RankType } from '../common/rank';
+import { ISearchQuery, ISearchSong } from '../common/search';
+import { BitRate, ISong } from '../common/song';
 
 class Kugou {
   private request: typeof rp;
 
   private bitRateMap = {
-    [IBitRate.mid]: 128,
-    [IBitRate.high]: 320,
-    [IBitRate.sq]: 'sq',
-    [IBitRate.hq]: 'hq',
+    [BitRate.mid]: 128,
+    [BitRate.high]: 320,
+    [BitRate.sq]: 'sq',
+    [BitRate.hq]: 'hq',
   };
 
   constructor() {
@@ -34,7 +34,7 @@ class Kugou {
     throw new Error('query not support');
   }
 
-  async getSong(id: string, br?: IBitRate): Promise<ISong> {
+  async getSong(id: string, br?: BitRate): Promise<ISong> {
     return this.getDetail(id, br);
   }
 
@@ -139,7 +139,7 @@ class Kugou {
     });
   }
 
-  private async getDetail(id: string, br: IBitRate = IBitRate.mid): Promise<ISong> {
+  private async getDetail(id: string, br: BitRate = BitRate.mid): Promise<ISong> {
     let hash = id;
 
     let idInfo = await this.request({

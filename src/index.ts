@@ -1,21 +1,16 @@
-import isArray from 'lodash/isArray';
-import maxBy from 'lodash/maxBy';
-import isUndefined from 'lodash/isUndefined';
-import get from 'lodash/get';
 import forEach from 'lodash/forEach';
+import get from 'lodash/get';
+import isArray from 'lodash/isArray';
+import isUndefined from 'lodash/isUndefined';
+import maxBy from 'lodash/maxBy';
 
-import { Netease } from './provider/netease';
+import { Provider } from './common/provider';
+import { RankType } from './common/rank';
+import { ISearchItem, ISearchQuery, ISearchSong } from './common/search';
+import { BitRate, ISong } from './common/song';
 import { Kugou } from './provider/kugou';
+import { Netease } from './provider/netease';
 import { Xiami } from './provider/xiami';
-import { ISearchQuery, ISearchSong, ISearchItem } from './interfaces/search';
-import { ISong, IBitRate } from './interfaces/song';
-import { RankType } from './interfaces/rank';
-
-enum Provider {
-  kugou = 'kugou',
-  netease = 'netease',
-  xiami = 'xiami',
-}
 
 const kugouMusic = new Kugou();
 const neteaseMusic = new Netease();
@@ -74,7 +69,7 @@ async function search(
   return result;
 }
 
-async function getSong(id: string, provider: Provider, br?: IBitRate): Promise<ISong> {
+async function getSong(id: string, provider: Provider, br?: BitRate): Promise<ISong> {
   if (provider === Provider.kugou) {
     return kugouMusic.getSong(id, br);
   }
@@ -101,5 +96,5 @@ async function rank(provider: Provider, rankType: RankType, limit = 100, skip = 
 }
 
 export {
-  search, rank, getSong, Provider, ISearchItem, ISong, IBitRate
+  search, rank, getSong, ISearchItem, ISong, Provider, BitRate, RankType
 };

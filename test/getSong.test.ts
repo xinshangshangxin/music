@@ -1,6 +1,6 @@
 import test from 'ava';
 
-import { getSong, Provider } from '../dist/index';
+import { getSong, Provider, BitRate } from '../dist/index';
 
 const testCases = [
   {
@@ -28,9 +28,7 @@ const testCases = [
 test('getSong', async (t) => {
   await Promise.all(
     testCases.map(async ({ id, provider, extra }) => {
-      let data = await getSong(id, provider);
-      console.info('provider: ', provider);
-      console.info(JSON.stringify(data));
+      let data = await getSong(id, provider, BitRate.mid);
 
       let {
         id: resultId, name, url, lrc, extra: realExtra,
