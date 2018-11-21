@@ -64,6 +64,12 @@ class Kugou {
         },
       });
 
+      let fr = get(result, 'fr');
+
+      if (fr === -2) {
+        throw new Error('Foreign IP not support');
+      }
+
       let item = get(result, 'songs', {});
       if (!item.list || !item.list.length) {
         break;

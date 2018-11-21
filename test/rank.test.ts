@@ -4,13 +4,21 @@ import { rank, Provider } from '../dist/index';
 import { RankType } from '../dist/interfaces/rank';
 
 test('new rank kugou', async (t) => {
-  let songs = await rank(Provider.kugou, RankType.new, 3);
-  t.true(songs.length === 3);
+  try {
+    let songs = await rank(Provider.kugou, RankType.new, 3);
+    t.true(songs.length === 3);
+  } catch (e) {
+    t.regex(e.message, /Foreign IP/i);
+  }
 });
 
 test('hot rank kugou', async (t) => {
-  let songs = await rank(Provider.kugou, RankType.hot, 11);
-  t.true(songs.length === 11);
+  try {
+    let songs = await rank(Provider.kugou, RankType.hot, 11);
+    t.true(songs.length === 11);
+  } catch (e) {
+    t.regex(e.message, /Foreign IP/i);
+  }
 });
 
 test('rank netease', async (t) => {
@@ -27,6 +35,6 @@ test('new rank xiami', async (t) => {
 });
 
 test('hot rank xiami', async (t) => {
-  let songs = await rank(Provider.kugou, RankType.hot, 11);
+  let songs = await rank(Provider.xiami, RankType.hot, 11);
   t.true(songs.length === 11);
 });
