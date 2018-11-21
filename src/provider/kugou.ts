@@ -1,8 +1,9 @@
 import get from 'lodash/get';
 import rp from 'request-promise';
 
+import { Provider } from '../common/provider';
 import { RankType } from '../common/rank';
-import { ISearchQuery, ISearchSong } from '../common/search';
+import { ISearchItem, ISearchQuery, ISearchSong } from '../common/search';
 import { BitRate, ISong } from '../common/song';
 
 class Kugou {
@@ -48,10 +49,10 @@ class Kugou {
     return this.concatRankList('6666', limit, skip);
   }
 
-  private async concatRankList(rankId: string, limit = 100, skip = 0) {
+  private async concatRankList(rankId: string, limit = 100, skip = 0): Promise<ISearchItem[]> {
     let page = 1;
     let total = limit + skip;
-    let arr: ISearchSong[] = [];
+    let arr: ISearchItem[] = [];
 
     while (arr.length < total) {
       // eslint-disable-next-line no-await-in-loop
@@ -82,6 +83,7 @@ class Kugou {
 
         let [singer, songName] = filename.split('-');
         return {
+          provider: Provider.kugou,
           id: song.hash || song['320hash'] || song.sqhash,
           name: `${songName || ''}`.trim(),
           artists: [

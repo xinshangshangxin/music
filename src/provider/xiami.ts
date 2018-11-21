@@ -2,9 +2,10 @@ import rp from 'request-promise';
 import isPlainObject from 'lodash/isPlainObject';
 import get from 'lodash/get';
 
-import { ISearchQuery, ISearchSong } from '../common/search';
+import { ISearchQuery, ISearchSong, ISearchItem } from '../common/search';
 import { ISong } from '../common/song';
 import { RankType } from '../common/rank';
+import { Provider } from '../common/provider';
 
 class Xiami {
   private request: typeof rp;
@@ -70,7 +71,7 @@ class Xiami {
     return this.getDetail(id);
   }
 
-  async rank(type: RankType = RankType.new, limit = 100, skip = 0) {
+  async rank(type: RankType = RankType.new, limit = 100, skip = 0): Promise<ISearchItem[]> {
     let qs = {
       v: '2.0',
       app_key: '1',
@@ -98,6 +99,7 @@ class Xiami {
 
     return songs.map((song: any) => {
       return {
+        provider: Provider.xiami,
         id: `${song.song_id}`,
         name: song.song_name,
         artists: [

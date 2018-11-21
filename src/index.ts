@@ -82,7 +82,12 @@ async function getSong(id: string, provider: Provider, br?: BitRate): Promise<IS
   throw new Error(`${provider} not support`);
 }
 
-async function rank(provider: Provider, rankType: RankType, limit = 100, skip = 0) {
+async function rank(
+  provider: Provider,
+  rankType: RankType,
+  limit = 100,
+  skip = 0
+): Promise<ISearchItem[]> {
   if (provider === Provider.kugou) {
     return kugouMusic.rank(rankType, limit, skip);
   }
