@@ -9,6 +9,7 @@ import { Kugou } from './provider/kugou';
 import { Xiami } from './provider/xiami';
 import { ISearchQuery, ISearchSong, ISearchItem } from './interfaces/search';
 import { ISong, IBitRate } from './interfaces/song';
+import { RankType } from './interfaces/rank';
 
 enum Provider {
   kugou = 'kugou',
@@ -86,6 +87,19 @@ async function getSong(id: string, provider: Provider, br?: IBitRate): Promise<I
   throw new Error(`${provider} not support`);
 }
 
+async function rank(provider: Provider, rankType: RankType, limit = 100, skip = 0) {
+  if (provider === Provider.kugou) {
+    return kugouMusic.rank(rankType, limit, skip);
+  }
+  if (provider === Provider.netease) {
+    throw new Error('netease is not support now, planing');
+  }
+  if (provider === Provider.xiami) {
+    return xiamiMusic.rank(rankType, limit, skip);
+  }
+  throw new Error(`${provider} not support`);
+}
+
 export {
-  search, getSong, Provider, ISearchItem, ISong, IBitRate
+  search, rank, getSong, Provider, ISearchItem, ISong, IBitRate
 };

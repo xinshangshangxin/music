@@ -5,12 +5,11 @@ import neteaseSearch from 'NeteaseCloudMusicApi/module/search';
 import neteaseSongDetail from 'NeteaseCloudMusicApi/module/song_detail';
 import neteaseSongUrl from 'NeteaseCloudMusicApi/module/song_url';
 import neteaseRequest from 'NeteaseCloudMusicApi/util/request';
-import request from 'request';
+import neteasePlayList from 'NeteaseCloudMusicApi/module/playlist_detail';
 
 import { INeteaseSearch, ISearchSong } from '../interfaces/search';
 import { IBitRate, ISong } from '../interfaces/song';
-
-request.debug = false;
+import { RankType } from '../interfaces/rank';
 
 export class Netease {
   private request: any;
@@ -41,6 +40,22 @@ export class Netease {
     ]);
 
     return { ...detailResult, ...songUrlResult, ...lyricResult };
+  }
+
+  async rank(type: RankType = RankType.new) {
+    let id;
+
+    if (type === RankType.hot) {
+      // 云音乐热歌榜
+      id = '3778678';
+    } else {
+      // 云音乐新歌榜
+      id = '3779629';
+    }
+
+    let result = await neteasePlayList({ id, s: 0 }, this.request);
+
+    return result;
   }
 
   private async searchList({

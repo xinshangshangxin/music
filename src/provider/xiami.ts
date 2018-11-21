@@ -4,6 +4,7 @@ import get from 'lodash/get';
 
 import { ISearchQuery, ISearchSong } from '../interfaces/search';
 import { ISong } from '../interfaces/song';
+import { RankType } from '../interfaces/rank';
 
 class Xiami {
   private request: typeof rp;
@@ -67,6 +68,46 @@ class Xiami {
 
   async getSong(id: string): Promise<ISong> {
     return this.getDetail(id);
+  }
+
+  async rank(type: RankType = RankType.new, limit = 100, skip = 0) {
+    let qs = {
+      v: '2.0',
+      app_key: '1',
+      page: parseInt(`${skip / limit}`, 10) + 1,
+      limit,
+    };
+
+    if (type === RankType.hot) {
+      Object.assign(qs, {
+        id: '101',
+        r: 'rank/song-list',
+      });
+    } else {
+      Object.assign(qs, {
+        r: 'song/new',
+      });
+    }
+
+    let result = await this.request({
+      url: 'https://api.xiami.com/web',
+      qs,
+    });
+
+    let songs = get(result, 'data', []);
+
+    return songs.map((song: any) => {
+      return {
+        id: `${song.song_id}`,
+        name: song.song_name,
+        artists: [
+          {
+            name: song.singers,
+          },
+        ],
+        needPay: song.need_pay_flag !== 0,
+      };
+    });
   }
 
   private async searchList({

@@ -3,6 +3,7 @@ import get from 'lodash/get';
 
 import { ISearchQuery, ISearchSong } from '../interfaces/search';
 import { ISong, IBitRate } from '../interfaces/song';
+import { RankType } from '../interfaces/rank';
 
 class Kugou {
   private request: typeof rp;
@@ -35,6 +36,63 @@ class Kugou {
 
   async getSong(id: string, br?: IBitRate): Promise<ISong> {
     return this.getDetail(id, br);
+  }
+
+  async rank(type: RankType = RankType.new, limit = 100, skip = 0) {
+    if (type === RankType.hot) {
+      // 酷狗TOP500
+      return this.concatRankList('8888', limit, skip);
+    }
+
+    // 酷狗飙升榜
+    return this.concatRankList('6666', limit, skip);
+  }
+
+  private async concatRankList(rankId: string, limit = 100, skip = 0) {
+    let page = 1;
+    let total = limit + skip;
+    let arr: ISearchSong[] = [];
+
+    while (arr.length < total) {
+      // eslint-disable-next-line no-await-in-loop
+      let result = await this.request({
+        url: 'http://m.kugou.com/rank/info/',
+        qs: {
+          rankid: rankId,
+          json: true,
+          page,
+        },
+      });
+
+      let item = get(result, 'songs', {});
+      if (!item.list || !item.list.length) {
+        break;
+      }
+
+      let list = get(item, 'list', []);
+
+      let songs = list.map((song: any) => {
+        let filename = song.filename || '';
+
+        let [singer, songName] = filename.split('-');
+        return {
+          id: song.hash || song['320hash'] || song.sqhash,
+          name: `${songName || ''}`.trim(),
+          artists: [
+            {
+              name: `${singer || ''}`.trim(),
+            },
+          ],
+          mvId: song.mvhash,
+        };
+      });
+
+      arr.push(...songs);
+
+      page += 1;
+    }
+
+    return arr.slice(skip, total);
   }
 
   private async searchList({

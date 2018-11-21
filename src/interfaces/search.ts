@@ -36,6 +36,7 @@ export interface ISearchSong {
   // eslint-disable-next-line no-restricted-globals
   name: string;
   artists: ISearchArtist[];
+  needPay?: boolean;
   album?: ISearchAlbum;
   duration?: number;
   mvId?: string;

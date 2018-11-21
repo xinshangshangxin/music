@@ -718,8 +718,8 @@
   resolved "https://registry.npmjs.org/@types/tough-cookie/-/tough-cookie-2.3.3.tgz#7f226d67d654ec9070e755f46daebf014628e9d9"
 
 NeteaseCloudMusicApi@Binaryify/NeteaseCloudMusicApi:
-  version "3.0.1"
-  resolved "https://codeload.github.com/Binaryify/NeteaseCloudMusicApi/tar.gz/7103f0a626ca97d49ef4f0fdbcc98cad315b72fd"
+  version "3.0.4"
+  resolved "https://codeload.github.com/Binaryify/NeteaseCloudMusicApi/tar.gz/f3f6b1acbfd1a8cd48ada3c5d61bb4168b835da0"
   dependencies:
     apicache "^1.2.1"
     express "^4.16.3"
