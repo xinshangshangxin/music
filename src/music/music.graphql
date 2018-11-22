@@ -1,0 +1,58 @@
+enum Provider {
+  kugou
+  netease
+  xiami
+}
+
+enum BitRate {
+  mid
+  high
+  sq
+  hq
+}
+
+enum RankType {
+  new
+  hot
+}
+
+input ISearchQuery {
+  keyword: String!
+  skip: Int
+  limit: Int
+}
+
+type ISearchArtist {
+  id: String
+  name: String!
+}
+type ISearchAlbum {
+  id: String
+  name: String
+  img: String
+}
+
+type ISearchItem {
+  provider: Provider!
+  id: String!
+  name: String!
+  artists: [ISearchArtist]!
+  album: ISearchAlbum
+}
+
+type SongDetail {
+  id: String!
+  name: String!
+  url: String!
+  lrc: String!
+  provider: Provider!
+  artists: [ISearchArtist]!
+  klyric: String
+  album: ISearchAlbum
+}
+
+type Query {
+  search(keyword: String!, providers: [Provider]): [ISearchItem]
+  get(id: ID!, provider: Provider!, br: BitRate): SongDetail
+  rank(provider: Provider!, rankType: RankType): [ISearchItem]
+}
