@@ -42,5 +42,6 @@ Network Trash Folder
 Temporary Items
 .apdisk
 
+.vscode/
 dist/
 node_modules/

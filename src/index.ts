@@ -5,8 +5,36 @@ import { Schema } from 'mongolass/lib/schema';
 
 import { getClient } from './clients';
 import { Model } from './model';
+import { IIndexOptions, IFindOptions } from './clients/Collection';
 
 const debug = debugPkg('Nmdb');
+
+interface IModel {
+  countDocuments(query: object): Promise<number>;
+
+  createIndex(fieldOrSpec: string | object, options?: IIndexOptions): Promise<any>;
+
+  deleteMany(filter: object): Promise<any>;
+
+  deleteOne(filter: object): Promise<any>;
+
+  dropIndex(indexName: string): Promise<any>;
+
+  // eslint-disable-next-line no-restricted-globals
+  find(query: object, options?: IFindOptions): Promise<any[]>;
+
+  findOne(query: object, options?: IFindOptions): Promise<any | null>;
+
+  insertMany(docs: object[]): Promise<any>;
+
+  insertOne(doc: object): Promise<any>;
+
+  remove(selector: object, options?: { single: boolean }): Promise<object>;
+
+  updateMany(filter: object, document: object, options?: { single: boolean }): Promise<any>;
+
+  updateOne(filter: object, document: object, options?: { single: boolean }): Promise<any>;
+}
 
 export default class Nmdb {
   private _plugins: any;
@@ -81,7 +109,7 @@ export default class Nmdb {
   /**
    * get/set collection model
    */
-  model(name: string, schema?: any, opts?: object) {
+  model(name: string, schema?: any, opts?: object): IModel {
     if (!name || !_.isString(name)) {
       throw new TypeError('Missing model name');
     }
@@ -114,7 +142,7 @@ export default class Nmdb {
       _.defaults(this._models[model]._plugins, this._plugins);
     });
 
-    debug(`Add global pulgin: ${name}`);
+    debug(`Add global plugin: ${name}`);
   }
 }
 
