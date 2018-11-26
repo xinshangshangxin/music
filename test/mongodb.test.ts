@@ -6,7 +6,28 @@ import muri from 'muri';
 import { MongoClientOptions } from 'mongodb';
 import { Nmdb, Schema } from '../dist/index';
 
-const mongoUrl = 'mongodb://localhost:27017/nmdb-test';
+function getMongoUrl() {
+  let url = 'mongodb://';
+  if (process.env.MONGO_PORT_27017_TCP_ADDR) {
+    url += process.env.MONGO_PORT_27017_TCP_ADDR;
+  } else {
+    url += '127.0.0.1';
+  }
+
+  url += ':';
+  if (process.env.MONGO_PORT_27017_TCP_PORT) {
+    url += process.env.MONGO_PORT_27017_TCP_PORT;
+  } else {
+    url += '27017';
+  }
+
+  url += '/nmdb-test';
+
+  return url;
+}
+
+const mongoUrl = getMongoUrl();
+
 let index = 0;
 function getModel() {
   let nmdb = new Nmdb();

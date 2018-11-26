@@ -3,12 +3,15 @@ image: node:8-alpine
 variables:
   PUBLISH_PATH: 'dist/'
 
+services:
+  - mongo:latest
+
 stages:
-  - test-build
+  - buildThenTest
   - release
 
-test-build:
-  stage: test-build
+buildThenTest:
+  stage: buildThenTest
   artifacts:
     name: 'nmdb-${CI_COMMIT_SHA}'
     paths:
