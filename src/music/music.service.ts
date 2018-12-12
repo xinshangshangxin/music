@@ -10,20 +10,35 @@ import {
 import * as promiseRetry from 'promise-retry';
 
 import { DownloadService } from '../services/download.service';
+import { SongPeakService } from 'song/song-peak.service';
 
 @Injectable()
 export class MusicService {
-  constructor(private downloadService: DownloadService) {}
+  constructor(
+    private downloadService: DownloadService,
+    private songPeakService: SongPeakService,
+  ) {}
 
   async getSong(id, provider, br = BitRate.mid) {
-    let song = await getSong(id, provider, br);
-    this.downloadService.download({
-      id,
-      provider,
-      br,
-      url: song.url,
-    });
-    return { provider, ...song };
+    console.debug('getSong', id, provider, br);
+
+    let [song, peak] = await Promise.all([
+      getSong(id, provider, br),
+      this.songPeakService.findOne(id, provider),
+    ]);
+
+    // try to rebuild the song info
+    // not care the result
+    this.downloadService
+      .download({
+        id,
+        provider,
+        br,
+        url: song.url,
+      })
+      .catch(console.warn);
+
+    return { ...peak, provider, ...song };
   }
 
   async search({

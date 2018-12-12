@@ -51,8 +51,16 @@ type SongDetail {
   album: ISearchAlbum
 }
 
+type PeakDetail {
+  provider: Provider!
+  id: String!
+  peakStartTime: Int!
+  peakEndTime: Int!
+}
+
 type Query {
   search(keyword: String!, providers: [Provider]): [ISearchItem]
   get(id: ID!, provider: Provider!, br: BitRate): SongDetail
   rank(provider: Provider!, rankType: RankType): [ISearchItem]
+  peak(id: ID!, provider: Provider!): PeakDetail
 }

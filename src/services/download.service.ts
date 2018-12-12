@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
+import { BitRate, Provider } from '@s4p/music-api';
 import { createWriteStream } from 'fs';
-import { access, move, remove, ensureDir } from 'fs-extra';
+import { access, ensureDir, move, remove } from 'fs-extra';
 import * as got from 'got';
-import { resolve as pathResolve } from 'path';
-import { Provider, BitRate } from '@s4p/music-api';
 import { homedir } from 'os';
+import { resolve as pathResolve } from 'path';
 
 interface ISongKey {
   id: string;
@@ -18,6 +18,8 @@ interface IDownloadKet extends ISongKey {
 
 @Injectable()
 export class DownloadService {
+  constructor() {}
+
   async download({ id, provider, br, url }: IDownloadKet) {
     let { realPath, tempPath } = await this.getDownloadUrl({
       id,
@@ -28,7 +30,7 @@ export class DownloadService {
     console.info('realPath: ', realPath);
     try {
       await access(realPath);
-      return null;
+      return;
     } catch (e) {
       console.warn(e);
     }
@@ -45,7 +47,7 @@ export class DownloadService {
         remove(tempPath).catch(console.warn);
       })
       .pipe(createWriteStream(tempPath))
-      .on('finish', () => {
+      .on('finish', async () => {
         console.info('finished');
         if (statusCode >= 300) {
           remove(tempPath).catch(console.warn);
