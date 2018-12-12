@@ -31,9 +31,9 @@ interface IModel {
 
   remove(selector: object, options?: { single: boolean }): Promise<object>;
 
-  updateMany(filter: object, document: object, options?: { single: boolean }): Promise<any>;
+  updateMany(filter: object, document: object, options?: { upsert: boolean }): Promise<any>;
 
-  updateOne(filter: object, document: object, options?: { single: boolean }): Promise<any>;
+  updateOne(filter: object, document: object, options?: { upsert: boolean }): Promise<any>;
 }
 
 export default class Nmdb {
