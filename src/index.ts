@@ -146,4 +146,6 @@ export default class Nmdb {
   }
 }
 
-export { Nmdb, Schema, Model };
+export {
+  Nmdb, Schema, Model, IModel
+};
