@@ -15,6 +15,29 @@ export interface IUpdateOptions {
   upsert: boolean;
 }
 
+export interface IDeleteResult {
+  n: number;
+  ok: number;
+  acknowledged?: boolean;
+  deletedCount: number;
+}
+
+export interface IInsertResult {
+  acknowledged?: boolean;
+  _id: string; // ObjectId
+}
+
+export interface IInsertManyResult {
+  acknowledged?: boolean;
+  _id: string[]; // ObjectId
+}
+
+export interface IUpsertedResult {
+  n: number;
+  nModified: number;
+  ok: number;
+}
+
 export class Collection {
   protected collection: any;
 
@@ -22,56 +45,69 @@ export class Collection {
     this.collection = originCollection;
   }
 
-  countDocuments(query: object) {
+  async countDocuments(query: object): Promise<number> {
     return this.collection.countDocuments(query);
   }
 
-  createIndex(fieldOrSpec: string | object, options?: IIndexOptions) {
+  async createIndex(fieldOrSpec: string | object, options?: IIndexOptions): Promise<void> {
     return this.collection.createIndex(fieldOrSpec, options);
   }
 
-  deleteMany(filter: object) {
-    return this.collection.deleteOne(filter);
+  async deleteMany(filter: object): Promise<IDeleteResult> {
+    let result = await this.collection.deleteOne(filter);
+    return { deletedCount: result.deleteMany, ...result.toJSON() };
   }
 
-  deleteOne(filter: object) {
-    return this.collection.deleteOne(filter);
+  async deleteOne(filter: object): Promise<IDeleteResult> {
+    let result = await this.collection.deleteOne(filter);
+    return result.toJSON();
   }
 
   // TODO: drop
 
-  dropIndex(indexName: string) {
+  async dropIndex(indexName: string): Promise<void> {
     return this.collection.dropIndex(indexName);
   }
 
   // eslint-disable-next-line no-restricted-globals
-  find(query: object, options: IFindOptions) {
-    return this.collection.find(query, options);
+  async find(query: object, options: IFindOptions): Promise<object[]> {
+    let cursor = this.collection.find(query, options);
+    return cursor.toArray();
   }
 
-  findOne(query: object, options: IFindOptions) {
+  async findOne(query: object, options: IFindOptions): Promise<object | null> {
     return this.collection.findOne(query, options);
   }
 
   // TODO:  indexes Retrieve all the indexes on the collection.
 
-  insertMany(docs: object[]) {
+  async insertMany(docs: object[]): Promise<IInsertManyResult> {
     return this.collection.insertMany(docs);
   }
 
-  insertOne(doc: object) {
+  async insertOne(doc: object): Promise<IInsertResult> {
     return this.collection.insertOne(doc);
   }
 
-  remove(selector: object, options = { single: false }) {
+  async remove(selector: object, options = { single: false }): Promise<IDeleteResult> {
     return this.collection.remove(selector, options);
   }
 
-  updateMany(filter: object, document: object, options = { upsert: false }) {
-    return this.collection.updateMany(filter, document, options);
+  async updateMany(
+    filter: object,
+    document: object,
+    options = { upsert: false }
+  ): Promise<IUpsertedResult> {
+    let result = await this.collection.updateMany(filter, document, options);
+    return result.toJSON();
   }
 
-  updateOne(filter: object, document: object, options = { upsert: false }) {
-    return this.collection.updateOne(filter, document, options);
+  async updateOne(
+    filter: object,
+    document: object,
+    options = { upsert: false }
+  ): Promise<IUpsertedResult> {
+    let result = await this.collection.updateOne(filter, document, options);
+    return result.toJSON();
   }
 }

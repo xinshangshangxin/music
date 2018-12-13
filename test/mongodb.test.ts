@@ -179,22 +179,31 @@ test('updateOne && updateMany', async (t) => {
     { name: 'name', age: 3 },
   ]);
 
-  await Model.updateOne(
+  let result = await Model.updateOne(
     { name: 'name' },
     {
       $set: { age: -1 },
     }
   );
+
+  t.is(result.ok, 1);
+  t.is(result.nModified, 1);
+  t.is(result.n, 1);
+
   let nu = await Model.countDocuments({ name: 'name', age: -1 });
 
   t.is(nu, 1);
 
-  await Model.updateMany(
+  result = await Model.updateMany(
     { name: 'name' },
     {
       $set: { age: -1 },
     }
   );
+
+  t.is(result.ok, 1);
+  t.is(result.nModified, 2);
+  t.is(result.n, 3);
 
   nu = await Model.countDocuments({ name: 'name', age: -1 });
   t.is(nu, 3);

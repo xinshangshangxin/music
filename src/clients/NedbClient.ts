@@ -49,7 +49,7 @@ async function createOriginCollection(collectionName: string, dbDir: string, opt
 
 class NedbCollection extends Collection {
   countDocuments(query: object) {
-    return bb.promisify<null, object>(this.collection.count, { context: this.collection })(query);
+    return bb.promisify<number, object>(this.collection.count, { context: this.collection })(query);
   }
 
   async createIndex(
@@ -78,36 +78,55 @@ class NedbCollection extends Collection {
     await bb.promisify<null, object>(this.collection.ensureIndex, { context: this.collection })(
       nedbIndexOptions
     );
-
-    return { result: {} };
   }
 
   async deleteMany(filter: object) {
-    await bb.promisify<null, object, object>(this.collection.remove, { context: this.collection })(
-      filter,
-      { multi: true }
-    );
+    let result = await bb.promisify<any, object, object>(this.collection.remove, {
+      context: this.collection,
+    })(filter, { multi: true });
 
-    return { result: {} };
+    if (!result) {
+      return {
+        ok: 0,
+        n: 0,
+        deletedCount: 0,
+      };
+    }
+
+    return {
+      ok: 1,
+      n: result.numRemoved,
+      deletedCount: result.numRemoved,
+    };
   }
 
   async deleteOne(filter: object) {
-    await bb.promisify<null, object, object>(this.collection.remove, { context: this.collection })(
-      filter,
-      { multi: false }
-    );
+    let result = await bb.promisify<any, object, object>(this.collection.remove, {
+      context: this.collection,
+    })(filter, { multi: false });
 
-    return { result: {} };
+    if (!result) {
+      return {
+        ok: 0,
+        n: 0,
+        deletedCount: 0,
+      };
+    }
+
+    return {
+      ok: 1,
+      n: result.numRemoved,
+      deletedCount: result.numRemoved,
+    };
   }
 
   async dropIndex(indexName: string) {
     await bb.promisify<null, string>(this.collection.removeIndex, { context: this.collection })(
       indexName
     );
-    return { result: {} };
   }
 
-  find(query: object, {
+  async find(query: object, {
     sort, skip, limit, projection,
   } = {} as IFindOptions) {
     let cursor = this.collection.find(query, projection);
@@ -124,10 +143,11 @@ class NedbCollection extends Collection {
       cursor = cursor.limit(limit);
     }
 
-    return bb.promisify(cursor.exec, { context: cursor })();
+    let data = await bb.promisify(cursor.exec, { context: cursor })();
+    return data as object[];
   }
 
-  findOne(query: object, {
+  async findOne(query: object, {
     sort, skip, limit, projection,
   } = {} as IFindOptions) {
     let cursor = this.collection.findOne(query, projection);
@@ -147,49 +167,94 @@ class NedbCollection extends Collection {
     return bb.promisify(cursor.exec, { context: cursor })();
   }
 
-  insertMany(docs: object[]) {
-    return Promise.all(
+  async insertMany(docs: object[]) {
+    let data = await Promise.all(
       docs.map((doc) => {
         return this.insertOne(doc);
       })
     );
+
+    return {
+      _id: data.map((item) => {
+        return item._id;
+      }),
+    };
   }
 
   async insertOne(doc: object) {
-    await bb.promisify<null, any>(this.collection.insert, { context: this.collection })(doc);
+    let result = await bb.promisify<any, any>(this.collection.insert, {
+      context: this.collection,
+    })(doc);
+
+    if (!result || !result._id) {
+      throw new Error('inserted failed');
+    }
 
     return {
-      result: {
-        ok: true,
-      },
+      _id: result._id,
     };
   }
 
   async remove(selector: object, { single } = { single: false }) {
-    await bb.promisify<null, object, object>(this.collection.remove, { context: this.collection })(
-      selector,
-      {
-        multi: !single,
-      }
-    );
+    let result = await bb.promisify<any, object, object>(this.collection.remove, {
+      context: this.collection,
+    })(selector, {
+      multi: !single,
+    });
 
-    return { result: {} };
+    if (!result) {
+      return {
+        ok: 0,
+        n: 0,
+        deletedCount: 0,
+      };
+    }
+
+    return {
+      ok: 1,
+      n: result.numRemoved,
+      deletedCount: result.numRemoved,
+    };
   }
 
   async updateMany(filter: object, document: object, { upsert } = { upsert: false }) {
-    await bb.promisify<null, object, object, object>(this.collection.update, {
+    let result = await bb.promisify<any, object, object, object>(this.collection.update, {
       context: this.collection,
     })(filter, document, { multi: true, upsert });
 
-    return { result: {} };
+    if (!result) {
+      return {
+        n: 0,
+        nModified: 0,
+        ok: 0,
+      };
+    }
+
+    return {
+      n: result.affectedDocuments || result.numAffected,
+      nModified: result.numAffected,
+      ok: 1,
+    };
   }
 
   async updateOne(filter: object, document: object, { upsert } = { upsert: false }) {
-    await bb.promisify<null, object, object, object>(this.collection.update, {
+    let result = await bb.promisify<any, object, object, object>(this.collection.update, {
       context: this.collection,
     })(filter, document, { multi: false, upsert });
 
-    return { result: {} };
+    if (!result) {
+      return {
+        n: 0,
+        nModified: 0,
+        ok: 0,
+      };
+    }
+
+    return {
+      n: result.affectedDocuments || result.numAffected,
+      nModified: result.numAffected,
+      ok: 1,
+    };
   }
 }
 

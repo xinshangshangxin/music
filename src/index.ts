@@ -4,36 +4,51 @@ import * as plugins from 'mongolass/lib/plugins';
 import { Schema } from 'mongolass/lib/schema';
 
 import { getClient } from './clients';
+import {
+  IFindOptions,
+  IIndexOptions,
+  IInsertManyResult,
+  IInsertResult,
+  IUpsertedResult,
+  IDeleteResult,
+} from './clients/Collection';
 import { Model } from './model';
-import { IIndexOptions, IFindOptions } from './clients/Collection';
 
 const debug = debugPkg('Nmdb');
 
 interface IModel {
   countDocuments(query: object): Promise<number>;
 
-  createIndex(fieldOrSpec: string | object, options?: IIndexOptions): Promise<any>;
+  createIndex(fieldOrSpec: string | object, options?: IIndexOptions): Promise<void>;
 
-  deleteMany(filter: object): Promise<any>;
+  deleteMany(filter: object): Promise<IDeleteResult>;
 
-  deleteOne(filter: object): Promise<any>;
+  deleteOne(filter: object): Promise<IDeleteResult>;
 
-  dropIndex(indexName: string): Promise<any>;
+  dropIndex(indexName: string): Promise<void>;
 
   // eslint-disable-next-line no-restricted-globals
   find(query: object, options?: IFindOptions): Promise<any[]>;
 
   findOne(query: object, options?: IFindOptions): Promise<any | null>;
 
-  insertMany(docs: object[]): Promise<any>;
+  insertMany(docs: object[]): Promise<IInsertManyResult>;
 
-  insertOne(doc: object): Promise<any>;
+  insertOne(doc: object): Promise<IInsertResult>;
 
-  remove(selector: object, options?: { single: boolean }): Promise<object>;
+  remove(selector: object, options?: { single: boolean }): Promise<IDeleteResult>;
 
-  updateMany(filter: object, document: object, options?: { upsert: boolean }): Promise<any>;
+  updateMany(
+    filter: object,
+    document: object,
+    options?: { upsert: boolean }
+  ): Promise<IUpsertedResult>;
 
-  updateOne(filter: object, document: object, options?: { upsert: boolean }): Promise<any>;
+  updateOne(
+    filter: object,
+    document: object,
+    options?: { upsert: boolean }
+  ): Promise<IUpsertedResult>;
 }
 
 export default class Nmdb {
