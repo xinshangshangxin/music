@@ -103,6 +103,10 @@ export default class Nmdb {
     return this.client.disconnect();
   }
 
+  async close() {
+    return this.disconnect();
+  }
+
   /**
    * get/set collection schema
    */
