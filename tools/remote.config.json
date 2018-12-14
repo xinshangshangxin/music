@@ -1,8 +1,8 @@
 {
   "dev": {
-    "url": "git@gitlab.com:xinshangshangxin/music.git",
+    "url": "git@gitlab.com:xinshangshangxin/nmdb.git",
     "remote": "gitlab",
-    "branch": "nmdb"
+    "branch": "develop"
   },
   "prod": {
     "url": "git@gitlab.com:demoshang/server-projects.git",
