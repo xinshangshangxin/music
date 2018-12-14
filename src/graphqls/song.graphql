@@ -43,12 +43,13 @@ type ISearchItem {
 type SongDetail {
   id: String!
   name: String!
-  url: String!
   lrc: String!
   provider: Provider!
   artists: [ISearchArtist]!
   klyric: String
   album: ISearchAlbum
+  peakStartTime: Int
+  peakEndTime: Int
 }
 
 type PeakDetail {
@@ -58,9 +59,20 @@ type PeakDetail {
   peakEndTime: Int!
 }
 
+input PeakTimeInput {
+  id: String!
+  provider: Provider!
+  peakStartTime: Int!
+  peakEndTime: Int!
+}
+
 type Query {
   search(keyword: String!, providers: [Provider]): [ISearchItem]
   get(id: ID!, provider: Provider!, br: BitRate): SongDetail
   rank(provider: Provider!, rankType: RankType): [ISearchItem]
   peak(id: ID!, provider: Provider!): PeakDetail
+}
+
+type Mutation {
+  addPeakTime(peakTime: PeakTimeInput!): Boolean
 }

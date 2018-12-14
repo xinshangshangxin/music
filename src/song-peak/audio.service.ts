@@ -2,7 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { Provider } from '@s4p/music-api';
 import * as audioDecode from 'audio-decode';
 import { createReadStream } from 'fs';
-import { SongPeakService } from 'song/song-peak.service';
+
+import { SongPeakService } from './song-peak.service';
 
 interface IDecode {
   filePath: string;
@@ -28,7 +29,7 @@ export class AudioService {
     console.info(`decode ${filePath}`);
 
     // had decoded
-    let doc = await this.songPeakService.findOne(id, provider);
+    let doc = await this.songPeakService.get(id, provider);
     if (doc) {
       console.debug('had decoded');
       return;
@@ -54,12 +55,13 @@ export class AudioService {
 
     console.debug('peakTime: ', peakTime);
 
-    await this.songPeakService.update(
+    await this.songPeakService.add({
       id,
       provider,
-      peakTime.startTime,
-      peakTime.endTime,
-    );
+      peakStartTime: peakTime.startTime,
+      peakEndTime: peakTime.endTime,
+    });
+
     return peakTime;
   }
 

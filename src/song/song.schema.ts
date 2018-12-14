@@ -11,10 +11,6 @@ export const SongSchema = {
     type: String,
     required: true,
   },
-  url: {
-    type: String,
-    required: true,
-  },
   lrc: {
     type: String,
     required: true,
@@ -23,7 +19,7 @@ export const SongSchema = {
     type: Object,
     required: true,
   },
-  artist: {
+  artists: {
     type: Array,
   },
   duration: {
@@ -33,9 +29,6 @@ export const SongSchema = {
     type: String,
   },
   extra: {
-    type: Object,
-  },
-  peak: {
     type: Object,
   },
 };

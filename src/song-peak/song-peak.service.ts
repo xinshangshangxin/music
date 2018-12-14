@@ -1,7 +1,14 @@
 import { Injectable } from '@nestjs/common';
+import { Provider } from '@s4p/music-api';
 import { InjectModel } from '@s4p/nest-nmdb';
 import { IModel } from '@s4p/nmdb';
-import { Provider } from '@s4p/music-api';
+
+export interface IPeakTime {
+  id: string;
+  provider: Provider;
+  peakStartTime: number;
+  peakEndTime: number;
+}
 
 @Injectable()
 export class SongPeakService {
@@ -9,24 +16,20 @@ export class SongPeakService {
     @InjectModel('SongPeak') private readonly SongPeakModel: IModel,
   ) {}
 
-  async create(body: any): Promise<any> {
-    return this.SongPeakModel.insertOne(body);
-  }
-
-  async findAll(): Promise<any[]> {
-    return this.SongPeakModel.find({});
-  }
-
-  async findOne(id: string, provider: Provider) {
+  async get(id: string, provider: Provider) {
     return this.SongPeakModel.findOne({ id, provider });
   }
 
-  async update(
-    id: string,
-    provider: Provider,
-    peakStartTime: number,
-    peakEndTime: number,
-  ) {
+  async add(peakTime: IPeakTime): Promise<any> {
+    return this.update(peakTime);
+  }
+
+  private async update({
+    id,
+    provider,
+    peakStartTime,
+    peakEndTime,
+  }: IPeakTime) {
     return this.SongPeakModel.updateOne(
       {
         id,
