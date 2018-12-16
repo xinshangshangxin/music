@@ -49,6 +49,10 @@ class Kugou {
     return this.concatRankList('6666', limit, skip);
   }
 
+  async playlist(id: string) {
+    return this.getSpecialSong(id);
+  }
+
   private async concatRankList(rankId: string, limit = 100, skip = 0): Promise<ISearchItem[]> {
     let page = 1;
     let total = limit + skip;
@@ -184,6 +188,37 @@ class Kugou {
       },
       extra,
     };
+  }
+
+  private async getSpecialSong(specialId: string): Promise<ISearchItem[]> {
+    let result = await this.request({
+      url: 'http://mobilecdnbj.kugou.com/api/v3/special/song',
+      qs: {
+        specialid: specialId,
+        version: 8000,
+        pagesize: 99999,
+        format: 'jsonp',
+      },
+    });
+
+    let songs = get(result, 'data.info', []);
+
+    return songs.map((song: any) => {
+      let filename = song.filename || '';
+
+      let [singer, songName] = filename.split('-');
+      return {
+        provider: Provider.kugou,
+        id: song.hash || song['320hash'] || song.sqhash,
+        name: `${songName || ''}`.trim(),
+        artists: [
+          {
+            name: `${singer || ''}`.trim(),
+          },
+        ],
+        mvId: song.mvhash,
+      };
+    });
   }
 }
 

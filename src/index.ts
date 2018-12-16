@@ -100,6 +100,19 @@ async function rank(
   throw new Error(`${provider} not support`);
 }
 
+async function playlist(provider: Provider, id: string): Promise<ISearchItem[]> {
+  if (provider === Provider.kugou) {
+    return kugouMusic.playlist(id);
+  }
+  if (provider === Provider.netease) {
+    throw new Error('netease is not support now, planing');
+  }
+  if (provider === Provider.xiami) {
+    throw new Error('xiami is not support now, planing');
+  }
+  throw new Error(`${provider} not support`);
+}
+
 export {
-  search, rank, getSong, ISearchItem, ISong, Provider, BitRate, RankType
+  search, rank, getSong, playlist, ISearchItem, ISong, Provider, BitRate, RankType
 };

@@ -8,7 +8,7 @@ function baseBuild() {
   gulp build:dist
   echo "copy package.json"
 
-  cat package.json | jq ".scripts.start=\"NODE_ENV=${nodeEnv} pm2-docker start .\/index.js --raw\" | .devDependencies={}" > ${buildDir}/package.json
+  cat package.json | jq ".scripts={} | .devDependencies={}" > ${buildDir}/package.json
 
   _generateLog
   _dockerConfig ${nodeEnv} ${projectDir}/${DockerfilePath}/${nodeEnv}
