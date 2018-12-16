@@ -392,3 +392,6 @@ docker-compose.yml
 dist
 
 .vscode
+
+src/config/*.json5
+!src/config/template.json5

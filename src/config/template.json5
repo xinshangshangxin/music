@@ -1,0 +1,3 @@
+{
+  nmdbUrl: 'mongodb://localhost/nmdb',
+}
