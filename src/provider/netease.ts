@@ -7,9 +7,10 @@ import neteaseSongUrl from 'NeteaseCloudMusicApi/module/song_url';
 import neteaseRequest from 'NeteaseCloudMusicApi/util/request';
 import neteasePlayList from 'NeteaseCloudMusicApi/module/playlist_detail';
 
-import { INeteaseSearch, ISearchSong } from '../common/search';
+import { INeteaseSearch, ISearchSong, ISearchItem } from '../common/search';
 import { BitRate, ISong } from '../common/song';
 import { RankType } from '../common/rank';
+import { Provider } from '..';
 
 export class Netease {
   private request: any;
@@ -61,7 +62,7 @@ export class Netease {
     return songs.slice(skip, limit);
   }
 
-  async playlist(id: string) {
+  async playlist(id: string): Promise<ISearchItem[]> {
     return this.getPlaylist(id);
   }
 
@@ -155,6 +156,7 @@ export class Netease {
 
     return songs.map((song: any) => {
       return {
+        provider: Provider.netease,
         id: `${song.id}`,
         name: song.name,
         artists: get(song, 'ar', []).map((item: any) => {
