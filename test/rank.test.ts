@@ -21,12 +21,16 @@ test('hot rank kugou', async (t) => {
   }
 });
 
-test('rank netease', async (t) => {
-  try {
-    await rank(Provider.netease, RankType.hot, 11);
-  } catch (e) {
-    t.regex(e.message, /not support/);
-  }
+test('hot rank netease', async (t) => {
+  let songs = await rank(Provider.netease, RankType.hot, 3);
+  t.is(songs.length, 3);
+  t.true(!!songs[0].id);
+});
+
+test('new rank netease', async (t) => {
+  let songs = await rank(Provider.netease, RankType.new, 3);
+  t.is(songs.length, 3);
+  t.true(!!songs[0].id);
 });
 
 test('new rank xiami', async (t) => {

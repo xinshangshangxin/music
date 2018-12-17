@@ -42,7 +42,7 @@ export class Netease {
     return { ...detailResult, ...songUrlResult, ...lyricResult };
   }
 
-  async rank(type: RankType = RankType.new) {
+  async rank(type: RankType = RankType.new, limit = 0, skip = 0) {
     let id;
 
     if (type === RankType.hot) {
@@ -53,9 +53,13 @@ export class Netease {
       id = '3779629';
     }
 
-    let result = await neteasePlayList({ id, s: 0 }, this.request);
+    let songs = await this.getPlaylist(id);
 
-    return result;
+    if (limit === 0) {
+      return songs.slice(skip, songs.length);
+    }
+    return songs.slice(skip, limit);
+
   }
 
   private async searchList({
@@ -140,5 +144,28 @@ export class Netease {
       lrc: get(result, 'body.lrc.lyric'),
       klyric: get(result, 'body.klyric.lyric'),
     };
+  }
+
+  private async getPlaylist(id: string) {
+    let result = await neteasePlayList({ id, s: 1 }, this.request);
+    let songs = get(result, 'body.playlist.tracks', []);
+
+    return songs.map((song: any) => {
+      return {
+        id: `${song.id}`,
+        name: song.name,
+        artists: get(song, 'ar', []).map((item: any) => {
+          return {
+            id: `${item.id}`,
+            name: item.name,
+          };
+        }),
+        album: {
+          id: `${get(song, 'al.id')}`,
+          name: get(song, 'al.name'),
+          img: get(song, 'al.picUrl'),
+        },
+      };
+    });
   }
 }

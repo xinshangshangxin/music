@@ -85,14 +85,14 @@ async function getSong(id: string, provider: Provider, br?: BitRate): Promise<IS
 async function rank(
   provider: Provider,
   rankType: RankType,
-  limit = 100,
+  limit = 9999,
   skip = 0
 ): Promise<ISearchItem[]> {
   if (provider === Provider.kugou) {
     return kugouMusic.rank(rankType, limit, skip);
   }
   if (provider === Provider.netease) {
-    throw new Error('netease is not support now, planing');
+    return neteaseMusic.rank(rankType, limit, skip);
   }
   if (provider === Provider.xiami) {
     return xiamiMusic.rank(rankType, limit, skip);
