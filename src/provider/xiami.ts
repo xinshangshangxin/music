@@ -60,6 +60,27 @@ class Xiami {
     return unescape(s.join('')).replace(/\^/g, '0');
   }
 
+  private static parseSongList(songs: any[]) {
+    return songs.map((song: any) => {
+      return {
+        provider: Provider.xiami,
+        id: `${song.song_id}`,
+        name: song.song_name,
+        artists: [
+          {
+            id: `${song.artist_id}`,
+            name: song.artist_name,
+          },
+        ],
+        album: {
+          id: `${song.album_id}`,
+          name: song.album_name,
+          img: song.album_logo,
+        },
+      };
+    });
+  }
+
   async search(query: string | ISearchQuery): Promise<ISearchSong[]> {
     if (isPlainObject(query)) {
       return this.searchList(query as ISearchQuery);
@@ -69,6 +90,10 @@ class Xiami {
 
   async getSong(id: string): Promise<ISong> {
     return this.getDetail(id);
+  }
+
+  async playlist(id: string): Promise<ISearchItem[]> {
+    return this.getPlaylist(id);
   }
 
   async rank(type: RankType = RankType.new, limit = 100, skip = 0): Promise<ISearchItem[]> {
@@ -132,22 +157,7 @@ class Xiami {
 
     let songs = get(result, 'data.songs', []);
 
-    return songs.map((song: any) => {
-      return {
-        id: `${song.song_id}`,
-        name: song.song_name,
-        artists: [
-          {
-            id: `${song.artist_id}`,
-            name: song.artist_name,
-          },
-        ],
-        album: {
-          id: `${song.album_id}`,
-          name: song.album_name,
-        },
-      };
-    });
+    return Xiami.parseSongList(songs);
   }
 
   private async getDetail(id: string): Promise<ISong> {
@@ -174,6 +184,28 @@ class Xiami {
         img: Xiami.handleProtocolRelativeUrl(`${song.album_pic}`),
       },
     };
+  }
+
+  private async getPlaylist(id: string) {
+    let result = await this.request({
+      method: 'GET',
+      url: 'http://api.xiami.com/web',
+      qs: {
+        id,
+        v: '2.0',
+        app_key: '1',
+        r: 'collect/detail',
+      },
+      headers: {
+        referer: 'http://m.xiami.com/',
+        host: 'api.xiami.com',
+        'content-type': 'application/x-www-form-urlencoded',
+      },
+    });
+
+    let songs = get(result, 'data.songs', []);
+
+    return Xiami.parseSongList(songs);
   }
 }
 

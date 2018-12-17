@@ -108,7 +108,7 @@ async function playlist(provider: Provider, id: string): Promise<ISearchItem[]> 
     return neteaseMusic.playlist(id);
   }
   if (provider === Provider.xiami) {
-    throw new Error('xiami is not support now, planing');
+    return xiamiMusic.playlist(id);
   }
   throw new Error(`${provider} not support`);
 }
