@@ -59,7 +59,10 @@ export class Netease {
       return songs.slice(skip, songs.length);
     }
     return songs.slice(skip, limit);
+  }
 
+  async playlist(id: string) {
+    return this.getPlaylist(id);
   }
 
   private async searchList({

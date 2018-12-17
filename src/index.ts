@@ -105,7 +105,7 @@ async function playlist(provider: Provider, id: string): Promise<ISearchItem[]> 
     return kugouMusic.playlist(id);
   }
   if (provider === Provider.netease) {
-    throw new Error('netease is not support now, planing');
+    return neteaseMusic.playlist(id);
   }
   if (provider === Provider.xiami) {
     throw new Error('xiami is not support now, planing');
