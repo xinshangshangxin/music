@@ -11,7 +11,7 @@ import { SongService } from '../song/song.service';
 interface ISongKey {
   id: string;
   provider: Provider;
-  br: BitRate;
+  br?: BitRate;
 }
 
 function defer() {
@@ -34,7 +34,7 @@ export class DownloadService {
 
   constructor(private songService: SongService) {}
 
-  async download({ id, provider, br }: ISongKey) {
+  async download({ id, provider, br }: ISongKey): Promise<string> {
     let { realPath, tempPath } = await this.getDownloadUrl({
       id,
       provider,
@@ -44,12 +44,13 @@ export class DownloadService {
     console.info('realPath: ', realPath);
     try {
       await access(realPath);
-      return;
+      return realPath;
     } catch (e) {
       console.warn(e);
     }
 
     await this.persist(id, provider, br, realPath, tempPath);
+    return realPath;
   }
 
   async getDownloadUrl({ id, provider, br }: ISongKey) {

@@ -10,7 +10,9 @@ async function bootstrap() {
 
   app.use(cors());
   // app.setGlobalPrefix('api/v1');
-  await app.listen(process.env.PORT || process.env.LEANCLOUD_APP_PORT || 3000);
+  let port = process.env.PORT || process.env.LEANCLOUD_APP_PORT || 3000;
+  console.info('port: ', port);
+  await app.listen(port);
 
   if (module.hot) {
     module.hot.accept();

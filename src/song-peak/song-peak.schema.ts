@@ -15,4 +15,8 @@ export const SongPeakSchema = {
     type: Number,
     required: true,
   },
+  peaks: {
+    type: Array,
+    required: true,
+  },
 };

@@ -6,7 +6,7 @@ import * as JSON5 from 'json5';
 import * as Joi from 'joi';
 
 interface EnvConfig {
-  [prop: string]: string;
+  [prop: string]: any;
 }
 
 @Injectable()
@@ -33,10 +33,15 @@ export class ConfigService {
     return this.envConfig.nmdbUrl;
   }
 
+  get disabledCache(): boolean {
+    return !!this.envConfig.disabledCache;
+  }
+
   private validateInput(envConfig: EnvConfig): EnvConfig {
     const envVarsSchema: Joi.ObjectSchema = Joi.object({
-      PORT: Joi.number().default(3000),
       nmdbUrl: Joi.string().required(),
+      disabledCache: Joi.boolean().default(false),
+      appId: Joi.string(),
     });
 
     const { error, value: validatedEnvConfig } = Joi.validate(

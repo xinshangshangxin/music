@@ -17,7 +17,7 @@ export class ProxyController {
     @Query('provider') provider: Provider,
     @Query('br') br = BitRate.mid,
   ) {
-    console.info(JSON.stringify({ id, provider, br }));
+    console.info({ id, provider, br });
 
     let { realPath } = await this.downloadService.getDownloadUrl({
       id,

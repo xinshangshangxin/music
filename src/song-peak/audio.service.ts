@@ -9,9 +9,12 @@ interface IDecode {
   filePath: string;
   id: string;
   provider: Provider;
+  // 分析高峰的时间段
   duration?: number;
-  layIn?: number;
-  layOut?: number;
+  // 前奏补齐
+  beforeFill?: number;
+  // 后续补齐
+  afterFill?: number;
 }
 
 @Injectable()
@@ -22,9 +25,9 @@ export class AudioService {
     filePath,
     id,
     provider,
-    duration = 30,
-    layIn = 2,
-    layOut = 3,
+    duration = 20,
+    beforeFill = 7,
+    afterFill = 3,
   }: IDecode) {
     console.info(`decode ${filePath}`);
 
@@ -46,11 +49,11 @@ export class AudioService {
       channelData,
     );
 
-    let peakStart = this.findMaxIndex(peaks, duration - layIn - layOut);
+    let peakStart = this.findMaxIndex(peaks, duration);
 
     let peakTime = {
-      startTime: peakStart - layIn,
-      endTime: peakStart - layIn + duration,
+      startTime: peakStart - beforeFill,
+      endTime: peakStart + duration + afterFill,
     };
 
     console.debug('peakTime: ', peakTime);
@@ -60,6 +63,7 @@ export class AudioService {
       provider,
       peakStartTime: peakTime.startTime,
       peakEndTime: peakTime.endTime,
+      peaks,
     });
 
     return peakTime;

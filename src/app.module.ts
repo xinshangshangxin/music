@@ -12,6 +12,8 @@ import { SongResolver } from './graphqls/song.resolvers';
 import { AudioService } from './song-peak/audio.service';
 import { SongPeakSchema } from './song-peak/song-peak.schema';
 import { SongPeakService } from './song-peak/song-peak.service';
+import { KugouUrlParseService } from './song-url/kugou-url.parse.service';
+import { SongUrlParseService } from './song-url/song-url-parse.service';
 import { DownloadService } from './song/download.service';
 import { SongSchema } from './song/song.schema';
 import { SongService } from './song/song.service';
@@ -50,6 +52,7 @@ import { SongService } from './song/song.service';
     AppService,
     AudioService,
     DownloadService,
+    KugouUrlParseService,
     SongPeakService,
     SongResolver,
     SongService,
@@ -57,6 +60,7 @@ import { SongService } from './song/song.service';
       provide: ConfigService,
       useValue: new ConfigService(process.env.NODE_ENV),
     },
+    SongUrlParseService,
   ],
 })
 export class AppModule {}

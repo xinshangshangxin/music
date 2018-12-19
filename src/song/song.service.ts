@@ -2,10 +2,12 @@ import { Injectable } from '@nestjs/common';
 import {
   BitRate,
   getSong,
+  playlist,
   Provider,
   rank,
   RankType,
   search,
+  album,
 } from '@s4p/music-api';
 import { InjectModel } from '@s4p/nest-nmdb';
 import { IModel } from '@s4p/nmdb';
@@ -77,6 +79,14 @@ export class SongService {
 
   async rank(provider: Provider, rankType?: RankType) {
     return rank(provider, rankType);
+  }
+
+  async playlist(provider: Provider, id: string) {
+    return playlist(provider, id);
+  }
+
+  async album(provider: Provider, id: string) {
+    return album(provider, id);
   }
 
   async getUrl(id: string, provider: Provider, br?: BitRate) {

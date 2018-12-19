@@ -8,6 +8,7 @@ export interface IPeakTime {
   provider: Provider;
   peakStartTime: number;
   peakEndTime: number;
+  peaks: number[];
 }
 
 @Injectable()
@@ -24,11 +25,16 @@ export class SongPeakService {
     return this.update(peakTime);
   }
 
+  async delete(id: string, provider: Provider) {
+    return this.SongPeakModel.deleteOne({ id, provider });
+  }
+
   private async update({
     id,
     provider,
     peakStartTime,
     peakEndTime,
+    peaks,
   }: IPeakTime) {
     return this.SongPeakModel.updateOne(
       {
@@ -42,6 +48,7 @@ export class SongPeakService {
           provider,
           peakStartTime,
           peakEndTime,
+          peaks,
         },
       },
       {
