@@ -28,19 +28,24 @@ const testCases = [
 test('getSong', async (t) => {
   await Promise.all(
     testCases.map(async ({ id, provider, extra }) => {
-      let data = await getSong(id, provider, BitRate.mid);
+      try {
+        let data = await getSong(id, provider, BitRate.mid);
 
-      let {
-        id: resultId, name, url, lrc, extra: realExtra,
-      } = data;
+        let {
+          id: resultId, name, url, lrc, extra: realExtra,
+        } = data;
 
-      t.is(resultId, id);
-      t.true(!!name);
-      t.true(!!url);
-      t.true(!!lrc);
+        t.is(resultId, id);
+        t.true(!!name);
+        t.true(!!url);
+        t.true(!!lrc);
 
-      if (extra) {
-        t.deepEqual(realExtra, extra);
+        if (extra) {
+          t.deepEqual(realExtra, extra);
+        }
+      } catch (e) {
+        console.warn(e);
+        t.regex(e.message, /应版权方要求/);
       }
     })
   );

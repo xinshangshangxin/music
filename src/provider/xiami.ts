@@ -169,6 +169,11 @@ class Xiami {
       url: `http://www.xiami.com/song/playlist/id/${id}/object_name/default/object_id/0/cat/json`,
     });
 
+    let { message } = result;
+    if (message) {
+      throw new Error(`${Provider.xiami} - ${message}`);
+    }
+
     let song = get(result, 'data.trackList[0]', {});
 
     return {
