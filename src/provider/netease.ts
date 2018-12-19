@@ -1,16 +1,17 @@
 import get from 'lodash/get';
 import isPlainObject from 'lodash/isPlainObject';
+import neteaseAlbum from 'NeteaseCloudMusicApi/module/album';
 import neteaseLyric from 'NeteaseCloudMusicApi/module/lyric';
+import neteasePlayList from 'NeteaseCloudMusicApi/module/playlist_detail';
 import neteaseSearch from 'NeteaseCloudMusicApi/module/search';
 import neteaseSongDetail from 'NeteaseCloudMusicApi/module/song_detail';
 import neteaseSongUrl from 'NeteaseCloudMusicApi/module/song_url';
 import neteaseRequest from 'NeteaseCloudMusicApi/util/request';
-import neteasePlayList from 'NeteaseCloudMusicApi/module/playlist_detail';
 
-import { INeteaseSearch, ISearchSong, ISearchItem } from '../common/search';
-import { BitRate, ISong } from '../common/song';
-import { RankType } from '../common/rank';
 import { Provider } from '..';
+import { RankType } from '../common/rank';
+import { INeteaseSearch, ISearchItem, ISearchSong } from '../common/search';
+import { BitRate, ISong } from '../common/song';
 
 export class Netease {
   private request: any;
@@ -24,6 +25,27 @@ export class Netease {
 
   constructor() {
     this.request = neteaseRequest;
+  }
+
+  private static parsePlaylist(songs: any[]): ISearchItem[] {
+    return songs.map((song: any) => {
+      return {
+        provider: Provider.netease,
+        id: `${song.id}`,
+        name: song.name,
+        artists: get(song, 'ar', []).map((item: any) => {
+          return {
+            id: `${item.id}`,
+            name: item.name,
+          };
+        }),
+        album: {
+          id: `${get(song, 'al.id')}`,
+          name: get(song, 'al.name'),
+          img: get(song, 'al.picUrl'),
+        },
+      };
+    });
   }
 
   async search(query: string | INeteaseSearch): Promise<ISearchSong[]> {
@@ -64,6 +86,10 @@ export class Netease {
 
   async playlist(id: string): Promise<ISearchItem[]> {
     return this.getPlaylist(id);
+  }
+
+  async album(id: string): Promise<ISearchItem[]> {
+    return this.getAlbum(id);
   }
 
   private async searchList({
@@ -154,23 +180,13 @@ export class Netease {
     let result = await neteasePlayList({ id, s: 1 }, this.request);
     let songs = get(result, 'body.playlist.tracks', []);
 
-    return songs.map((song: any) => {
-      return {
-        provider: Provider.netease,
-        id: `${song.id}`,
-        name: song.name,
-        artists: get(song, 'ar', []).map((item: any) => {
-          return {
-            id: `${item.id}`,
-            name: item.name,
-          };
-        }),
-        album: {
-          id: `${get(song, 'al.id')}`,
-          name: get(song, 'al.name'),
-          img: get(song, 'al.picUrl'),
-        },
-      };
-    });
+    return Netease.parsePlaylist(songs);
+  }
+
+  private async getAlbum(id: string): Promise<ISearchItem[]> {
+    let result = await neteaseAlbum({ id }, this.request);
+    let songs = get(result, 'body.songs', []);
+
+    return Netease.parsePlaylist(songs);
   }
 }

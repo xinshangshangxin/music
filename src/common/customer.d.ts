@@ -4,3 +4,4 @@ declare module 'NeteaseCloudMusicApi/module/song_detail';
 declare module 'NeteaseCloudMusicApi/module/song_url';
 declare module 'NeteaseCloudMusicApi/module/lyric';
 declare module 'NeteaseCloudMusicApi/module/playlist_detail';
+declare module 'NeteaseCloudMusicApi/module/album';

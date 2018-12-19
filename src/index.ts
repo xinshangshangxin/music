@@ -113,6 +113,19 @@ async function playlist(provider: Provider, id: string): Promise<ISearchItem[]> 
   throw new Error(`${provider} not support`);
 }
 
+async function album(provider: Provider, id: string): Promise<ISearchItem[]> {
+  if (provider === Provider.kugou) {
+    return kugouMusic.album(id);
+  }
+  if (provider === Provider.netease) {
+    return neteaseMusic.album(id);
+  }
+  if (provider === Provider.xiami) {
+    return xiamiMusic.album(id);
+  }
+  throw new Error(`${provider} not support`);
+}
+
 export {
-  search, rank, getSong, playlist, ISearchItem, ISong, Provider, BitRate, RankType
+  search, rank, getSong, playlist, album, ISearchItem, ISong, Provider, BitRate, RankType
 };

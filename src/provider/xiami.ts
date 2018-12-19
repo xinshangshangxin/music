@@ -1,11 +1,11 @@
-import rp from 'request-promise';
-import isPlainObject from 'lodash/isPlainObject';
 import get from 'lodash/get';
+import isPlainObject from 'lodash/isPlainObject';
+import rp from 'request-promise';
 
-import { ISearchQuery, ISearchSong, ISearchItem } from '../common/search';
-import { ISong } from '../common/song';
-import { RankType } from '../common/rank';
 import { Provider } from '../common/provider';
+import { RankType } from '../common/rank';
+import { ISearchItem, ISearchQuery, ISearchSong } from '../common/search';
+import { ISong } from '../common/song';
 
 class Xiami {
   private request: typeof rp;
@@ -137,6 +137,10 @@ class Xiami {
     });
   }
 
+  async album(id: string): Promise<ISearchItem[]> {
+    return this.getAlbum(id);
+  }
+
   private async searchList({
     keyword,
     skip = 0,
@@ -206,6 +210,45 @@ class Xiami {
     let songs = get(result, 'data.songs', []);
 
     return Xiami.parseSongList(songs);
+  }
+
+  private async getAlbum(id: string) {
+    let result = await this.request({
+      method: 'GET',
+      url: 'http://api.xiami.com/web',
+      qs: {
+        id,
+        v: '2.0',
+        app_key: '1',
+        r: 'album/detail',
+      },
+      headers: {
+        referer: 'http://m.xiami.com/',
+        host: 'api.xiami.com',
+        'content-type': 'application/x-www-form-urlencoded',
+      },
+    });
+
+    let songs = get(result, 'data.songs', []);
+
+    return songs.map((song: any) => {
+      return {
+        provider: Provider.xiami,
+        id: `${song.song_id}`,
+        name: song.song_name,
+        artists: [
+          {
+            id: `${song.artist_id}`,
+            name: song.singers,
+          },
+        ],
+        album: {
+          id: `${song.album_id}`,
+          name: song.album_name,
+          img: song.album_logo,
+        },
+      };
+    });
   }
 }
 

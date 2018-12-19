@@ -53,6 +53,10 @@ class Kugou {
     return this.getSpecialSong(id);
   }
 
+  async album(id: string) {
+    return this.getAlbum(id);
+  }
+
   private async concatRankList(rankId: string, limit = 100, skip = 0): Promise<ISearchItem[]> {
     let page = 1;
     let total = limit + skip;
@@ -217,6 +221,34 @@ class Kugou {
           },
         ],
         mvId: song.mvhash,
+      };
+    });
+  }
+
+  private async getAlbum(id: string): Promise<ISearchItem[]> {
+    let result = await this.request({
+      url: 'http://m.kugou.com/app/i/getablum.php',
+      qs: {
+        type: 1,
+        ablumid: id,
+      },
+    });
+
+    let songs = get(result, 'list', []);
+
+    return songs.map((song: any) => {
+      let name = song.songname || '';
+
+      let [singer, songName] = name.split('-');
+      return {
+        provider: Provider.kugou,
+        id: song.hash,
+        name: `${songName || ''}`.trim(),
+        artists: [
+          {
+            name: `${singer || ''}`.trim(),
+          },
+        ],
       };
     });
   }
