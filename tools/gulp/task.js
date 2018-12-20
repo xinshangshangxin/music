@@ -9,11 +9,14 @@ const replace = require('gulp-replace');
 const gulpLoadPlugins = require('gulp-load-plugins');
 const ts = require('gulp-typescript');
 const { spawn } = require('child_process');
+const fs = require('fs');
+const { resolve: pathResolve } = require('path');
 
 const tsProject = ts.createProject('tsconfig.json', {
   allowJs: false,
   declaration: true,
   declarationMap: true,
+  rootDir: './',
   outDir: './dist',
   noEmit: false,
 });
@@ -173,6 +176,22 @@ gulp.task('nodemon', (done) => {
 
 gulp.task('cp', () => {
   return gulp.src(config.cp.src, config.cp.opt).pipe(gulp.dest(config.cp.dest));
+});
+
+gulp.task('buildIndex', () => {
+  return new Promise((resolve, reject) => {
+    fs.writeFile(
+      pathResolve(__dirname, '../../dist/index.js'),
+      "module.exports = require('./src/index');\n",
+      (err) => {
+        if (err) {
+          return reject(err);
+        }
+
+        return resolve();
+      }
+    );
+  });
 });
 
 gulp.task('build', gulp.series('clean', gulp.parallel('eslint', 'tsc', 'cp')));

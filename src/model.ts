@@ -2,7 +2,7 @@ import debugPkg from 'debug';
 import * as inflected from 'inflected';
 import * as _ from 'lodash';
 
-const Query = require('mongolass/lib/query');
+const Query = require('./lib/query');
 
 const debug = debugPkg('mongolass-model');
 

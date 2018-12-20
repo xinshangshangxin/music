@@ -182,13 +182,16 @@ test('updateOne && updateMany', async (t) => {
   let result = await Model.updateOne(
     { name: 'name' },
     {
-      $set: { age: -1 },
+      $set: { age: -1, noUsed: 1 },
     }
   );
 
   t.is(result.ok, 1);
   t.is(result.nModified, 1);
   t.is(result.n, 1);
+
+  let doc = await Model.findOne({ name: 'name', age: -1 });
+  t.is(typeof doc.noUsed, 'undefined');
 
   let nu = await Model.countDocuments({ name: 'name', age: -1 });
 
@@ -197,7 +200,7 @@ test('updateOne && updateMany', async (t) => {
   result = await Model.updateMany(
     { name: 'name' },
     {
-      $set: { age: -1 },
+      $set: { age: -1, noUsed: 1 },
     }
   );
 
@@ -207,4 +210,9 @@ test('updateOne && updateMany', async (t) => {
 
   nu = await Model.countDocuments({ name: 'name', age: -1 });
   t.is(nu, 3);
+
+  let docs = await Model.find({ name: 'name', age: -1 });
+  docs.forEach((item) => {
+    t.is(typeof item.noUsed, 'undefined');
+  });
 });

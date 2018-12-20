@@ -1,7 +1,5 @@
 import debugPkg from 'debug';
 import * as _ from 'lodash';
-import * as plugins from 'mongolass/lib/plugins';
-import { Schema } from 'mongolass/lib/schema';
 
 import { getClient } from './clients';
 import {
@@ -13,6 +11,9 @@ import {
   IDeleteResult,
 } from './clients/Collection';
 import { Model } from './model';
+
+const plugins = require('./lib/plugin.js');
+const { Schema } = require('./lib/schema.js');
 
 const debug = debugPkg('Nmdb');
 
