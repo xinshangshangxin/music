@@ -1,4 +1,4 @@
-query search($keyword: String!, $providers: [String]) {
+query search($keyword: String!, $providers: [Provider]) {
   search(keyword: $keyword, providers: $providers) {
     id
     name

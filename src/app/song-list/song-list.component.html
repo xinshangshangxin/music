@@ -1,0 +1,11 @@
+<div cdkDropList class="song-list" (cdkDropListDropped)="drop($event)">
+  <div class="song-box" *ngFor="let song of playList; index as i" cdkDrag (click)="play(i)">
+    [{{ song.provider }}]-{{ song.name }}
+    <span *ngFor="let artist of song.artists"> {{ artist.name }} </span>
+
+    <div class="example-handle" (click)="$event.stopPropagation()">
+      <i class="material-icons drag" cdkDragHandle>drag_handle</i>
+      <i class="material-icons" (click)="remove(i)">delete</i>
+    </div>
+  </div>
+</div>

@@ -1,5 +1,3 @@
-<div>
-  <mat-progress-bar class="example-margin" color="primary" mode="buffer" [value]="currentPercent"
-    [bufferValue]="bufferedPercent">
-  </mat-progress-bar>
-</div>
+<button mat-button (click)="next()">下一首</button>
+<button mat-button (click)="previous()">上一首</button>
+<button mat-button (click)="togglePlay()">暂停/播放</button>

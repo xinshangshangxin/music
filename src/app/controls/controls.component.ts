@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { PlayerService, IPlayerState } from '../services/player.service';
-import { map } from 'rxjs/operators';
+
+import { PlayerService } from '../services/player.service';
 
 @Component({
   selector: 'app-controls',
@@ -14,4 +14,16 @@ export class ControlsComponent implements OnInit {
   public currentPercent = 0;
 
   ngOnInit() {}
+
+  togglePlay() {
+    this.playerService.togglePlay();
+  }
+
+  next() {
+    this.playerService.next();
+  }
+
+  previous() {
+    this.playerService.previous();
+  }
 }

@@ -4,16 +4,18 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "build": "ng build",
+    "build": "ng build --prod --output-path dist",
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e",
-    "gql-gen": "gql-gen --schema http://localhost:3000/graphql --template graphql-codegen-apollo-angular-template --out ./src/app/graphql/generated.ts \"./src/app/graphql/**/*.graphql\""
+    "gql-gen-local": "gql-gen --schema http://localhost:3000/graphql --template graphql-codegen-apollo-angular-template --out ./src/app/graphql/generated.ts \"./src/app/graphql/**/*.graphql\"",
+    "gql-gen-remote": "gql-gen --schema http://music.leanapp.cn/graphql --template graphql-codegen-apollo-angular-template --out ./src/app/graphql/generated.ts \"./src/app/graphql/**/*.graphql\""
+
   },
   "private": true,
   "dependencies": {
     "@angular/animations": "^7.0.2",
-    "@angular/cdk": "^7.0.2",
+    "@angular/cdk": "^7.0.3",
     "@angular/common": "^6.1.0",
     "@angular/compiler": "^6.1.0",
     "@angular/core": "^6.1.0",
@@ -29,10 +31,12 @@
     "apollo-client": "^2.4.0",
     "apollo-link": "^1.2.0",
     "core-js": "^2.5.4",
+    "eventemitter3": "^3.1.0",
     "graphql": "^0.13.2",
     "graphql-tag": "^2.10.0",
     "hammerjs": "^2.0.8",
     "rxjs": "~6.2.0",
+    "rxjs-observe": "^1.0.2",
     "zone.js": "~0.8.26"
   },
   "devDependencies": {
@@ -42,6 +46,7 @@
     "@angular/language-service": "^6.1.0",
     "@types/jasmine": "~2.8.8",
     "@types/jasminewd2": "~2.0.3",
+    "@types/node": "^10.12.5",
     "@types/webaudioapi": "^0.0.27",
     "codelyzer": "~4.3.0",
     "graphql-code-generator": "^0.13.0",

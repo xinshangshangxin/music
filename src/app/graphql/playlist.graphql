@@ -1,0 +1,10 @@
+query playlist($provider: Provider!, $id: String!) {
+  playlist(provider: $provider, id: $id) {
+    provider
+    id
+    name
+    artists {
+      name
+    }
+  }
+}

@@ -64,8 +64,14 @@ export class AudioPeakService {
 
   async get(audioUrl: string, cutSeconds: number) {
     let response = await fetch(audioUrl);
+    console.info('response.status: ', response.status);
+    if (response.status >= 400) {
+      throw new Error('response.status: ' + response.status);
+    }
     let audioData = await response.arrayBuffer();
+    console.info(new Date());
     let audioBuffer = await this.audioCtx.decodeAudioData(audioData);
+    console.info(new Date());
     let channelData = audioBuffer.getChannelData(0);
 
     let peaks = this.getPeaks(parseInt(`${audioBuffer.duration + 1}`, 10), channelData);
@@ -73,6 +79,7 @@ export class AudioPeakService {
     let startTime = this.findMaxIndex(peaks, cutSeconds);
     return {
       startTime,
+      peaks,
       audioBuffer,
     };
   }

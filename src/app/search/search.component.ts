@@ -1,18 +1,24 @@
 import { Component, OnInit } from '@angular/core';
-import { Subject, of, combineLatest } from 'rxjs';
+import { combineLatest, of, Subject } from 'rxjs';
 import {
-  startWith,
+  catchError,
   debounceTime,
   distinctUntilChanged,
-  switchMap,
   map,
-  catchError,
+  startWith,
+  switchMap,
   tap,
 } from 'rxjs/operators';
 
-import { SearchGQL, ISearchItem, GetGQL, SongDetail } from '../graphql/generated';
-import { PlayerService, IPlayerState } from '../services/player.service';
-import { AudioPeakService } from '../services/audio-peak.service';
+import {
+  GetGQL,
+  ISearchItem,
+  ParseUrlGQL,
+  Provider,
+  SearchGQL,
+  SongDetail,
+} from '../graphql/generated';
+import { PlayerService } from '../services/player.service';
 
 @Component({
   selector: 'app-search',
@@ -21,74 +27,36 @@ import { AudioPeakService } from '../services/audio-peak.service';
 })
 export class SearchComponent implements OnInit {
   private searchSubject = new Subject<string>();
-  private providersSubject = new Subject<string[]>();
-  public searchValue = '田馥甄';
+  private providersSubject = new Subject<Provider[]>();
+  public searchValue = '';
 
   public searchList: ISearchItem[];
+  public playList: SongDetail[];
 
   constructor(
     private searchGQL: SearchGQL,
     private getGQL: GetGQL,
-    private playerService: PlayerService,
-    private audioPeakService: AudioPeakService
+    private parseUrlGQL: ParseUrlGQL,
+    private playerService: PlayerService
   ) {}
 
   ngOnInit() {
-    try {
-      this.playerService.songList = JSON.parse(localStorage.getItem('songList')) || [];
-    } catch (e) {
-      this.playerService.songList = [];
-    }
-
-    this.playerService.endedSubject.subscribe(() => {
-      console.info('ended');
-      this.playerService.next();
-    });
-
-    this.playerService.layoutTouchSubject.subscribe(async () => {
-      await this.playerService.layOutPause();
-    });
-
-    this.playerService.errorSubject.subscribe(() => {
-      let song = this.playerService.getCurrent();
-      this.getGQL
-        .fetch({
-          id: song.id,
-          provider: song.provider,
-        })
-        .pipe(
-          map((result) => {
-            return result.data.get;
-          })
-        )
-        .subscribe((playSong) => {
-          song.url = playSong.url;
-          this.playerService.playCurrent();
-          this.saveSongList();
-        });
-    });
-  }
-
-  test() {
-    this.audioPeakService
-      .get(
-        'http://fs.w.kugou.com/201811071312/d4eecb5627e325a8040734b08ac9b6db/G020/M00/14/18/tIYBAFWefNSAWNYZAbwpBMYEjsE47.flac',
-        25
-      )
-      .then(console.info)
-      .catch(console.warn);
+    this.search();
   }
 
   search() {
     let providersSubject = this.providersSubject.pipe(
-      startWith(['']),
+      startWith([]),
       distinctUntilChanged()
     );
 
     let searchSubject = this.searchSubject.pipe(
       startWith(this.searchValue),
       debounceTime(300),
-      distinctUntilChanged()
+      distinctUntilChanged(),
+      map((str) => {
+        return (str || '').trim();
+      })
     );
 
     combineLatest(providersSubject, searchSubject)
@@ -101,6 +69,25 @@ export class SearchComponent implements OnInit {
           if (!keyword) {
             return of([]);
           }
+
+          if (/^\s*http/.test(keyword)) {
+            return this.parseUrlGQL
+              .fetch({
+                url: keyword,
+              })
+              .pipe(
+                map((result) => {
+                  return result.data.parseUrl || [];
+                }),
+                map((songs) => {
+                  this.playerService.songList.length = 0;
+                  this.playerService.songList.push(...(songs as SongDetail[]));
+                  this.searchValue = '';
+                  this.playerService.playAt(0);
+                })
+              );
+          }
+
           return this.searchGQL
             .fetch({
               keyword,
@@ -117,13 +104,13 @@ export class SearchComponent implements OnInit {
           return caught;
         })
       )
-      .subscribe((songList) => {
-        console.log('songList: ', songList);
-        this.searchList = songList;
+      .subscribe((searchList) => {
+        console.log('searchList: ', searchList);
+        this.searchList = searchList;
       });
   }
 
-  inputKeyup(e) {
+  inputKeyup() {
     this.searchSubject.next(this.searchValue);
   }
 
@@ -132,11 +119,7 @@ export class SearchComponent implements OnInit {
     this.searchSubject.next(this.searchValue);
   }
 
-  play() {
-    this.playerService.next();
-  }
-
-  add(song: ISearchItem) {
+  add(song: ISearchItem, isPlay = false) {
     this.getGQL
       .fetch({
         id: song.id,
@@ -149,13 +132,9 @@ export class SearchComponent implements OnInit {
       )
       .subscribe((playSong) => {
         this.playerService.add(playSong);
-        this.saveSongList();
-        // this.playerService.addAndPlay(playSong);
-        // this.playerService.playPeak(playSong);
+        if (isPlay) {
+          this.playerService.playLast();
+        }
       });
-  }
-
-  saveSongList() {
-    localStorage.setItem('songList', JSON.stringify(this.playerService.songList));
   }
 }

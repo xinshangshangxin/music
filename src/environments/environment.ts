@@ -3,7 +3,11 @@
 // The list of file replacements can be found in `angular.json`.
 
 export const environment = {
-  production: false
+  production: false,
+  // backendUrl: 'http://127.0.0.1:3000',
+  // proxyUrl: 'http://127.0.0.1:3000/proxy',
+  backendUrl: 'http://music.leanapp.cn',
+  proxyUrl: 'http://music.leanapp.cn/proxy',
 };
 
 /*

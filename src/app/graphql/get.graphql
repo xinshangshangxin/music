@@ -1,9 +1,8 @@
-query get($id: ID!, $provider:String!) {
-  get(id: $id, provider: $provider) {
+query get($id: ID!, $provider: Provider!, $br: BitRate) {
+  get(id: $id, provider: $provider, br: $br) {
     provider
     id
     name
-    url
     lrc
     klyric
     artists {
@@ -14,5 +13,7 @@ query get($id: ID!, $provider:String!) {
       name
       img
     }
+    peakStartTime
+    peakEndTime
   }
 }

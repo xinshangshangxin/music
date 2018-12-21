@@ -12,9 +12,10 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { PlayerService } from './services/player.service';
 import { ControlsComponent } from './controls/controls.component';
 import { AudioPeakService } from './services/audio-peak.service';
+import { SongListComponent } from './song-list/song-list.component';
 
 @NgModule({
-  declarations: [AppComponent, SearchComponent, ControlsComponent],
+  declarations: [AppComponent, SearchComponent, ControlsComponent, SongListComponent],
   imports: [
     FormsModule,
     ReactiveFormsModule,

@@ -103,7 +103,7 @@
   dependencies:
     tslib "^1.9.0"
 
-"@angular/cdk@^7.0.2":
+"@angular/cdk@^7.0.3":
   version "7.0.3"
   resolved "https://registry.npmjs.org/@angular/cdk/-/cdk-7.0.3.tgz#6f6ca3203470dfa91858a421d72c8e41765644e5"
   dependencies:
@@ -353,6 +353,10 @@
   resolved "https://registry.npmjs.org/@types/jasminewd2/-/jasminewd2-2.0.6.tgz#2f57a8d9875a6c9ef328a14bd070ba14a055ac39"
   dependencies:
     "@types/jasmine" "*"
+
+"@types/node@^10.12.5":
+  version "10.12.5"
+  resolved "https://registry.npmjs.org/@types/node/-/node-10.12.5.tgz#7e7ea1a9b34d2c8d704cb0b755dffbcda34741ad"
 
 "@types/node@^6.0.46":
   version "6.14.1"
@@ -2337,7 +2341,7 @@ etag@~1.8.1:
   version "1.8.1"
   resolved "https://registry.npmjs.org/etag/-/etag-1.8.1.tgz#41ae2eeb65efa62268aebfea83ac7d79299b0887"
 
-eventemitter3@^3.0.0:
+eventemitter3@^3.0.0, eventemitter3@^3.1.0:
   version "3.1.0"
   resolved "https://registry.npmjs.org/eventemitter3/-/eventemitter3-3.1.0.tgz#090b4d6cdbd645ed10bf750d4b5407942d7ba163"
 
@@ -5577,6 +5581,10 @@ run-queue@^1.0.0, run-queue@^1.0.3:
   resolved "https://registry.npmjs.org/run-queue/-/run-queue-1.0.3.tgz#e848396f057d223f24386924618e25694161ec47"
   dependencies:
     aproba "^1.1.1"
+
+rxjs-observe@^1.0.2:
+  version "1.0.2"
+  resolved "https://registry.npmjs.org/rxjs-observe/-/rxjs-observe-1.0.2.tgz#7150e2022afd1ed3d97704065bb83e151a7a7174"
 
 rxjs@~6.2.0:
   version "6.2.2"

@@ -11,15 +11,21 @@
 export interface Query {
   search?: (ISearchItem | null)[] | null;
 
-  searchWithQuery?: (ISearchItem | null)[] | null;
-
   get?: SongDetail | null;
+
+  rank?: (ISearchItem | null)[] | null;
+
+  playlist?: (ISearchItem | null)[] | null;
+
+  album?: (ISearchItem | null)[] | null;
+
+  parseUrl?: (ISearchItem | null)[] | null;
 
   temp__?: boolean | null;
 }
 
 export interface ISearchItem {
-  provider: string;
+  provider: Provider;
 
   id: string;
 
@@ -49,22 +55,58 @@ export interface SongDetail {
 
   name: string;
 
-  url: string;
-
   lrc: string;
 
-  provider: string;
+  provider: Provider;
 
   artists: (ISearchArtist | null)[];
 
   klyric?: string | null;
 
   album?: ISearchAlbum | null;
+
+  peakStartTime?: number | null;
+
+  peakEndTime?: number | null;
+
+  peaks?: (number | null)[] | null;
+}
+
+export interface Mutation {
+  triggerPeak?: boolean | null;
+
+  addPeakTime?: boolean | null;
+
+  deletePeakTime?: boolean | null;
+}
+
+export interface PeakDetail {
+  provider: Provider;
+
+  id: string;
+
+  peakStartTime: number;
+
+  peakEndTime: number;
+
+  peaks: (number | null)[];
 }
 
 // ====================================================
 // InputTypes
 // ====================================================
+
+export interface PeakTimeInput {
+  id: string;
+
+  provider: Provider;
+
+  peakStartTime: number;
+
+  peakEndTime: number;
+
+  peaks: (number | null)[];
+}
 
 export interface ISearchQuery {
   keyword: string;
@@ -81,17 +123,67 @@ export interface ISearchQuery {
 export interface SearchQueryArgs {
   keyword: string;
 
-  providers?: (string | null)[] | null;
-}
-export interface SearchWithQueryQueryArgs {
-  query?: ISearchQuery | null;
-
-  providers?: (string | null)[] | null;
+  providers?: (Provider | null)[] | null;
 }
 export interface GetQueryArgs {
   id: string;
 
-  provider: string;
+  provider: Provider;
+
+  br?: BitRate | null;
+}
+export interface RankQueryArgs {
+  provider: Provider;
+
+  rankType?: RankType | null;
+}
+export interface PlaylistQueryArgs {
+  provider: Provider;
+
+  id?: string | null;
+}
+export interface AlbumQueryArgs {
+  provider: Provider;
+
+  id?: string | null;
+}
+export interface ParseUrlQueryArgs {
+  url: string;
+}
+export interface TriggerPeakMutationArgs {
+  id: string;
+
+  provider: Provider;
+}
+export interface AddPeakTimeMutationArgs {
+  peakTime: PeakTimeInput;
+}
+export interface DeletePeakTimeMutationArgs {
+  id: string;
+
+  provider: Provider;
+}
+
+// ====================================================
+// Enums
+// ====================================================
+
+export enum Provider {
+  kugou = 'kugou',
+  netease = 'netease',
+  xiami = 'xiami',
+}
+
+export enum BitRate {
+  mid = 'mid',
+  high = 'high',
+  sq = 'sq',
+  hq = 'hq',
+}
+
+export enum RankType {
+  new = 'new',
+  hot = 'hot',
 }
 
 // ====================================================
@@ -102,10 +194,23 @@ export interface GetQueryArgs {
 // Documents
 // ====================================================
 
+export namespace AddPeakTime {
+  export type Variables = {
+    peakTime: PeakTimeInput;
+  };
+
+  export type Mutation = {
+    __typename?: 'Mutation';
+
+    addPeakTime?: boolean | null;
+  };
+}
+
 export namespace Get {
   export type Variables = {
     id: string;
-    provider: string;
+    provider: Provider;
+    br?: BitRate | null;
   };
 
   export type Query = {
@@ -117,13 +222,11 @@ export namespace Get {
   export type Get = {
     __typename?: 'SongDetail';
 
-    provider: string;
+    provider: Provider;
 
     id: string;
 
     name: string;
-
-    url: string;
 
     lrc: string;
 
@@ -132,6 +235,10 @@ export namespace Get {
     artists: (Artists | null)[];
 
     album?: Album | null;
+
+    peakStartTime?: number | null;
+
+    peakEndTime?: number | null;
   };
 
   export type Artists = {
@@ -151,10 +258,110 @@ export namespace Get {
   };
 }
 
+export namespace ParseUrl {
+  export type Variables = {
+    url: string;
+  };
+
+  export type Query = {
+    __typename?: 'Query';
+
+    parseUrl?: (ParseUrl | null)[] | null;
+  };
+
+  export type ParseUrl = {
+    __typename?: 'ISearchItem';
+
+    id: string;
+
+    name: string;
+
+    provider: Provider;
+
+    artists: (Artists | null)[];
+
+    album?: Album | null;
+  };
+
+  export type Artists = {
+    __typename?: 'ISearchArtist';
+
+    name: string;
+  };
+
+  export type Album = {
+    __typename?: 'ISearchAlbum';
+
+    name?: string | null;
+  };
+}
+
+export namespace Playlist {
+  export type Variables = {
+    provider: Provider;
+    id: string;
+  };
+
+  export type Query = {
+    __typename?: 'Query';
+
+    playlist?: (Playlist | null)[] | null;
+  };
+
+  export type Playlist = {
+    __typename?: 'ISearchItem';
+
+    provider: Provider;
+
+    id: string;
+
+    name: string;
+
+    artists: (Artists | null)[];
+  };
+
+  export type Artists = {
+    __typename?: 'ISearchArtist';
+
+    name: string;
+  };
+}
+
+export namespace Rank {
+  export type Variables = {
+    provider: Provider;
+    rankType?: RankType | null;
+  };
+
+  export type Query = {
+    __typename?: 'Query';
+
+    rank?: (Rank | null)[] | null;
+  };
+
+  export type Rank = {
+    __typename?: 'ISearchItem';
+
+    id: string;
+
+    name: string;
+
+    provider: Provider;
+
+    artists: (Artists | null)[];
+  };
+
+  export type Artists = {
+    __typename?: 'ISearchArtist';
+
+    name: string;
+  };
+}
+
 export namespace Search {
   export type Variables = {
     keyword: string;
-    providers?: (string | null)[] | null;
+    providers?: (Provider | null)[] | null;
   };
 
   export type Query = {
@@ -170,7 +377,7 @@ export namespace Search {
 
     name: string;
 
-    provider: string;
+    provider: Provider;
 
     artists: (Artists | null)[];
 
@@ -207,14 +414,23 @@ import gql from 'graphql-tag';
 @Injectable({
   providedIn: 'root',
 })
+export class AddPeakTimeGQL extends Apollo.Mutation<AddPeakTime.Mutation, AddPeakTime.Variables> {
+  document: any = gql`
+    mutation addPeakTime($peakTime: PeakTimeInput!) {
+      addPeakTime(peakTime: $peakTime)
+    }
+  `;
+}
+@Injectable({
+  providedIn: 'root',
+})
 export class GetGQL extends Apollo.Query<Get.Query, Get.Variables> {
   document: any = gql`
-    query get($id: ID!, $provider: String!) {
-      get(id: $id, provider: $provider) {
+    query get($id: ID!, $provider: Provider!, $br: BitRate) {
+      get(id: $id, provider: $provider, br: $br) {
         provider
         id
         name
-        url
         lrc
         klyric
         artists {
@@ -225,6 +441,62 @@ export class GetGQL extends Apollo.Query<Get.Query, Get.Variables> {
           name
           img
         }
+        peakStartTime
+        peakEndTime
+      }
+    }
+  `;
+}
+@Injectable({
+  providedIn: 'root',
+})
+export class ParseUrlGQL extends Apollo.Query<ParseUrl.Query, ParseUrl.Variables> {
+  document: any = gql`
+    query parseUrl($url: String!) {
+      parseUrl(url: $url) {
+        id
+        name
+        provider
+        artists {
+          name
+        }
+        album {
+          name
+        }
+      }
+    }
+  `;
+}
+@Injectable({
+  providedIn: 'root',
+})
+export class PlaylistGQL extends Apollo.Query<Playlist.Query, Playlist.Variables> {
+  document: any = gql`
+    query playlist($provider: Provider!, $id: String!) {
+      playlist(provider: $provider, id: $id) {
+        provider
+        id
+        name
+        artists {
+          name
+        }
+      }
+    }
+  `;
+}
+@Injectable({
+  providedIn: 'root',
+})
+export class RankGQL extends Apollo.Query<Rank.Query, Rank.Variables> {
+  document: any = gql`
+    query rank($provider: Provider!, $rankType: RankType) {
+      rank(provider: $provider, rankType: $rankType) {
+        id
+        name
+        provider
+        artists {
+          name
+        }
       }
     }
   `;
@@ -234,7 +506,7 @@ export class GetGQL extends Apollo.Query<Get.Query, Get.Variables> {
 })
 export class SearchGQL extends Apollo.Query<Search.Query, Search.Variables> {
   document: any = gql`
-    query search($keyword: String!, $providers: [String]) {
+    query search($keyword: String!, $providers: [Provider]) {
       search(keyword: $keyword, providers: $providers) {
         id
         name
