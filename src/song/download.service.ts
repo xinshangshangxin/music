@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { BitRate, Provider } from '@s4p/music-api';
 import { createWriteStream } from 'fs';
 import { access, ensureDir, move, remove } from 'fs-extra';
-import * as got from 'got';
+import got from 'got';
 import { homedir } from 'os';
 import { resolve as pathResolve } from 'path';
 

@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ISearchItem, Provider } from '@s4p/music-api';
-import * as got from 'got';
-import * as get from 'lodash/get';
+import got from 'got';
+import get from 'lodash/get';
 import { parse as querystringParse } from 'querystring';
 import { parse as urlParse } from 'url';
 

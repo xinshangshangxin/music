@@ -1,7 +1,7 @@
 import { Controller, Get, Query, Req, Res } from '@nestjs/common';
 import { BitRate, Provider } from '@s4p/music-api';
 import { access } from 'fs-extra';
-import * as ms from 'mediaserver';
+import ms from 'mediaserver';
 
 import { DownloadService } from '../song/download.service';
 

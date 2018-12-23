@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Provider } from '@s4p/music-api';
-import * as audioDecode from 'audio-decode';
+import audioDecode from 'audio-decode';
 import { createReadStream } from 'fs';
 
 import { SongPeakService } from './song-peak.service';

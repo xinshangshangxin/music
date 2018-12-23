@@ -11,7 +11,7 @@ import {
 } from '@s4p/music-api';
 import { InjectModel } from '@s4p/nest-nmdb';
 import { IModel } from '@s4p/nmdb';
-import * as promiseRetry from 'promise-retry';
+import promiseRetry from 'promise-retry';
 
 import { SongPeakService } from '../song-peak/song-peak.service';
 

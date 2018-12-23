@@ -1,9 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { resolve as pathResolve } from 'path';
 import { readFileSync } from 'fs';
-import * as JSON5 from 'json5';
-
-import * as Joi from 'joi';
+import Joi from 'joi';
+import JSON5 from 'json5';
+import { resolve as pathResolve } from 'path';
 
 interface EnvConfig {
   [prop: string]: any;
