@@ -5,38 +5,47 @@ import { createReadStream } from 'fs';
 
 import { SongPeakService } from './song-peak.service';
 
+// 总共播放时长 = duration + before + end
+interface IPeakConfig {
+  // 高潮音乐时长
+  duration: number;
+  // 渐入时长
+  layIn: number;
+  // 渐出时长
+  layOut: number;
+  // 高潮音乐前置时间
+  before: number;
+  // 高潮音乐后置时间
+  after: number;
+  // peak 数组的精确度
+  precision: number;
+}
+
 interface IDecode {
   filePath: string;
   id: string;
   provider: Provider;
-  // 分析高峰的时间段
-  duration?: number;
-  // 前奏补齐
-  beforeFill?: number;
-  // 后续补齐
-  afterFill?: number;
+  peakConfig?: IPeakConfig;
 }
 
 @Injectable()
 export class AudioService {
-  constructor(private songPeakService: SongPeakService) {}
+  constructor() {}
 
-  async decode({
-    filePath,
-    id,
-    provider,
-    duration = 20,
-    beforeFill = 7,
-    afterFill = 3,
-  }: IDecode) {
+  async decode({ filePath, id, provider, peakConfig }: IDecode) {
     console.info(`decode ${filePath}`);
 
-    // had decoded
-    let doc = await this.songPeakService.get(id, provider);
-    if (doc) {
-      console.debug('had decoded');
-      return;
-    }
+    peakConfig = Object.assign(
+      {
+        duration: 20,
+        before: 6,
+        after: 4,
+        precision: 10,
+      },
+      peakConfig,
+    );
+
+    let { duration, precision } = peakConfig;
 
     let stream = createReadStream(filePath);
     let buffer = await this.streamToBuffer(stream);
@@ -45,28 +54,22 @@ export class AudioService {
     let channelData = audioBuffer.getChannelData(0);
 
     let peaks = this.getPeaks(
-      parseInt(`${audioBuffer.duration + 1}`, 10),
+      precision * parseInt(`${audioBuffer.duration + 1}`, 10),
       channelData,
     );
 
-    let peakStart = this.findMaxIndex(peaks, duration);
+    let peak = await this.getSongPeak(peaks, precision, duration);
 
-    let peakTime = {
-      startTime: peakStart - beforeFill,
-      endTime: peakStart + duration + afterFill,
+    return peak;
+  }
+
+  async getSongPeak(peaks: number[], precision: number, duration: number) {
+    let startTime = this.findMaxIndex(peaks, duration * precision) / precision;
+
+    return {
+      peakStartTime: startTime,
+      peakDuration: duration,
     };
-
-    console.debug('peakTime: ', peakTime);
-
-    await this.songPeakService.add({
-      id,
-      provider,
-      peakStartTime: peakTime.startTime,
-      peakEndTime: peakTime.endTime,
-      peaks,
-    });
-
-    return peakTime;
   }
 
   private accumulate(arr) {

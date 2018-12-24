@@ -30,8 +30,9 @@ export class SongResolver {
     @Args('id') id: string,
     @Args('provider') provider: Provider,
     @Args('br') br: BitRate,
+    @Args('peakDuration') peakDuration: number,
   ) {
-    return this.songService.getSong(id, provider, br);
+    return this.songService.getSong(id, provider, br, peakDuration);
   }
 
   @Query()

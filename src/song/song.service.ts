@@ -22,12 +22,17 @@ export class SongService {
     private songPeakService: SongPeakService,
   ) {}
 
-  async getSong(id, provider, br = BitRate.mid) {
-    console.debug('getSong', id, provider, br);
+  async getSong(
+    id: string,
+    provider: Provider,
+    br = BitRate.mid,
+    peakDuration = 20,
+  ) {
+    console.debug('getSong', { id, provider, br, peakDuration });
 
     let [song, peak] = await Promise.all([
       this.getSongBaseInfo(id, provider, br),
-      this.songPeakService.get(id, provider),
+      this.songPeakService.getPeak(id, provider, peakDuration),
     ]);
 
     return { ...peak, provider, ...song };

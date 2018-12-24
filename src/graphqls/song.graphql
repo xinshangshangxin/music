@@ -40,6 +40,11 @@ type ISearchItem {
   album: ISearchAlbum
 }
 
+type IPeaks {
+  precision: Int!
+  data: [Float]!
+}
+
 type SongDetail {
   id: String!
   name: String!
@@ -48,32 +53,31 @@ type SongDetail {
   artists: [ISearchArtist]!
   klyric: String
   album: ISearchAlbum
-  peakStartTime: Int
-  peakEndTime: Int
-  peaks: [Float]
-
+  peakStartTime: Float
+  peakDuration: Int
+  peaks: [IPeaks]
 }
 
-type PeakDetail {
-  provider: Provider!
-  id: String!
-  peakStartTime: Int!
-  peakEndTime: Int!
-  peaks: [Float]!
+input PeakInput {
+  duration: Int!
+  startTime: Float!
+}
+
+input PeaksInput {
+  precision: Int!
+  data: [Float]!
 }
 
 input PeakTimeInput {
   id: String!
   provider: Provider!
-  peakStartTime: Int!
-  peakEndTime: Int!
-  peaks: [Float]!
+  peak: PeakInput!
+  peaks: PeaksInput!
 }
-
 
 type Query {
   search(keyword: String!, providers: [Provider]): [ISearchItem]
-  get(id: ID!, provider: Provider!, br: BitRate): SongDetail
+  get(id: ID!, provider: Provider!, br: BitRate, peakDuration: Int): SongDetail
   rank(provider: Provider!, rankType: RankType): [ISearchItem]
   playlist(provider: Provider!, id: String): [ISearchItem]
   album(provider: Provider!, id: String): [ISearchItem]

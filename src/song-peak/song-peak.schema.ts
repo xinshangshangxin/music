@@ -7,16 +7,28 @@ export const SongPeakSchema = {
     type: String,
     required: true,
   },
-  peakStartTime: {
-    type: Number,
-    required: true,
-  },
-  peakEndTime: {
-    type: Number,
-    required: true,
-  },
-  peaks: {
-    type: Array,
-    required: true,
-  },
+  peak: [
+    {
+      duration: {
+        type: Number,
+        required: true,
+      },
+      startTime: {
+        type: Number,
+        required: true,
+      },
+    },
+  ],
+  peaks: [
+    {
+      precision: {
+        type: Number,
+        required: true,
+      },
+      data: {
+        type: Array,
+        required: true,
+      },
+    },
+  ],
 };
