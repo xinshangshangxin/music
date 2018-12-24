@@ -13,53 +13,12 @@ import { PlayerService } from '../services/player.service';
 export class SongListComponent implements OnInit {
   public playList: SongDetail[];
 
-  private songRetryNu = 0;
-  private songListRetryNu = 0;
-  private MAX_SONG_RETRY = 1;
-  private MAX_SONG_LIST_RETRY = 2;
   private mode = '1';
 
   constructor(private playerService: PlayerService, private rankGQL: RankGQL) {}
 
   ngOnInit() {
     this.getSongList();
-
-    this.playerService.endedSubject.subscribe(() => {
-      console.info('endedSubject emit');
-      this.playerService.next();
-
-      this.songRetryNu = 0;
-      this.songListRetryNu = 0;
-    });
-
-    this.playerService.layoutTouchSubject.subscribe(async () => {
-      this.playerService.layOutPause();
-    });
-
-    this.playerService.errorSubject.subscribe((e) => {
-      console.warn(e);
-      if (this.songListRetryNu >= this.MAX_SONG_LIST_RETRY * this.playerService.songList.length) {
-        throw new Error('song list retry over ' + this.MAX_SONG_LIST_RETRY);
-      }
-
-      if (this.songRetryNu >= this.MAX_SONG_RETRY) {
-        console.warn('song retryNu = ' + this.songRetryNu);
-        this.songRetryNu = 0;
-        this.songListRetryNu += 1;
-        setTimeout(() => {
-          this.playerService.next();
-        }, this.songListRetryNu * 200);
-        return null;
-      }
-
-      this.songRetryNu += 1;
-      this.playerService.playCurrent();
-    });
-
-    this.playerService.songListChangeSubject.subscribe(() => {
-      console.info('songListChangeSubject');
-      this.saveSongList();
-    });
   }
 
   drop(event: CdkDragDrop<string[]>) {

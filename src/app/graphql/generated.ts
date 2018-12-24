@@ -67,9 +67,15 @@ export interface SongDetail {
 
   peakStartTime?: number | null;
 
-  peakEndTime?: number | null;
+  peakDuration?: number | null;
 
-  peaks?: (number | null)[] | null;
+  peaks?: (IPeaks | null)[] | null;
+}
+
+export interface IPeaks {
+  precision: number;
+
+  data: (number | null)[];
 }
 
 export interface Mutation {
@@ -78,18 +84,6 @@ export interface Mutation {
   addPeakTime?: boolean | null;
 
   deletePeakTime?: boolean | null;
-}
-
-export interface PeakDetail {
-  provider: Provider;
-
-  id: string;
-
-  peakStartTime: number;
-
-  peakEndTime: number;
-
-  peaks: (number | null)[];
 }
 
 // ====================================================
@@ -101,11 +95,21 @@ export interface PeakTimeInput {
 
   provider: Provider;
 
-  peakStartTime: number;
+  peak: PeakInput;
 
-  peakEndTime: number;
+  peaks: PeaksInput;
+}
 
-  peaks: (number | null)[];
+export interface PeakInput {
+  duration: number;
+
+  startTime: number;
+}
+
+export interface PeaksInput {
+  precision: number;
+
+  data: (number | null)[];
 }
 
 export interface ISearchQuery {
@@ -238,7 +242,7 @@ export namespace Get {
 
     peakStartTime?: number | null;
 
-    peakEndTime?: number | null;
+    peakDuration?: number | null;
   };
 
   export type Artists = {
@@ -442,7 +446,7 @@ export class GetGQL extends Apollo.Query<Get.Query, Get.Variables> {
           img
         }
         peakStartTime
-        peakEndTime
+        peakDuration
       }
     }
   `;

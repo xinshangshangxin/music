@@ -84,6 +84,9 @@ export class SearchComponent implements OnInit {
                   this.playerService.songList.push(...(songs as SongDetail[]));
                   this.searchValue = '';
                   this.playerService.playAt(0);
+
+                  let key = `songs-1`;
+                  localStorage.setItem(key, JSON.stringify(this.playerService.songList));
                 })
               );
           }
@@ -110,7 +113,8 @@ export class SearchComponent implements OnInit {
       });
   }
 
-  inputKeyup() {
+  inputKeyup(e: any) {
+    console.info(e);
     this.searchSubject.next(this.searchValue);
   }
 

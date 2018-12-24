@@ -33,7 +33,7 @@ export class SrcAudio extends EventEmitter {
     this.gainNode.connect(this.audioContext.destination);
   }
 
-  set src(value) {
+  set src(value: string) {
     this.audio.src = value;
   }
 
@@ -70,19 +70,13 @@ export class SrcAudio extends EventEmitter {
       0,
       this.audioContext.currentTime + this.layOutDuration
     );
-
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve();
-        this.audio.pause();
-
-        this.emit('ended', { from: 'layOut ended' });
-      }, this.layOutDuration * 1000);
-    });
   }
 
   destroy() {
-    console.info('src audio destory');
+    console.info('========== src audio destory ==========');
+
+    this.emit('destroy');
+    this.audio.pause();
 
     Object.keys(this.eventListeners).forEach((key) => {
       this.eventListeners[key].forEach((fn) => {
@@ -93,6 +87,7 @@ export class SrcAudio extends EventEmitter {
     this.source.disconnect();
     this.analyser.disconnect();
     this.gainNode.disconnect();
+    this.audioContext.close();
 
     this.source = null;
     this.analyser = null;
@@ -100,6 +95,8 @@ export class SrcAudio extends EventEmitter {
     this.audioContext = null;
 
     this.audio = null;
+
+    this.removeAllListeners();
   }
 
   pause() {

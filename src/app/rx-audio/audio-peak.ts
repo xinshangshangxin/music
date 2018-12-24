@@ -1,10 +1,32 @@
-import { Injectable } from '@angular/core';
-
-@Injectable()
-export class AudioPeakService {
+export class AudioPeak {
   private audioCtx: AudioContext;
   constructor() {
     this.audioCtx = new AudioContext();
+  }
+
+  /**
+   *
+   * @param audioUrl audio url
+   * @param cutSeconds high music seconds
+   * @param precision return peaks weith (1 seconds / precision)
+   */
+  async get(audioUrl: string, cutSeconds: number, precision = 10) {
+    let response = await fetch(audioUrl);
+    if (response.status >= 400) {
+      throw new Error('response.status: ' + response.status);
+    }
+    let audioData = await response.arrayBuffer();
+    let audioBuffer = await this.audioCtx.decodeAudioData(audioData);
+    let channelData = audioBuffer.getChannelData(0);
+
+    let peaks = this.getPeaks(precision * parseInt(`${audioBuffer.duration + 1}`, 10), channelData);
+
+    let startTime = this.findMaxIndex(peaks, cutSeconds * precision) / precision;
+    return {
+      startTime,
+      peaks,
+      audioBuffer,
+    };
   }
 
   private accumulate(arr) {
@@ -47,7 +69,7 @@ export class AudioPeakService {
     return (max + max1) / 2;
   }
 
-  private getPeaks(width, data) {
+  private getPeaks(width, data): number[] {
     const dataLength = data.length;
     const size = dataLength / width;
     let current = 0;
@@ -60,27 +82,5 @@ export class AudioPeakService {
     }
 
     return peaks;
-  }
-
-  async get(audioUrl: string, cutSeconds: number) {
-    let response = await fetch(audioUrl);
-    console.info('response.status: ', response.status);
-    if (response.status >= 400) {
-      throw new Error('response.status: ' + response.status);
-    }
-    let audioData = await response.arrayBuffer();
-    console.info(new Date());
-    let audioBuffer = await this.audioCtx.decodeAudioData(audioData);
-    console.info(new Date());
-    let channelData = audioBuffer.getChannelData(0);
-
-    let peaks = this.getPeaks(parseInt(`${audioBuffer.duration + 1}`, 10), channelData);
-
-    let startTime = this.findMaxIndex(peaks, cutSeconds);
-    return {
-      startTime,
-      peaks,
-      audioBuffer,
-    };
   }
 }

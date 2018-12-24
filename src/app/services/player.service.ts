@@ -1,34 +1,30 @@
 import { Injectable } from '@angular/core';
-import { fromEvent, merge, Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { catchError, tap, mergeMap } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
 
-import { SongDetail, AddPeakTimeGQL, PeakTimeInput, GetGQL } from '../graphql/generated';
-import { ArrayBufferAudio } from './array-buffer-audio';
-import { AudioPeakService } from './audio-peak.service';
-import { SrcAudio } from './src-audio';
+import { AddPeakTimeGQL, GetGQL, SongDetail, Provider } from '../graphql/generated';
+import { MyAudio } from '../rx-audio/my-audio';
+
+interface IPlaySong extends SongDetail {
+  peakStartTime?: number;
+}
 
 export interface IPlayerState {
+  isPeak?: boolean;
   playing: boolean;
   currentIndex: number;
   currentTime: number;
   bufferedTime: number;
   duration: number;
+  song?: IPlaySong;
 }
 
-interface IPlaySong extends SongDetail {
-  peakStartTime?: number;
-  peakEndTime?: number;
-}
-
-@Injectable({
-  providedIn: 'root',
-})
+@Injectable()
 export class PlayerService {
   public songList: IPlaySong[] = [];
 
-  private isPeak = true;
   private state: IPlayerState = {
+    isPeak: true,
     playing: false,
     currentIndex: 0,
     currentTime: 0,
@@ -36,55 +32,99 @@ export class PlayerService {
     duration: 0,
   };
 
-  public errorSubject: Subject<Error> = new Subject<Error>();
-  public endedSubject: Subject<any> = new Subject();
-  public layoutTouchSubject: Subject<any> = new Subject();
-  public songListChangeSubject: Subject<any> = new Subject();
+  private myAudio: MyAudio;
 
-  private audio: ArrayBufferAudio | SrcAudio;
+  constructor(private addPeakTimeGQL: AddPeakTimeGQL, private getGel: GetGQL) {
+    this.myAudio = new MyAudio();
 
-  constructor(
-    private audioPeakService: AudioPeakService,
-    private addPeakTimeGQL: AddPeakTimeGQL,
-    private getGel: GetGQL
-  ) {}
+    this.catchNext();
+    this.updatePeakTime();
+  }
 
-  async playPeak(song: IPlaySong) {
-    console.info('playPeak');
+  private static buildSongUrl(song: IPlaySong) {
+    return `${environment.proxyUrl}?id=${song.id}&provider=${song.provider}`;
+  }
 
-    this.destroy();
+  private catchNext() {
+    let songRetryNu = 0;
+    let songListRetryNu = 0;
+    let MAX_SONG_RETRY = 1;
+    let MAX_SONG_LIST_RETRY = 1;
 
-    try {
-      let url = `${environment.proxyUrl}?id=${song.id}&provider=${song.provider}`;
+    this.myAudio.endedSubject.subscribe(() => {
+      console.info('endedSubject emit');
 
-      let layInDuration = 2;
-      let layOutDuration = 3;
-      let duration = 20 - layInDuration - layOutDuration;
-      let { startTime, audioBuffer, peaks } = await this.audioPeakService.get(url, duration);
-      let endTime = startTime + duration;
+      songRetryNu = 0;
+      songListRetryNu = 0;
 
-      // set peak time
-      song.peakStartTime = startTime - layInDuration - 7;
-      song.peakEndTime = endTime + layInDuration + layOutDuration + 3;
+      this.next();
+    });
 
-      this.songListChangeSubject.next();
+    this.myAudio.errorSubject.subscribe((e) => {
+      console.warn(e);
 
-      // create audio
-      this.audio = new ArrayBufferAudio(audioBuffer, layInDuration, layOutDuration);
-      this.addListener();
-      this.audio.play(song.peakStartTime);
-      this.setLayoutTouch(song.peakEndTime);
+      if (songListRetryNu >= MAX_SONG_LIST_RETRY * this.songList.length) {
+        console.log(new Error('song list retry over ' + MAX_SONG_LIST_RETRY));
+        return null;
+      }
 
-      this.updatePeakTime({
-        id: song.id,
-        provider: song.provider,
-        peakStartTime: song.peakStartTime,
-        peakEndTime: song.peakEndTime,
-        peaks,
-      });
-    } catch (e) {
-      this.errorSubject.next(e);
+      if (songRetryNu >= MAX_SONG_RETRY) {
+        console.warn('song retryNu = ' + songRetryNu);
+        songRetryNu = 0;
+        songListRetryNu += 1;
+        setTimeout(() => {
+          this.next();
+        }, songListRetryNu * 200);
+        return null;
+      }
+
+      songRetryNu += 1;
+      this.playCurrent();
+    });
+  }
+
+  private async play(song: IPlaySong) {
+    console.info('wait to play song: ', song);
+
+    this.state.song = song;
+    if (this.state.isPeak) {
+      if (!song.peakStartTime) {
+        try {
+          console.info('get server peakStartTime');
+          let { data } = await this.getGel
+            .fetch({
+              id: song.id,
+              provider: song.provider,
+            })
+            .toPromise();
+
+          let { __typename, ...newSong } = data.get;
+
+          if (newSong.peakStartTime) {
+            song = { ...song, ...newSong };
+          }
+        } catch (e) {
+          this.myAudio.errorSubject.next(e);
+          return;
+        }
+      }
     }
+
+    if (song.id !== this.state.song.id || song.provider !== this.state.song.provider) {
+      console.warn('not in current loop song, skip play');
+      return;
+    }
+
+    this.state.playing = true;
+    this.myAudio.playSong(
+      {
+        url: PlayerService.buildSongUrl(song),
+        id: song.id,
+        provider: song.provider as string,
+        peakStartTime: song.peakStartTime,
+      },
+      this.state.isPeak
+    );
   }
 
   getCurrent(): IPlaySong {
@@ -94,7 +134,6 @@ export class PlayerService {
 
   add(song: IPlaySong) {
     this.songList.push(song);
-    this.songListChangeSubject.next();
   }
 
   remove(index: number) {
@@ -124,9 +163,7 @@ export class PlayerService {
       return null;
     }
 
-    if (this.isPeak) {
-      this.play(song);
-    }
+    this.play(song);
   }
 
   previous(): void {
@@ -161,17 +198,11 @@ export class PlayerService {
 
   togglePlay() {
     if (this.state.playing) {
-      this.destroy();
+      this.state.playing = false;
+      this.myAudio.pause();
     } else {
-      this.playCurrent();
-    }
-  }
-
-  destroy() {
-    this.state.playing = false;
-    if (this.audio) {
-      this.audio.destroy();
-      this.audio = null;
+      this.myAudio.play();
+      this.state.playing = true;
     }
   }
 
@@ -181,127 +212,25 @@ export class PlayerService {
     }
   }
 
-  private playSrcAudio(song: IPlaySong) {
-    console.info('playSrcAudio');
-    this.audio = new SrcAudio(2, 3);
-    this.addListener();
-
-    let url = `${environment.proxyUrl}?id=${song.id}&provider=${song.provider}`;
-
-    try {
-      this.audio.pause();
-    } catch (e) {
-      console.warn(e);
-    }
-    this.audio.src = url;
-
-    if (this.isPeak) {
-      this.audio.play(song.peakStartTime);
-      this.setLayoutTouch(song.peakEndTime);
-    } else {
-      this.audio.play(0);
-    }
-  }
-
-  private async play(song: IPlaySong) {
-    console.info('song: ', song);
-    this.destroy();
-
-    this.state.playing = true;
-    if (!this.isPeak) {
-      this.playSrcAudio(song);
-      return;
-    } else if (song.peakStartTime && song.peakEndTime) {
-      this.playSrcAudio(song);
-      return;
-    }
-
-    let { data } = await this.getGel
-      .fetch({
-        id: song.id,
-        provider: song.provider,
-      })
-      .toPromise();
-
-    let { __typename, ...newSong } = data.get;
-
-    if (newSong.peakStartTime && newSong.peakEndTime) {
-      song = { ...song, ...newSong };
-      this.playSrcAudio(song);
-      return;
-    }
-
-    await this.playPeak(song);
-  }
-
-  private addListener() {
-    this.audio.once('error', (e) => {
-      this.errorSubject.next(e);
-    });
-
-    this.audio.once('ended', (data) => {
-      this.audio.pause();
-
-      this.endedSubject.next(data);
-    });
-
-    this.audio.once('layoutTouch', (data) => {
-      this.layoutTouchSubject.next(data);
-    });
-
-    // just for debug
-    this.audio.on('error', (e) => {
-      console.info('error: ', e);
-    });
-
-    this.audio.on('ended', (data) => {
-      console.info('ended: ', data);
-    });
-
-    this.audio.on('layoutTouch', (data) => {
-      console.info('layoutTouch: ', data);
-    });
-  }
-
-  private async updatePeakTime(peakTime: PeakTimeInput) {
-    try {
-      await this.addPeakTimeGQL.mutate({ peakTime }).toPromise();
-    } catch (e) {
-      console.warn(e);
-    }
-  }
-
-  layOutPause() {
-    this.audio.layOutPause();
-  }
-
-  setLayoutTouch(endTime: number) {
-    fromEvent(this.audio, 'timeupdate')
+  private async updatePeakTime() {
+    this.myAudio.peakTimeUpdateSubject
       .pipe(
-        takeUntil(
-          merge(
-            fromEvent(this.audio, 'layoutTouch'),
-            fromEvent(this.audio, 'ended'),
-            fromEvent(this.audio, 'error')
-          )
-        )
+        tap((peakResult) => {
+          console.info('updatePeakTime: ', peakResult);
+        }),
+        mergeMap((peakResult) => {
+          return this.addPeakTimeGQL.mutate({
+            peakTime: {
+              ...peakResult,
+              provider: peakResult.provider as Provider,
+            },
+          });
+        }),
+        catchError((e) => {
+          console.warn(e);
+          return null;
+        })
       )
-      .subscribe(() => {
-        if (endTime && this.audio.currentTime >= endTime - this.audio.getLayoutDuration()) {
-          // 片段结尾
-          this.audio.emit('layoutTouch', {
-            currentTime: this.audio.currentTime,
-            layOutTime: endTime - this.audio.getLayoutDuration(),
-            peak: true,
-          });
-        } else if (this.audio.currentTime >= this.audio.duration - this.audio.getLayoutDuration()) {
-          // 整首歌结尾
-          this.audio.emit('layoutTouch', {
-            currentTime: this.audio.currentTime,
-            layOutTime: this.audio.duration - this.audio.getLayoutDuration(),
-            peak: false,
-          });
-        }
-      });
+      .subscribe(() => {});
   }
 }

@@ -1,17 +1,16 @@
-import { BrowserModule } from '@angular/platform-browser';
+import { HttpClientModule } from '@angular/common/http';
 import { NgModule } from '@angular/core';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { BrowserModule } from '@angular/platform-browser';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { ControlsComponent } from './controls/controls.component';
 import { CustomerMaterialModule } from './customer-material/customer-material.module';
-import { HttpClientModule } from '@angular/common/http';
 import { GraphQLModule } from './graphql/graphql.module';
 import { SearchComponent } from './search/search.component';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { PlayerService } from './services/player.service';
-import { ControlsComponent } from './controls/controls.component';
-import { AudioPeakService } from './services/audio-peak.service';
 import { SongListComponent } from './song-list/song-list.component';
 
 @NgModule({
@@ -26,7 +25,7 @@ import { SongListComponent } from './song-list/song-list.component';
     HttpClientModule,
     GraphQLModule,
   ],
-  providers: [PlayerService, AudioPeakService],
+  providers: [PlayerService],
   bootstrap: [AppComponent],
 })
 export class AppModule {}
