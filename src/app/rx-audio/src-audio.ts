@@ -54,7 +54,7 @@ export class SrcAudio extends EventEmitter {
       return;
     }
 
-    this.gainNode.gain.value = 0;
+    this.gainNode.gain.setValueAtTime(0, this.audioContext.currentTime);
     this.gainNode.gain.linearRampToValueAtTime(
       1,
       this.audioContext.currentTime + this.layInDuration
@@ -66,6 +66,7 @@ export class SrcAudio extends EventEmitter {
       return;
     }
 
+    this.gainNode.gain.setValueAtTime(1, this.audioContext.currentTime);
     this.gainNode.gain.linearRampToValueAtTime(
       0,
       this.audioContext.currentTime + this.layOutDuration
@@ -111,38 +112,38 @@ export class SrcAudio extends EventEmitter {
   }
 
   private addEvents() {
-    let that = this;
-
     let playFn = (event) => {
-      that.emit('play', { event });
+      this.emit('play', { event });
     };
     this.audio.addEventListener('play', playFn);
     this.eventListeners.play = this.eventListeners.play || [];
     this.eventListeners.play.push(playFn);
 
     let pauseFn = (event) => {
-      that.emit('pause', { event });
+      this.emit('pause', { event });
     };
     this.audio.addEventListener('pause', pauseFn);
     this.eventListeners.pause = this.eventListeners.pause || [];
     this.eventListeners.pause.push(pauseFn);
 
     let timeupdateFn = (event) => {
-      that.emit('timeupdate', { event });
+      this.emit('timeupdate', { event });
     };
     this.audio.addEventListener('timeupdate', timeupdateFn);
     this.eventListeners.timeupdate = this.eventListeners.timeupdate || [];
     this.eventListeners.timeupdate.push(timeupdateFn);
 
-    let errorFn = (event) => {
-      that.emit('error', { event });
+    let errorFn = (event: ErrorEvent) => {
+      if (!event.isTrusted) {
+        this.emit('error', { event });
+      }
     };
     this.audio.addEventListener('error', errorFn);
     this.eventListeners.error = this.eventListeners.error || [];
     this.eventListeners.error.push(errorFn);
 
     let endedFn = (event) => {
-      that.emit('ended', { from: 'audio ended', event });
+      this.emit('ended', { from: 'audio ended', event });
     };
     this.audio.addEventListener('ended', endedFn);
     this.eventListeners.ended = this.eventListeners.ended || [];

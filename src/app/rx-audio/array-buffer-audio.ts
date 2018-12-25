@@ -180,6 +180,7 @@ export class ArrayBufferAudio extends EventEmitter {
       return;
     }
 
+    this.gainNode.gain.setValueAtTime(1, this.audioContext.currentTime);
     this.gainNode.gain.linearRampToValueAtTime(
       0,
       this.audioContext.currentTime + this.layOutDuration
@@ -191,7 +192,7 @@ export class ArrayBufferAudio extends EventEmitter {
       return;
     }
 
-    this.gainNode.gain.value = 0;
+    this.gainNode.gain.setValueAtTime(0, this.audioContext.currentTime);
     this.gainNode.gain.linearRampToValueAtTime(
       1,
       this.audioContext.currentTime + this.layInDuration
