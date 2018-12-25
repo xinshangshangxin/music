@@ -2,7 +2,6 @@ import EventEmitter from 'eventemitter3';
 
 export class ArrayBufferAudio extends EventEmitter {
   public duration: number;
-  public paused = true;
   public playing = false;
 
   private audioContext: AudioContext;
@@ -48,7 +47,7 @@ export class ArrayBufferAudio extends EventEmitter {
   }
 
   play(start: number) {
-    if (!this.paused) {
+    if (this.playing) {
       this.pause();
     }
 
@@ -62,7 +61,6 @@ export class ArrayBufferAudio extends EventEmitter {
     this.source.start(0, start);
 
     this.playing = true;
-    this.paused = false;
     this.emit('play');
   }
 
@@ -73,7 +71,6 @@ export class ArrayBufferAudio extends EventEmitter {
   async pause() {
     console.info('===pause=== array buffer audio ');
     this.playing = false;
-    this.paused = true;
 
     this.afterStop();
 
@@ -129,8 +126,8 @@ export class ArrayBufferAudio extends EventEmitter {
 
   private addSourceListener() {
     let endedFn = (event) => {
-      console.debug('source ended: ', { paused: this.paused, event });
-      if (!this.paused) {
+      console.debug('source ended: ', { paused: !this.playing, event });
+      if (this.playing) {
         this.emit('ended', { from: 'audioContext bufferSource ended' });
       }
     };

@@ -1,5 +1,5 @@
-import { from, fromEvent, merge, Observable, Observer, Subject } from 'rxjs';
-import { switchMap, takeUntil } from 'rxjs/operators';
+import { from, fromEvent, merge, Observable, Observer, of, Subject, empty, never } from 'rxjs';
+import { catchError, switchMap, takeUntil, tap } from 'rxjs/operators';
 
 import { ArrayBufferAudio } from './array-buffer-audio';
 import { AudioPeak } from './audio-peak';
@@ -51,6 +51,8 @@ export class MyAudio {
     provider: string;
   }> = new Subject();
 
+  public playing = false;
+
   private playerSubject = new Subject<[IPlaySong, boolean]>();
   private audioPeak: AudioPeak;
   private peakConfig: IPeakConfig;
@@ -78,17 +80,23 @@ export class MyAudio {
 
   play() {
     if (this.audio) {
+      this.playing = true;
       this.audio.play(this.audio.currentTime);
     }
   }
 
   pause() {
+    this.playing = false;
+
     if (this.audio) {
       this.audio.pause();
     }
   }
 
   playSong(song: IPlaySong, peakPlay = true) {
+    console.info('call playSong');
+
+    this.playing = true;
     this.playerSubject.next([song, peakPlay]);
   }
 
@@ -101,6 +109,9 @@ export class MyAudio {
   private init(): void {
     this.playerSubject
       .pipe(
+        tap(([song, peakPlay]) => {
+          console.info(peakPlay ? 'peak 播放' : '整首播放', song);
+        }),
         switchMap(([song, peakPlay]) => {
           this.state.song = song;
           this.state.isPeak = peakPlay;
@@ -117,10 +128,19 @@ export class MyAudio {
 
           console.info('==========3 play peak audio');
           return this.peakAudio(song);
+        }),
+        catchError((e) => {
+          console.warn('play subject error: ', e);
+          return empty();
         })
       )
       .subscribe(
         (audio) => {
+          if (!audio) {
+            console.info('do nothing');
+            this.errorSubject.next(new Error('audio is null'));
+            return;
+          }
           this.audio = audio;
           console.info('this.state: ', this.state);
           try {
@@ -134,13 +154,17 @@ export class MyAudio {
             } else {
               audio.play(0);
             }
+
+            if (!this.playing) {
+              this.pause();
+            }
           } catch (e) {
             console.warn(e);
           }
         },
         (error) => {
           console.warn(error);
-          this.errorSubject.next(error);
+          alert('failed, check devTools');
         }
       );
   }
@@ -169,6 +193,10 @@ export class MyAudio {
             arrayBufferAudio = null;
           };
         });
+      }),
+      catchError((e) => {
+        console.warn('play peak error: ', e);
+        return of(null);
       })
     );
   }

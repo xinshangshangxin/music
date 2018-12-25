@@ -1,6 +1,8 @@
 import EventEmitter from 'eventemitter3';
 
 export class SrcAudio extends EventEmitter {
+  public playing = false;
+
   private audioContext: AudioContext;
   private eventListeners: any = {};
 
@@ -102,12 +104,15 @@ export class SrcAudio extends EventEmitter {
 
   pause() {
     this.audio.pause();
+    this.playing = false;
   }
 
   play(startTime: number = 0) {
     this.layIn();
 
     this.audio.currentTime = startTime;
+
+    this.playing = true;
     this.audio.play();
   }
 
