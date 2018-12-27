@@ -8,13 +8,13 @@ import { AudioService } from './audio.service';
 export interface IPeakTime {
   id: string;
   provider: Provider;
-  peak: {
-    duration: number;
-    startTime: number;
-  };
   peaks: {
     precision: number;
     data: number[];
+  };
+  peak?: {
+    duration: number;
+    startTime: number;
   };
 }
 
@@ -59,9 +59,21 @@ export class SongPeakService {
 
   async add(peakTime: IPeakTime): Promise<any> {
     let updatedResult = await this.update(peakTime);
+
+    // not care the result
+    this.fillOtherDuration(peakTime);
+
+    return updatedResult;
+  }
+
+  async delete(id: string, provider: Provider) {
+    return this.SongPeakModel.deleteOne({ id, provider });
+  }
+
+  private async fillOtherDuration({ id, provider, peaks }) {
+    console.info('fillOtherDuration', id, provider);
     let arr = [10, 15, 20, 25, 30, 35, 40];
 
-    let { id, provider, peaks } = peakTime;
     Promise.all(
       arr.map(async duration => {
         let savedPeak = await this.getPeak(id, provider, duration);
@@ -79,7 +91,7 @@ export class SongPeakService {
           duration,
         );
 
-        await this.add({
+        await this.update({
           id,
           provider,
           peak: {
@@ -92,15 +104,24 @@ export class SongPeakService {
     ).catch(e => {
       console.warn(e);
     });
-
-    return updatedResult;
-  }
-
-  async delete(id: string, provider: Provider) {
-    return this.SongPeakModel.deleteOne({ id, provider });
   }
 
   private async update({ id, provider, peak, peaks }: IPeakTime) {
+    if (!peaks) {
+      throw new Error('no peaks');
+    }
+    if (!peaks.data || !peaks.precision) {
+      throw new Error('peaks type error');
+    }
+
+    let addToSet: any = {
+      peaks,
+    };
+
+    if (peak) {
+      addToSet.peak = peak;
+    }
+
     return this.SongPeakModel.updateOne(
       {
         id,
@@ -112,10 +133,7 @@ export class SongPeakService {
           id,
           provider,
         },
-        $addToSet: {
-          peak,
-          peaks,
-        },
+        $addToSet: addToSet,
       },
       {
         upsert: true,

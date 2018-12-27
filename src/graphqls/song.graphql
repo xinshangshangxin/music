@@ -48,9 +48,9 @@ type IPeaks {
 type SongDetail {
   id: String!
   name: String!
-  lrc: String!
   provider: Provider!
   artists: [ISearchArtist]!
+  lrc: String
   klyric: String
   album: ISearchAlbum
   peakStartTime: Float
@@ -71,8 +71,8 @@ input PeaksInput {
 input PeakTimeInput {
   id: String!
   provider: Provider!
-  peak: PeakInput!
   peaks: PeaksInput!
+  peak: PeakInput
 }
 
 type Query {

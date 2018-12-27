@@ -1,3 +1,5 @@
+console.info('loading exception');
+
 process.on('uncaughtException', err => {
   console.error('uncaughtException:', err);
   process.exit(1);

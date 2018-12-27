@@ -1,6 +1,6 @@
 import { Controller, Get, HttpCode } from '@nestjs/common';
 
-// // leancloud不使用云函数和Hook
+// leancloud不使用云函数和Hook
 @Controller('/1.1/functions/_ops/metadatas')
 export class LeanCloudFunctionController {
   constructor() {}
