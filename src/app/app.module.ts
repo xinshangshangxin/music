@@ -9,12 +9,19 @@ import { AppComponent } from './app.component';
 import { ControlsComponent } from './controls/controls.component';
 import { CustomerMaterialModule } from './customer-material/customer-material.module';
 import { GraphQLModule } from './graphql/graphql.module';
+import { HomeComponent } from './home/home.component';
 import { SearchComponent } from './search/search.component';
 import { PlayerService } from './services/player.service';
 import { SongListComponent } from './song-list/song-list.component';
 
 @NgModule({
-  declarations: [AppComponent, SearchComponent, ControlsComponent, SongListComponent],
+  declarations: [
+    AppComponent,
+    SearchComponent,
+    ControlsComponent,
+    SongListComponent,
+    HomeComponent,
+  ],
   imports: [
     FormsModule,
     ReactiveFormsModule,

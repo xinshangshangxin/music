@@ -1,11 +1,25 @@
 import { NgModule } from '@angular/core';
-import { Routes, RouterModule } from '@angular/router';
+import { RouterModule, Routes } from '@angular/router';
+
+import { HomeComponent } from './home/home.component';
 import { SearchComponent } from './search/search.component';
+import { SongListComponent } from './song-list/song-list.component';
 
 const routes: Routes = [
   {
     path: '',
-    component: SearchComponent,
+    component: HomeComponent,
+
+    children: [
+      {
+        path: '',
+        component: SongListComponent,
+      },
+      {
+        path: 'search',
+        component: SearchComponent,
+      },
+    ],
   },
   {
     path: '**',
@@ -15,6 +29,6 @@ const routes: Routes = [
 
 @NgModule({
   imports: [RouterModule.forRoot(routes)],
-  exports: [RouterModule]
+  exports: [RouterModule],
 })
-export class AppRoutingModule { }
+export class AppRoutingModule {}

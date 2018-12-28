@@ -1,25 +1,8 @@
-<mat-form-field class="search">
-  <input matInput type="text" placeholder="search" [(ngModel)]="searchValue" (keyup)="inputKeyup($event)">
-  <button mat-button *ngIf="searchValue" matSuffix mat-icon-button aria-label="Clear" (click)="clear()">
-    <mat-icon>close</mat-icon>
-  </button>
-</mat-form-field>
-
-<app-controls></app-controls>
-
-
-
 <mat-list role="list">
   <mat-list-item *ngFor="let song of searchList">
-    [{{song.provider}}]{{song.name}}
-    <span *ngFor="let artist of song.artists">
-      {{artist.name}}
-    </span>
-  <button mat-button (click)="add(song)">添加</button>
-  <button mat-button (click)="add(song, true)">添加&播放</button>
-
+    [{{ song.provider }}]{{ song.name }}
+    <span *ngFor="let artist of song.artists"> {{ artist.name }} </span>
+    <button mat-button (click)="add(song)">添加</button>
+    <button mat-button (click)="add(song, true)">添加&播放</button>
   </mat-list-item>
 </mat-list>
-
-
-<app-song-list></app-song-list>

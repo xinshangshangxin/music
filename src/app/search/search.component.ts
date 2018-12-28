@@ -1,24 +1,17 @@
 import { Component, OnInit } from '@angular/core';
-import { combineLatest, of, Subject } from 'rxjs';
+import { combineLatest, of } from 'rxjs';
 import {
   catchError,
   debounceTime,
   distinctUntilChanged,
   map,
-  startWith,
   switchMap,
   tap,
 } from 'rxjs/operators';
 
-import {
-  GetGQL,
-  ISearchItem,
-  ParseUrlGQL,
-  Provider,
-  SearchGQL,
-  SongDetail,
-} from '../graphql/generated';
+import { GetGQL, ISearchItem, ParseUrlGQL, SearchGQL, SongDetail } from '../graphql/generated';
 import { PlayerService } from '../services/player.service';
+import { SearchService } from '../services/search.service';
 
 @Component({
   selector: 'app-search',
@@ -26,14 +19,13 @@ import { PlayerService } from '../services/player.service';
   styleUrls: ['./search.component.scss'],
 })
 export class SearchComponent implements OnInit {
-  private searchSubject = new Subject<string>();
-  private providersSubject = new Subject<Provider[]>();
   public searchValue = '';
 
   public searchList: ISearchItem[];
   public playList: SongDetail[];
 
   constructor(
+    private readonly searchService: SearchService,
     private searchGQL: SearchGQL,
     private getGQL: GetGQL,
     private parseUrlGQL: ParseUrlGQL,
@@ -45,13 +37,9 @@ export class SearchComponent implements OnInit {
   }
 
   search() {
-    let providersSubject = this.providersSubject.pipe(
-      startWith([]),
-      distinctUntilChanged()
-    );
+    let providersSubject = this.searchService.providersSubject.pipe(distinctUntilChanged());
 
-    let searchSubject = this.searchSubject.pipe(
-      startWith(this.searchValue),
+    let searchSubject = this.searchService.searchSubject.pipe(
       debounceTime(300),
       distinctUntilChanged(),
       map((str) => {
@@ -107,16 +95,6 @@ export class SearchComponent implements OnInit {
         console.log('searchList: ', searchList);
         this.searchList = searchList;
       });
-  }
-
-  inputKeyup(e: any) {
-    console.info(e);
-    this.searchSubject.next(this.searchValue);
-  }
-
-  clear() {
-    this.searchValue = '';
-    this.searchSubject.next(this.searchValue);
   }
 
   add(song: ISearchItem, isPlay = false) {

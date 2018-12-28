@@ -1,0 +1,26 @@
+<mat-form-field class="search">
+  <input
+    matInput
+    type="text"
+    placeholder="search"
+    [(ngModel)]="searchValue"
+    (keyup)="inputKeyup($event)"
+  />
+  <button
+    mat-button
+    *ngIf="searchValue"
+    matSuffix
+    mat-icon-button
+    aria-label="Clear"
+    (click)="clear()"
+  >
+    <mat-icon>close</mat-icon>
+  </button>
+</mat-form-field>
+
+<app-controls></app-controls>
+
+
+<router-outlet></router-outlet>
+
+<!-- <app-song-list></app-song-list> -->
