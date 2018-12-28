@@ -1,10 +1,11 @@
 import { Injectable } from '@angular/core';
-import { catchError, mergeMap, tap } from 'rxjs/operators';
+import { catchError, mergeMap, tap, map, filter, switchMap } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
 
 import { AddPeakTimeGQL, GetGQL, Provider, SongDetail } from '../graphql/generated';
 import { MyAudio } from '../rx-audio/my-audio';
 import { SongList } from './song-list';
+import { from } from 'rxjs';
 
 export interface ISongState {
   playing: boolean;
@@ -17,6 +18,8 @@ export interface ISongState {
 export class PlayerService extends SongList {
   private songState: ISongState;
   private myAudio: MyAudio;
+
+  private preLoadNextSongLength = 2;
 
   constructor(private readonly addPeakTimeGQL: AddPeakTimeGQL, private readonly getGel: GetGQL) {
     super();
@@ -71,6 +74,10 @@ export class PlayerService extends SongList {
 
     this.play(song);
     this.saveMeta();
+
+    for (let i = 1; i <= this.preLoadNextSongLength; i += 1) {
+      this.loadNext(i);
+    }
   }
 
   previous(): void {
@@ -175,6 +182,13 @@ export class PlayerService extends SongList {
 
           if (newSong.peakStartTime) {
             song = { ...song, ...newSong };
+
+            this.saveSongPeakTime(
+              song.id,
+              song.provider,
+              newSong.peakStartTime,
+              newSong.peakDuration
+            );
           }
         } catch (e) {
           this.myAudio.errorSubject.next(e);
@@ -200,17 +214,21 @@ export class PlayerService extends SongList {
     );
   }
 
-  private checkIndex(index: number) {
-    if (index < 0 || index >= this.songList.length) {
-      throw new Error('over length');
-    }
-  }
-
   private async updatePeakTime() {
     this.myAudio.peakTimeUpdateSubject
       .pipe(
         tap((peakResult) => {
           console.info('updatePeakTime: ', peakResult);
+        }),
+        map((peakResult) => {
+          this.saveSongPeakTime(
+            peakResult.id,
+            peakResult.provider as Provider,
+            peakResult.peak.startTime,
+            peakResult.peak.duration
+          );
+
+          return peakResult;
         }),
         mergeMap((peakResult) => {
           return this.addPeakTimeGQL.mutate({
@@ -226,5 +244,80 @@ export class PlayerService extends SongList {
         })
       )
       .subscribe(() => {});
+  }
+
+  private getNextSong(step = 1) {
+    if (!this.songList.length) {
+      return null;
+    }
+
+    return this.songList[(this.meta.currentIndex + step) % this.songList.length];
+  }
+
+  private saveSongPeakTime(
+    id: string,
+    provider: Provider,
+    peakStartTime: number,
+    peakDuration: number
+  ) {
+    this.updateSong(
+      {
+        id: id,
+        provider: provider,
+      },
+      {
+        peakStartTime: peakStartTime,
+        peakDuration: peakDuration,
+      },
+      this.meta.currentPlayListId
+    );
+  }
+
+  private loadNext(step = 1) {
+    let song = this.getNextSong(step);
+
+    if (!song) {
+      return;
+    }
+
+    if (song.peakStartTime) {
+      return;
+    }
+
+    this.getGel
+      .fetch({
+        id: song.id,
+        provider: song.provider,
+      })
+      .pipe(
+        filter(({ data: { get } }) => {
+          let { peakStartTime, peakDuration } = get;
+
+          if (peakStartTime) {
+            this.saveSongPeakTime(song.id, song.provider, peakStartTime, peakDuration);
+
+            return false;
+          }
+
+          return true;
+        }),
+        switchMap(() => {
+          return from(
+            this.myAudio.getAudioPeak({
+              url: PlayerService.buildSongUrl(song),
+              id: song.id,
+              provider: song.provider as string,
+            })
+          );
+        })
+      )
+      .subscribe(
+        () => {
+          console.info('loadNext success');
+        },
+        (e) => {
+          console.info('loadNext failed', e);
+        }
+      );
   }
 }

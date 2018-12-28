@@ -106,6 +106,18 @@ export class MyAudio {
     }
   }
 
+  async getAudioPeak(song: IPlaySong) {
+    let { startTime, audioBuffer, peaks } = await this.audioPeak.get(
+      song.url,
+      this.peakConfig.duration,
+      this.peakConfig.precision
+    );
+
+    this.setSongPeakTime(startTime, this.peakConfig.duration, song, peaks);
+
+    return { startTime, audioBuffer, peaks };
+  }
+
   private init(): void {
     this.playerSubject
       .pipe(
@@ -170,15 +182,12 @@ export class MyAudio {
   }
 
   private peakAudio(song: IPlaySong): Observable<ArrayBufferAudio> {
-    return from(
-      this.audioPeak.get(song.url, this.peakConfig.duration, this.peakConfig.precision)
-    ).pipe(
-      switchMap(({ startTime, audioBuffer, peaks }) => {
+    return from(this.getAudioPeak(song)).pipe(
+      switchMap(({ startTime, audioBuffer }) => {
         console.info('create ArrayBufferAudio Observable');
         song.peakStartTime = startTime;
 
         return Observable.create((observer: Observer<ArrayBufferAudio>) => {
-          this.setSongPeakTime(startTime, this.peakConfig.duration, song, peaks);
           let arrayBufferAudio = new ArrayBufferAudio(
             audioBuffer,
             this.peakConfig.layIn,

@@ -1,4 +1,4 @@
-import { SongDetail } from '../graphql/generated';
+import { SongDetail, Provider } from '../graphql/generated';
 
 export interface IPlayList {
   id: string;
@@ -11,6 +11,13 @@ export interface IMeta {
   isPeak: boolean;
   playList: IPlayList[];
 }
+
+interface ISearchSong {
+  id: string;
+  provider: Provider;
+}
+
+type IUpdateSong<T> = { [P in keyof T]?: T[P] };
 
 export class SongList {
   public songList: SongDetail[];
@@ -102,22 +109,38 @@ export class SongList {
     this.savePlayList(playListId);
   }
 
-  updateSong(param: number | SongDetail, song: SongDetail, playListId = '__temp__') {
+  updateSong(
+    param: number | ISearchSong,
+    song: Pick<IUpdateSong<SongDetail>, Exclude<keyof SongDetail, 'id' | 'provider'>>,
+    playListId = '__temp__'
+  ) {
     let playList = this.getPlayList(playListId);
+    let index = -1;
 
     if (typeof param === 'number') {
-      playList.splice(param, 1, song);
+      index = param;
     } else {
-      let index = playList.findIndex(({ id, provider }) => {
+      index = playList.findIndex(({ id, provider }) => {
         return param.id === id && param.provider === provider;
       });
+    }
 
-      if (index > -1) {
-        playList.splice(index, 1, song);
-      }
+    if (index >= 0 && index < this.songList.length) {
+      let oldSong = playList[index];
+
+      this.songList.splice(index, 1, {
+        ...oldSong,
+        ...song,
+      });
     }
 
     this.savePlayList(playListId);
+  }
+
+  protected checkIndex(index: number) {
+    if (index < 0 || index >= this.songList.length) {
+      throw new Error('over length');
+    }
   }
 
   private updatePlayListInfo(playListId: string, playListName?: string, rm = false) {
