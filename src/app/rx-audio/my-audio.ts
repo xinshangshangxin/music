@@ -82,7 +82,10 @@ export class MyAudio {
     if (this.audio) {
       this.playing = true;
       this.audio.play(this.audio.currentTime);
+      return true;
     }
+
+    return false;
   }
 
   pause() {

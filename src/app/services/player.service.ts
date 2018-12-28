@@ -115,8 +115,11 @@ export class PlayerService extends SongList {
       this.songState.playing = false;
       this.myAudio.pause();
     } else {
-      this.myAudio.play();
-      this.songState.playing = true;
+      if (this.myAudio.play()) {
+        this.songState.playing = true;
+      } else {
+        this.playCurrent();
+      }
     }
   }
 

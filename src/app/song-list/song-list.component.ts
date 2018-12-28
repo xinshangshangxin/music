@@ -12,7 +12,7 @@ import { PlayerService } from '../services/player.service';
 export class SongListComponent implements OnInit {
   public playList: SongDetail[];
 
-  constructor(private playerService: PlayerService) {}
+  constructor(public playerService: PlayerService) {}
 
   ngOnInit() {
     this.playList = this.playerService.songList;

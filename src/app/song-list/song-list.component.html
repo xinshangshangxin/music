@@ -1,5 +1,5 @@
 <div cdkDropList class="song-list" (cdkDropListDropped)="drop($event)">
-  <div class="song-box" *ngFor="let song of playList; index as i" cdkDrag (click)="play(i)">
+  <div [ngClass]="{'playing': playerService.meta.currentIndex === i}" class="song-box" *ngFor="let song of playList; index as i" cdkDrag (click)="play(i)">
     [{{ song.provider }}]-{{ song.name }}
     <span *ngFor="let artist of song.artists"> {{ artist.name }} </span>
 
