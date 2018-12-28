@@ -70,7 +70,7 @@ export class SrcAudio extends EventEmitter {
 
     this.gainNode.gain.setValueAtTime(1, this.audioContext.currentTime);
     this.gainNode.gain.linearRampToValueAtTime(
-      0,
+      0.2,
       this.audioContext.currentTime + this.layOutDuration
     );
   }
