@@ -55,11 +55,11 @@ export interface SongDetail {
 
   name: string;
 
-  lrc: string;
-
   provider: Provider;
 
   artists: (ISearchArtist | null)[];
+
+  lrc?: string | null;
 
   klyric?: string | null;
 
@@ -95,21 +95,21 @@ export interface PeakTimeInput {
 
   provider: Provider;
 
-  peak: PeakInput;
-
   peaks: PeaksInput;
-}
 
-export interface PeakInput {
-  duration: number;
-
-  startTime: number;
+  peak?: PeakInput | null;
 }
 
 export interface PeaksInput {
   precision: number;
 
   data: (number | null)[];
+}
+
+export interface PeakInput {
+  duration: number;
+
+  startTime: number;
 }
 
 export interface ISearchQuery {
@@ -135,6 +135,8 @@ export interface GetQueryArgs {
   provider: Provider;
 
   br?: BitRate | null;
+
+  peakDuration?: number | null;
 }
 export interface RankQueryArgs {
   provider: Provider;
@@ -232,7 +234,7 @@ export namespace Get {
 
     name: string;
 
-    lrc: string;
+    lrc?: string | null;
 
     klyric?: string | null;
 

@@ -80,13 +80,9 @@ export class SearchComponent implements OnInit {
                   return result.data.parseUrl || [];
                 }),
                 map((songs) => {
-                  this.playerService.songList.length = 0;
-                  this.playerService.songList.push(...(songs as SongDetail[]));
                   this.searchValue = '';
+                  this.playerService.setPlayList(songs);
                   this.playerService.playAt(0);
-
-                  let key = `songs-1`;
-                  localStorage.setItem(key, JSON.stringify(this.playerService.songList));
                 })
               );
           }

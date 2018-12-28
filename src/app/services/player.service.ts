@@ -1,48 +1,121 @@
 import { Injectable } from '@angular/core';
-import { catchError, tap, mergeMap } from 'rxjs/operators';
+import { catchError, mergeMap, tap } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
 
-import { AddPeakTimeGQL, GetGQL, SongDetail, Provider } from '../graphql/generated';
+import { AddPeakTimeGQL, GetGQL, Provider, SongDetail } from '../graphql/generated';
 import { MyAudio } from '../rx-audio/my-audio';
+import { SongList } from './song-list';
 
-interface IPlaySong extends SongDetail {
-  peakStartTime?: number;
-}
-
-export interface IPlayerState {
-  isPeak?: boolean;
+export interface ISongState {
   playing: boolean;
-  currentIndex: number;
   currentTime: number;
   bufferedTime: number;
-  duration: number;
-  song?: IPlaySong;
+  song?: SongDetail;
 }
 
 @Injectable()
-export class PlayerService {
-  public songList: IPlaySong[] = [];
-
-  private state: IPlayerState = {
-    isPeak: true,
-    playing: false,
-    currentIndex: 0,
-    currentTime: 0,
-    bufferedTime: 0,
-    duration: 0,
-  };
-
+export class PlayerService extends SongList {
+  private songState: ISongState;
   private myAudio: MyAudio;
 
-  constructor(private addPeakTimeGQL: AddPeakTimeGQL, private getGel: GetGQL) {
+  constructor(private readonly addPeakTimeGQL: AddPeakTimeGQL, private readonly getGel: GetGQL) {
+    super();
+
     this.myAudio = new MyAudio();
+
+    this.songState = {
+      playing: false,
+      currentTime: 0,
+      bufferedTime: 0,
+    };
 
     this.catchNext();
     this.updatePeakTime();
   }
 
-  private static buildSongUrl(song: IPlaySong) {
+  private static buildSongUrl(song: SongDetail) {
     return `${environment.proxyUrl}?id=${song.id}&provider=${song.provider}`;
+  }
+
+  add(song: SongDetail) {
+    this.addSong(song);
+  }
+
+  remove(index: number) {
+    this.checkIndex(index);
+
+    this.rmSong(index);
+    if (index === this.meta.currentIndex) {
+      // 如果当前播放歌曲被删除, 正好播放下一首
+      this.meta.currentIndex = this.meta.currentIndex - 1;
+      if (this.songState.playing) {
+        this.next();
+      }
+    } else if (index < this.meta.currentIndex) {
+      // 如果当前播放歌曲在 删除歌曲的后面, 需要调整位置
+      this.meta.currentIndex = this.meta.currentIndex - 1;
+    }
+  }
+
+  addAndPlay(song: SongDetail) {
+    this.add(song);
+    this.playAt(this.songList.length - 1);
+  }
+
+  playCurrent(): void {
+    let song = this.getCurrent();
+
+    if (!song) {
+      return null;
+    }
+
+    this.play(song);
+    this.saveMeta();
+  }
+
+  previous(): void {
+    if (!this.songList.length) {
+      return null;
+    }
+
+    this.meta.currentIndex =
+      (this.meta.currentIndex - 1 + this.songList.length) % this.songList.length;
+    this.playCurrent();
+  }
+
+  next(): void {
+    if (!this.songList.length) {
+      return null;
+    }
+
+    this.meta.currentIndex = (this.meta.currentIndex + 1) % this.songList.length;
+    this.playCurrent();
+  }
+
+  playAt(index: number): void {
+    this.checkIndex(index);
+
+    this.meta.currentIndex = index;
+    this.playCurrent();
+  }
+
+  playLast() {
+    this.playAt(this.songList.length - 1);
+  }
+
+  togglePlay() {
+    if (this.songState.playing) {
+      this.songState.playing = false;
+      this.myAudio.pause();
+    } else {
+      this.myAudio.play();
+      this.songState.playing = true;
+    }
+  }
+
+  private getCurrent(): SongDetail {
+    this.checkIndex(this.meta.currentIndex);
+    return this.songList[this.meta.currentIndex];
   }
 
   private catchNext() {
@@ -83,11 +156,11 @@ export class PlayerService {
     });
   }
 
-  private async play(song: IPlaySong) {
+  private async play(song: SongDetail) {
     console.info('wait to play song: ', song);
 
-    this.state.song = song;
-    if (this.state.isPeak) {
+    this.songState.song = song;
+    if (this.meta.isPeak) {
       if (!song.peakStartTime) {
         try {
           console.info('get server peakStartTime');
@@ -110,12 +183,12 @@ export class PlayerService {
       }
     }
 
-    if (song.id !== this.state.song.id || song.provider !== this.state.song.provider) {
+    if (song.id !== this.songState.song.id || song.provider !== this.songState.song.provider) {
       console.warn('not in current loop song, skip play');
       return;
     }
 
-    this.state.playing = true;
+    this.songState.playing = true;
     this.myAudio.playSong(
       {
         url: PlayerService.buildSongUrl(song),
@@ -123,90 +196,11 @@ export class PlayerService {
         provider: song.provider as string,
         peakStartTime: song.peakStartTime,
       },
-      this.state.isPeak
+      this.meta.isPeak
     );
   }
 
-  getCurrent(): IPlaySong {
-    this.checkIndex(this.state.currentIndex);
-    return this.songList[this.state.currentIndex];
-  }
-
-  add(song: IPlaySong) {
-    this.songList.push(song);
-  }
-
-  remove(index: number) {
-    this.checkIndex(index);
-
-    this.songList.splice(index, 1);
-
-    if (index === this.state.currentIndex) {
-      // 如果当前播放歌曲被删除, 正好播放下一首
-      this.state.currentIndex = this.state.currentIndex - 1;
-      this.next();
-    } else if (index < this.state.currentIndex) {
-      // 如果当前播放歌曲在 删除歌曲的后面, 需要调整位置
-      this.state.currentIndex = this.state.currentIndex - 1;
-    }
-  }
-
-  addAndPlay(song: IPlaySong) {
-    this.add(song);
-    this.playAt(this.songList.length - 1);
-  }
-
-  playCurrent(): void {
-    let song = this.getCurrent();
-
-    if (!song) {
-      return null;
-    }
-
-    this.play(song);
-  }
-
-  previous(): void {
-    if (!this.songList.length) {
-      return null;
-    }
-
-    this.state.currentIndex =
-      (this.state.currentIndex - 1 + this.songList.length) % this.songList.length;
-    this.playCurrent();
-  }
-
-  next(): void {
-    if (!this.songList.length) {
-      return null;
-    }
-
-    this.state.currentIndex = (this.state.currentIndex + 1) % this.songList.length;
-    this.playCurrent();
-  }
-
-  playAt(index: number): void {
-    this.checkIndex(index);
-
-    this.state.currentIndex = index;
-    this.playCurrent();
-  }
-
-  playLast() {
-    this.playAt(this.songList.length - 1);
-  }
-
-  togglePlay() {
-    if (this.state.playing) {
-      this.state.playing = false;
-      this.myAudio.pause();
-    } else {
-      this.myAudio.play();
-      this.state.playing = true;
-    }
-  }
-
-  private checkIndex(index) {
+  private checkIndex(index: number) {
     if (index < 0 || index >= this.songList.length) {
       throw new Error('over length');
     }
