@@ -9,7 +9,7 @@ import {
   tap,
 } from 'rxjs/operators';
 
-import { GetGQL, ISearchItem, ParseUrlGQL, SearchGQL, SongDetail } from '../graphql/generated';
+import { GetGQL, ISearchItem, ParseUrlGQL, SearchGQL, Provider } from '../graphql/generated';
 import { PlayerService } from '../services/player.service';
 import { SearchService } from '../services/search.service';
 
@@ -22,7 +22,6 @@ export class SearchComponent implements OnInit {
   public searchValue = '';
 
   public searchList: ISearchItem[];
-  public playList: SongDetail[];
 
   constructor(
     private readonly searchService: SearchService,
