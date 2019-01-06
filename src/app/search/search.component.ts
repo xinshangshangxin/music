@@ -1,15 +1,17 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { combineLatest, of } from 'rxjs';
 import {
   catchError,
   debounceTime,
+  delay,
   distinctUntilChanged,
   map,
   switchMap,
   tap,
 } from 'rxjs/operators';
 
-import { GetGQL, ISearchItem, ParseUrlGQL, SearchGQL, Provider } from '../graphql/generated';
+import { GetGQL, ISearchItem, ParseUrlGQL, SearchGQL } from '../graphql/generated';
 import { PlayerService } from '../services/player.service';
 import { SearchService } from '../services/search.service';
 
@@ -23,6 +25,7 @@ export class SearchComponent implements OnInit {
 
   constructor(
     private readonly searchService: SearchService,
+    private readonly router: Router,
     private searchGQL: SearchGQL,
     private getGQL: GetGQL,
     private parseUrlGQL: ParseUrlGQL,
@@ -67,6 +70,10 @@ export class SearchComponent implements OnInit {
                 map((songs) => {
                   this.playerService.setPlayList(songs);
                   this.playerService.playAt(0);
+                }),
+                delay(200),
+                map(() => {
+                  this.router.navigate(['']);
                 })
               );
           }
