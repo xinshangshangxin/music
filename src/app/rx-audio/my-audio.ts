@@ -38,6 +38,7 @@ export interface IAudioState {
 export class MyAudio {
   public errorSubject: Subject<Error> = new Subject<Error>();
   public endedSubject: Subject<any> = new Subject();
+  public playSubject: Subject<any> = new Subject();
   public peakTimeUpdateSubject: Subject<{
     peaks: {
       precision: number;
@@ -307,21 +308,28 @@ export class MyAudio {
     });
 
     audio.once('layoutTouch', (data) => {
-      console.info('layoutTouch', data);
       this.layOutPause();
+    });
+
+    audio.on('play', (data) => {
+      this.playSubject.next(data);
     });
 
     // just for debug
     audio.on('error', (e) => {
-      console.info('error: ', e);
+      console.debug('error: ', e);
     });
 
     audio.on('ended', (data) => {
-      console.info('ended: ', data);
+      console.debug('ended: ', data);
     });
 
     audio.on('layoutTouch', (data) => {
-      console.info('layoutTouch: ', data);
+      console.debug('layoutTouch: ', data);
+    });
+
+    audio.on('play', (data) => {
+      console.debug('play: ', data);
     });
   }
 }

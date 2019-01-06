@@ -19,8 +19,6 @@ import { SearchService } from '../services/search.service';
   styleUrls: ['./search.component.scss'],
 })
 export class SearchComponent implements OnInit {
-  public searchValue = '';
-
   public searchList: ISearchItem[];
 
   constructor(
@@ -67,7 +65,6 @@ export class SearchComponent implements OnInit {
                   return result.data.parseUrl || [];
                 }),
                 map((songs) => {
-                  this.searchValue = '';
                   this.playerService.setPlayList(songs);
                   this.playerService.playAt(0);
                 })
