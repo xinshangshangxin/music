@@ -1,20 +1,20 @@
 import { Injectable } from '@angular/core';
+import { from, Observable, of } from 'rxjs';
 import {
   catchError,
-  mergeMap,
-  tap,
-  map,
-  filter,
-  switchMap,
   concatMap,
+  filter,
+  map,
   mapTo,
+  mergeMap,
+  switchMap,
+  tap,
 } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
 
 import { AddPeakTimeGQL, GetGQL, Provider, SongDetail } from '../graphql/generated';
 import { MyAudio } from '../rx-audio/my-audio';
 import { SongList } from './song-list';
-import { from, Subject, of, Observable } from 'rxjs';
 
 export interface ISongState {
   playing: boolean;
@@ -310,10 +310,12 @@ export class PlayerService extends SongList {
       return of(undefined);
     }
 
+    console.time(`${song.name}`);
     console.info(`start loadNext ${song.name}`);
 
     if (song.peakStartTime) {
       console.info(`end loadNext ${song.name} with peakTime ${song.peakStartTime}`);
+      console.timeEnd(`${song.name}`);
       return of(undefined);
     }
 
@@ -328,6 +330,7 @@ export class PlayerService extends SongList {
 
           if (peakStartTime) {
             console.info(`end loadNext ${song.name} use server peakTime ${peakStartTime}`);
+            console.timeEnd(`${song.name}`);
             this.saveSongPeakTime(song.id, song.provider, peakStartTime, peakDuration);
 
             return false;
@@ -346,8 +349,14 @@ export class PlayerService extends SongList {
         }),
         tap(() => {
           console.info(`end loadNext ${song.name} use local build`);
+          console.timeEnd(`${song.name}`);
         }),
-        mapTo(undefined)
+        mapTo(undefined),
+        catchError((e) => {
+          console.warn(e);
+          console.timeEnd(`${song.name}`);
+          return of(undefined);
+        })
       );
   }
 }
