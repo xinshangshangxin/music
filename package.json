@@ -10,7 +10,6 @@
     "e2e": "ng e2e",
     "gql-gen-local": "gql-gen --schema http://localhost:3000/graphql --template graphql-codegen-apollo-angular-template --out ./src/app/graphql/generated.ts \"./src/app/graphql/**/*.graphql\"",
     "gql-gen-remote": "gql-gen --schema http://music.leanapp.cn/graphql --template graphql-codegen-apollo-angular-template --out ./src/app/graphql/generated.ts \"./src/app/graphql/**/*.graphql\""
-
   },
   "private": true,
   "dependencies": {
@@ -31,6 +30,7 @@
     "apollo-client": "^2.4.0",
     "apollo-link": "^1.2.0",
     "core-js": "^2.5.4",
+    "detect-browser": "^4.0.3",
     "eventemitter3": "^3.1.0",
     "graphql": "^0.13.2",
     "graphql-tag": "^2.10.0",

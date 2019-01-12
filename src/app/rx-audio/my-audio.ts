@@ -297,22 +297,22 @@ export class MyAudio {
   }
 
   private addListener(audio: SrcAudio | ArrayBufferAudio) {
-    audio.once('error', (e) => {
+    audio.on('error', (e) => {
       this.errorSubject.next(e);
     });
 
-    audio.once('ended', (data) => {
+    audio.on('ended', (data) => {
       audio.pause();
 
       this.endedSubject.next(data);
     });
 
-    audio.once('layoutTouch', (data) => {
-      this.layOutPause();
-    });
-
     audio.on('play', (data) => {
       this.playSubject.next(data);
+    });
+
+    audio.once('layoutTouch', (data) => {
+      this.layOutPause();
     });
 
     // just for debug

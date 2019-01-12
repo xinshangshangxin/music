@@ -1,4 +1,5 @@
 import EventEmitter from 'eventemitter3';
+import { detect } from 'detect-browser';
 
 export class SrcAudio extends EventEmitter {
   public playing = false;
@@ -12,6 +13,7 @@ export class SrcAudio extends EventEmitter {
   private gainNode: GainNode;
   private layInDuration: number;
   private layOutDuration: number;
+  private browser = detect();
 
   constructor(layInDuration = 0, layOutDuration = 0) {
     super();
@@ -139,9 +141,14 @@ export class SrcAudio extends EventEmitter {
     this.eventListeners.timeupdate.push(timeupdateFn);
 
     let errorFn = (event: ErrorEvent) => {
-      if (!event.isTrusted) {
-        this.emit('error', { event });
+      if (this.browser && this.browser.name === 'firefox') {
+        if (event.isTrusted && this.audio.error.code === 2) {
+          console.debug('ignore firefox MEDIA_ERR_NETWORK: ', event);
+          return;
+        }
       }
+
+      this.emit('error', { event });
     };
     this.audio.addEventListener('error', errorFn);
     this.eventListeners.error = this.eventListeners.error || [];
