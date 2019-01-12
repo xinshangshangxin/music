@@ -154,9 +154,9 @@
   version "1.1.0"
   resolved "https://registry.npmjs.org/@protobufjs/utf8/-/utf8-1.1.0.tgz#a777360b5b39a1a2e5106f8e858f2fd2d060c570"
 
-"@s4p/music-api@^1.7.1":
-  version "1.7.1"
-  resolved "https://registry.npmjs.org/@s4p/music-api/-/music-api-1.7.1.tgz#8017f571057f06e69370be1bd8d11a030d1494b1"
+"@s4p/music-api@^1.7.2":
+  version "1.7.2"
+  resolved "https://registry.npmjs.org/@s4p/music-api/-/music-api-1.7.2.tgz#c0c8c587666c37e47a693443fbed866411d7d6f8"
   dependencies:
     "@babel/runtime" "^7.1.2"
     NeteaseCloudMusicApi Binaryify/NeteaseCloudMusicApi
@@ -475,9 +475,9 @@
   version "4.2.1"
   resolved "https://registry.npmjs.org/@xtuc/long/-/long-4.2.1.tgz#5c85d662f76fa1d34575766c5dcd6615abcd30d8"
 
-NeteaseCloudMusicApi@Binaryify/NeteaseCloudMusicApi:
-  version "3.0.9"
-  resolved "https://codeload.github.com/Binaryify/NeteaseCloudMusicApi/tar.gz/8d4a746cdaadcf0ee5de4802e79b5f0f07564915"
+"NeteaseCloudMusicApi@github:Binaryify/NeteaseCloudMusicApi":
+  version "3.1.0"
+  resolved "https://codeload.github.com/Binaryify/NeteaseCloudMusicApi/tar.gz/82fc5868cae8d00977a4414898f8613699add9bf"
   dependencies:
     apicache "^1.2.1"
     express "^4.16.3"
