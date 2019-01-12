@@ -94,17 +94,20 @@ export class KugouUrlParseService {
     let songs = get(result, 'body.list.info', []);
 
     return songs.map(item => {
-      let [name, artistName] = (item.name || '').split(' - ');
+      let [singer, songName] = (item.name || '').split(' - ');
 
       return {
         provider: Provider.kugou,
         id: item.hash,
-        name: (name || '').trim(),
-        artists: [
-          {
-            name: artistName,
-          },
-        ],
+        name: (songName || '').trim(),
+        artists: `${singer || ''}`
+          .trim()
+          .split('、')
+          .map(name => {
+            return {
+              name,
+            };
+          }),
         duration: item.timelen,
         mvId: item.mvhash,
       };
