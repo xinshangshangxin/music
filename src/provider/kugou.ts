@@ -39,7 +39,7 @@ class Kugou {
     return this.getDetail(id, br);
   }
 
-  async rank(type: RankType = RankType.new, limit = 100, skip = 0) {
+  async rank(type: RankType = RankType.new, limit = 500, skip = 0) {
     if (type === RankType.hot) {
       // 酷狗TOP500
       return this.concatRankList('8888', limit, skip);
@@ -58,57 +58,38 @@ class Kugou {
   }
 
   private async concatRankList(rankId: string, limit = 100, skip = 0): Promise<ISearchItem[]> {
-    let page = 1;
-    let total = limit + skip;
-    let arr: ISearchItem[] = [];
+    let page = parseInt(`${skip / limit}`, 10) + 1;
 
-    while (arr.length < total) {
-      // eslint-disable-next-line no-await-in-loop
-      let result = await this.request({
-        url: 'http://m.kugou.com/rank/info/',
-        qs: {
-          rankid: rankId,
-          json: true,
-          page,
-        },
-      });
+    let result = await this.request({
+      method: 'GET',
+      url: 'http://mobilecdn.kugou.com/api/v3/rank/song',
+      qs: { pagesize: limit, page, rankid: rankId },
+      headers: {
+        host: 'mobilecdn.kugou.com',
+      },
+    });
 
-      let fr = get(result, 'fr');
+    let songs = get(result, 'data.info', []);
 
-      if (fr === -2) {
-        throw new Error('Foreign IP not support');
-      }
+    return songs.map((song: any) => {
+      let filename = song.filename || '';
 
-      let item = get(result, 'songs', {});
-      if (!item.list || !item.list.length) {
-        break;
-      }
-
-      let list = get(item, 'list', []);
-
-      let songs = list.map((song: any) => {
-        let filename = song.filename || '';
-
-        let [singer, songName] = filename.split('-');
-        return {
-          provider: Provider.kugou,
-          id: song.hash || song['320hash'] || song.sqhash,
-          name: `${songName || ''}`.trim(),
-          artists: [
-            {
-              name: `${singer || ''}`.trim(),
-            },
-          ],
-          mvId: song.mvhash,
-        };
-      });
-
-      arr.push(...songs);
-
-      page += 1;
-    }
-
-    return arr.slice(skip, total);
+      let [singer, songName] = filename.split('-');
+      return {
+        provider: Provider.kugou,
+        id: song.hash || song['320hash'] || song.sqhash,
+        name: `${songName || ''}`.trim(),
+        artists: `${singer || ''}`
+          .trim()
+          .split('、')
+          .map((name) => {
+            return {
+              name,
+            };
+          }),
+        mvId: song.mvhash,
+      };
+    });
   }
 
   private async searchList({
@@ -215,11 +196,14 @@ class Kugou {
         provider: Provider.kugou,
         id: song.hash || song['320hash'] || song.sqhash,
         name: `${songName || ''}`.trim(),
-        artists: [
-          {
-            name: `${singer || ''}`.trim(),
-          },
-        ],
+        artists: `${singer || ''}`
+          .trim()
+          .split('、')
+          .map((name) => {
+            return {
+              name,
+            };
+          }),
         mvId: song.mvhash,
       };
     });

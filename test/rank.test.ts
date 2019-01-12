@@ -5,8 +5,8 @@ import { RankType } from '../dist/common/rank';
 
 test('new rank kugou', async (t) => {
   try {
-    let songs = await rank(Provider.kugou, RankType.new, 3);
-    t.true(songs.length === 3);
+    let songs = await rank(Provider.kugou, RankType.new, 99);
+    t.true(songs.length === 99);
   } catch (e) {
     t.regex(e.message, /Foreign IP/i);
   }
