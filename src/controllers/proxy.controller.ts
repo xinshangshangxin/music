@@ -1,8 +1,8 @@
-import { Controller, Get, Query, Req, Res } from '@nestjs/common';
+import { Controller, Get, Headers, Query, Req, Res } from '@nestjs/common';
 import { BitRate, Provider } from '@s4p/music-api';
 import { access } from 'fs-extra';
-import ms from 'mediaserver';
 
+import { audioPipe } from '../services/AudioPipeService';
 import { DownloadService } from '../song/download.service';
 
 @Controller('proxy')
@@ -11,11 +11,11 @@ export class ProxyController {
 
   @Get()
   async pipe(
-    @Req() req,
     @Res() res,
     @Query('id') id: string,
     @Query('provider') provider: Provider,
     @Query('br') br = BitRate.mid,
+    @Headers('range') range,
   ) {
     console.info({ id, provider, br });
 
@@ -27,36 +27,39 @@ export class ProxyController {
 
     console.info('realPath: ', realPath);
 
-    // 已经下载过
+    let hadFile = true;
     try {
       await access(realPath);
+    } catch (e) {
+      hadFile = false;
+    }
 
-      console.info('first ms pipe');
-      ms.pipe(
-        req,
-        res,
-        realPath,
-      );
+    // 已经下载过
+    if (hadFile) {
+      try {
+        console.info('first file pipe');
+        await audioPipe(res, realPath, range);
+      } catch (e) {
+        console.warn(e);
+        res.statusCode = 400;
+        res.end();
+      }
+
       return;
-    } catch (e) {}
+    }
 
     // 没有下载过, 再次下载
     await this.downloadService.download({ id, provider, br });
 
-    // 再次尝试获取
     try {
+      // 再次尝试获取
       await access(realPath);
 
-      console.info('second ms pipe');
-      ms.pipe(
-        req,
-        res,
-        realPath,
-      );
-      return;
+      console.info('second file pipe');
+      await audioPipe(res, realPath, range);
     } catch (e) {
       console.warn(e);
-      res.writeHeader(400);
+      res.statusCode = 400;
       res.end();
     }
   }
