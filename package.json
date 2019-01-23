@@ -36,7 +36,6 @@
     "graphql-tools": "^4.0.3",
     "graphql-type-json": "^0.2.1",
     "joi": "^14.3.0",
-    "json5": "^2.1.0",
     "mediaserver": "^0.1.1",
     "pino": "^5.10.1",
     "pino-pretty": "^2.5.0",

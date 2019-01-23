@@ -11,7 +11,7 @@ function baseBuild() {
   cp src/graphqls/*.graphql dist/graphqls/
 
   mkdir dist/config
-  cp src/config/${nodeEnv}.json5 dist/config/
+  cp src/config/${nodeEnv}.js dist/config/
   tsc
   
   echo "copy package.json"

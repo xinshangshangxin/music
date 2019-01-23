@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common';
-import { readFileSync } from 'fs';
 import Joi from 'joi';
-import JSON5 from 'json5';
 import { resolve as pathResolve } from 'path';
 
 interface EnvConfig {
   [prop: string]: any;
+  nmdbUrl: string;
+  port: number;
 }
 
 @Injectable()
@@ -13,19 +13,15 @@ export class ConfigService {
   private readonly envConfig: EnvConfig;
 
   constructor(env = 'development') {
-    let filePath = pathResolve(__dirname, `${env}.json5`);
-    let webpackBuildPath = `/${env}.json5`;
+    let filePath = pathResolve(__dirname, `${env}.js`);
 
-    // use webpack fix the path
-    if (filePath === webpackBuildPath) {
-      filePath = `./dist/${env}.json5`;
+    // when use webpack, should fix the path
+    if (filePath === `/${env}.js`) {
+      filePath = `./dist/${env}.js`;
     }
 
     console.log('filePath: ', filePath);
-    const config = readFileSync(filePath, {
-      encoding: 'utf8',
-    });
-    this.envConfig = this.validateInput(JSON5.parse(config));
+    this.envConfig = this.validateInput(require(filePath));
   }
 
   get nmdbUrl(): string {
@@ -36,11 +32,16 @@ export class ConfigService {
     return !!this.envConfig.disabledCache;
   }
 
+  get port(): number {
+    return this.envConfig.port;
+  }
+
   private validateInput(envConfig: EnvConfig): EnvConfig {
     const envVarsSchema: Joi.ObjectSchema = Joi.object({
       nmdbUrl: Joi.string().required(),
       disabledCache: Joi.boolean().default(false),
       appId: Joi.string(),
+      port: Joi.number().default(3000),
     });
 
     const { error, value: validatedEnvConfig } = Joi.validate(

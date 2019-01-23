@@ -393,5 +393,5 @@ dist
 
 .vscode
 
-src/config/*.json5
-!src/config/template.json5
+src/config/*.js
+!src/config/docker.js
