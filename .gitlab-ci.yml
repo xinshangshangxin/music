@@ -1,0 +1,31 @@
+image: demoshang/docker-bash:18
+
+services:
+  - docker:dind
+
+variables:
+  # GIT_SUBMODULE_STRATEGY: recursive
+  CONTAINER_USER_NAME: gitlab-ci-token
+  CONTAINER_PASSWORD: ${CI_JOB_TOKEN}
+  CONTAINER_HOST: registry.gitlab.com
+  CONTAINER_IMAGE: ${CONTAINER_HOST}/${CI_PROJECT_PATH}/${CI_PROJECT_NAME}:${CI_COMMIT_REF_NAME}
+  ALI_CONTAINER_IMAGE: ${ALI_CONTAINER_HOST}/${ALI_CONTAINER_NAMESPACE}/${CI_PROJECT_NAME}:${CI_COMMIT_REF_NAME}
+
+stages:
+  - build
+
+build-docker:
+  stage: build
+  script:
+    # gitlab login
+    - docker login -u ${CONTAINER_USER_NAME} -p ${CONTAINER_PASSWORD} ${CONTAINER_HOST}
+    # gitlab build
+    - docker build -t ${CONTAINER_IMAGE} .
+    # gitlab push
+    - docker push ${CONTAINER_IMAGE}
+    # ali push
+    - docker login -u ${ALI_CONTAINER_USER_NAME} -p ${ALI_CONTAINER_PASSWORD} ${ALI_CONTAINER_HOST}
+    # ali tag
+    - docker tag ${CONTAINER_IMAGE} ${ALI_CONTAINER_IMAGE}
+    # ali push
+    - docker push ${ALI_CONTAINER_IMAGE}
