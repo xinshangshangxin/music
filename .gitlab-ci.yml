@@ -17,15 +17,4 @@ stages:
 build-docker:
   stage: build
   script:
-    # gitlab login
-    - docker login -u ${CONTAINER_USER_NAME} -p ${CONTAINER_PASSWORD} ${CONTAINER_HOST}
-    # gitlab build
-    - docker build -t ${CONTAINER_IMAGE} .
-    # gitlab push
-    - docker push ${CONTAINER_IMAGE}
-    # ali push
-    - docker login -u ${ALI_CONTAINER_USER_NAME} -p ${ALI_CONTAINER_PASSWORD} ${ALI_CONTAINER_HOST}
-    # ali tag
-    - docker tag ${CONTAINER_IMAGE} ${ALI_CONTAINER_IMAGE}
-    # ali push
-    - docker push ${ALI_CONTAINER_IMAGE}
+    - bash tools/script-tools/gitlab-build.sh
