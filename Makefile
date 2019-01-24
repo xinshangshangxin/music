@@ -2,19 +2,19 @@
 prodNodeEnv:=$(shell cat Makefile.rsync.env.private 2>&1)
 
 build:
-	@ bash tools/script-tools/index.sh build $(RUN_ARGS)
+	@ bash tools/local/index.sh build $(RUN_ARGS)
 push:
-	@ bash tools/script-tools/index.sh push $(RUN_ARGS)
+	@ bash tools/local/index.sh push $(RUN_ARGS)
 test:
-	@ bash tools/script-tools/index.sh test $(RUN_ARGS)
+	@ bash tools/local/index.sh test $(RUN_ARGS)
 now:
 	@ # make now -- XXX
 	@ # will do now -t token XXXX
-	@ bash tools/script-tools/index.sh now $(RUN_ARGS)
+	@ bash tools/local/index.sh now $(RUN_ARGS)
 lc:
 	@ # make now -- XXX
 	@ # will do now -t token XXXX
-	@ bash tools/script-tools/index.sh leancloud $(RUN_ARGS)
+	@ bash tools/local/index.sh leancloud $(RUN_ARGS)
 
 
 ifeq ($(firstword $(MAKECMDGOALS)), $(filter $(firstword $(MAKECMDGOALS)),build push now lc))

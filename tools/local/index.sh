@@ -17,7 +17,7 @@ projectDir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && cd ../.. && pwd )"
 projectName=$( cat ${projectDir}/package.json | jq -r '.name' )
 
 defaultConfigPath="tools/remote.config.json"
-defaultCopyScriptPath="tools/script-tools/copy.sh"
+defaultCopyScriptPath="tools/local/copy.sh"
 DockerfilePath="tools/Dockerfiles"
 defaultEnv="leancloud"
 buildDir="dist"
@@ -61,11 +61,6 @@ case ${key} in
     test)
     shift 1
     source test.sh $*
-    shift $#
-    ;;
-    now)
-    shift 1
-    source now.sh $*
     shift $#
     ;;
     leancloud)
