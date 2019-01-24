@@ -6,6 +6,7 @@ interface EnvConfig {
   [prop: string]: any;
   nmdbUrl: string;
   port: number;
+  saveDir: string;
 }
 
 @Injectable()
@@ -36,12 +37,17 @@ export class ConfigService {
     return this.envConfig.port;
   }
 
+  get saveDir(): string {
+    return this.envConfig.saveDir;
+  }
+
   private validateInput(envConfig: EnvConfig): EnvConfig {
     const envVarsSchema: Joi.ObjectSchema = Joi.object({
       nmdbUrl: Joi.string().required(),
       disabledCache: Joi.boolean().default(false),
       appId: Joi.string(),
       port: Joi.number().default(3000),
+      saveDir: Joi.string(),
     });
 
     const { error, value: validatedEnvConfig } = Joi.validate(

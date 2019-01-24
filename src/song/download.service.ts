@@ -7,6 +7,7 @@ import { homedir } from 'os';
 import { resolve as pathResolve } from 'path';
 
 import { SongService } from '../song/song.service';
+import { ConfigService } from '../config/config.service';
 
 interface ISongKey {
   id: string;
@@ -32,7 +33,10 @@ function defer() {
 export class DownloadService {
   private cacheMap: any = {};
 
-  constructor(private songService: SongService) {}
+  constructor(
+    private songService: SongService,
+    private config: ConfigService,
+  ) {}
 
   async download({ id, provider, br }: ISongKey): Promise<string> {
     let { realPath, tempPath } = await this.getDownloadUrl({
@@ -54,7 +58,10 @@ export class DownloadService {
   }
 
   async getDownloadUrl({ id, provider, br }: ISongKey) {
-    const saveDir = pathResolve(homedir(), '.music');
+    const saveDir = this.config.saveDir
+      ? this.config.saveDir
+      : pathResolve(homedir(), '.music');
+
     const tmpDir = pathResolve(saveDir, 'tmp');
 
     await ensureDir(tmpDir);
