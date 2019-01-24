@@ -1,14 +1,15 @@
 #!/usr/bin/env bash
 set -e
 
-BUILDER_CONTAINER_IMAGE=${CONTAINER_IMAGE}-builder
+BUILDER_CONTAINER_IMAGE=${CONTAINER_HOST}/${CI_PROJECT_PATH}/${CI_PROJECT_NAME}:builder
+LATEST_CONTAINER_IMAGE=${CONTAINER_HOST}/${CI_PROJECT_PATH}/${CI_PROJECT_NAME}:latest
 
 # login gitlab
 docker login -u ${CONTAINER_USER_NAME} -p ${CONTAINER_PASSWORD} ${CONTAINER_HOST}
 
 # pull builder image
 echo "docker pull ${BUILDER_CONTAINER_IMAGE}"
-docker pull ${BUILDER_CONTAINER_IMAGE}
+docker pull ${BUILDER_CONTAINER_IMAGE} || true
 
 # build "builder image" with cache 
 echo "docker build --cache-from ${BUILDER_CONTAINER_IMAGE} --tag=${BUILDER_CONTAINER_IMAGE}"
@@ -33,14 +34,14 @@ EOF
 echo "docker push ${BUILDER_CONTAINER_IMAGE}"
 docker push ${BUILDER_CONTAINER_IMAGE}
 
-# pull "CONTAINER_IMAGE"
-echo "docker pull ${CONTAINER_IMAGE}"
-docker pull ${CONTAINER_IMAGE}
+# pull "LATEST_CONTAINER_IMAGE"
+echo "docker pull ${LATEST_CONTAINER_IMAGE}"
+docker pull ${LATEST_CONTAINER_IMAGE} || true
 
-# build "CONTAINER_IMAGE" with cache
-echo "docker build --cache-from ${BUILDER_CONTAINER_IMAGE} --cache-from ${CONTAINER_IMAGE} --tag=${CONTAINER_IMAGE}"
-docker build --cache-from ${BUILDER_CONTAINER_IMAGE} --cache-from ${CONTAINER_IMAGE} --tag=${CONTAINER_IMAGE} --file=- . <<EOF
-FROM ${CONTAINER_IMAGE}-builder as build
+# build "LATEST_CONTAINER_IMAGE" with cache
+echo "docker build --cache-from ${LATEST_CONTAINER_IMAGE} --tag=${LATEST_CONTAINER_IMAGE}"
+docker build --cache-from ${LATEST_CONTAINER_IMAGE} --tag=${LATEST_CONTAINER_IMAGE} --file=- . <<EOF
+FROM ${BUILDER_CONTAINER_IMAGE} as build
 
 FROM keymetrics/pm2:latest-alpine
 
@@ -65,11 +66,11 @@ CMD ["npm", "run", "docker-run"]
 
 EOF
 
-# push "CONTAINER_IMAGE" to gitlab
-echo "docker push ${CONTAINER_IMAGE}"
-docker push ${CONTAINER_IMAGE}
+# push "LATEST_CONTAINER_IMAGE" to gitlab
+echo "docker push ${LATEST_CONTAINER_IMAGE}"
+docker push ${LATEST_CONTAINER_IMAGE}
 
 # ali push
 docker login -u ${ALI_CONTAINER_USER_NAME} -p ${ALI_CONTAINER_PASSWORD} ${ALI_CONTAINER_HOST}
-docker tag ${CONTAINER_IMAGE} ${ALI_CONTAINER_IMAGE}
+docker tag ${LATEST_CONTAINER_IMAGE} ${ALI_CONTAINER_IMAGE}
 docker push ${ALI_CONTAINER_IMAGE}
