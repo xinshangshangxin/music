@@ -5,7 +5,7 @@ function build() {
   resetDir
 
   mkdir -p ${buildDir}/.leancloud
-  local appId=$( cat ${projectDir}/src/config/${nodeEnv}.json5 | grep -E "appId" | sed -e "s/ *appId[ \"']*:[ \"']*//g" -e "s/[\"',]*//g" )
+  local appId=$( cat ${projectDir}/src/config/${nodeEnv}.js | grep -E "appId" | sed -e "s/ *appId[ \"']*:[ \"']*//g" -e "s/[\"',]*//g" )
   echo "${appId}" > ${buildDir}/.leancloud/current_app_id
   echo "web" > ${buildDir}/.leancloud/current_group
 
