@@ -78,6 +78,7 @@ input PeakTimeInput {
 type Query {
   search(keyword: String!, providers: [Provider]): [ISearchItem]
   get(id: ID!, provider: Provider!, br: BitRate, peakDuration: Int): SongDetail
+  url(id: ID!, provider: Provider!, br: BitRate): String
   rank(provider: Provider!, rankType: RankType): [ISearchItem]
   playlist(provider: Provider!, id: String): [ISearchItem]
   album(provider: Provider!, id: String): [ISearchItem]

@@ -36,6 +36,16 @@ export class SongResolver {
   }
 
   @Query()
+  async url(
+    @Args('id') id: string,
+    @Args('provider') provider: Provider,
+    @Args('br') br: BitRate,
+  ) {
+    let url = await this.songService.getUrl(id, provider, br);
+    return url;
+  }
+
+  @Query()
   async rank(
     @Args('provider') provider: Provider,
     @Args('rankType') rankType: RankType,
