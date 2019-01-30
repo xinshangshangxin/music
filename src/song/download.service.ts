@@ -2,12 +2,16 @@ import { Injectable } from '@nestjs/common';
 import { BitRate, Provider } from '@s4p/music-api';
 import { createWriteStream } from 'fs';
 import { access, ensureDir, move, remove } from 'fs-extra';
-import got from 'got';
 import { homedir } from 'os';
 import { resolve as pathResolve } from 'path';
+import request from 'request';
+import { pipeline as originPipeline } from 'stream';
+import { promisify } from 'util';
 
-import { SongService } from '../song/song.service';
 import { ConfigService } from '../config/config.service';
+import { SongService } from '../song/song.service';
+
+const pipeline = promisify(originPipeline);
 
 interface ISongKey {
   id: string;
@@ -29,6 +33,14 @@ function defer() {
   };
 }
 
+function awaitWrap<T, U = any>(
+  promise: Promise<T>,
+): Promise<[U | null, T | null]> {
+  return promise
+    .then<[null, T]>((data: T) => [null, data])
+    .catch<[U, null]>(err => [err, null]);
+}
+
 @Injectable()
 export class DownloadService {
   private cacheMap: any = {};
@@ -45,15 +57,12 @@ export class DownloadService {
       br,
     });
 
-    console.info('realPath: ', realPath);
-    try {
-      await access(realPath);
-      return realPath;
-    } catch (e) {
-      console.warn(e);
+    let [err] = await awaitWrap(access(realPath));
+
+    if (err) {
+      await this.persist(id, provider, br, realPath, tempPath);
     }
 
-    await this.persist(id, provider, br, realPath, tempPath);
     return realPath;
   }
 
@@ -97,46 +106,36 @@ export class DownloadService {
     if (!url) {
       deferred.reject(new Error('download error'));
     } else {
-      new Promise((resolve, reject) => {
-        let statusCode;
+      let statusCode;
 
-        got
-          .stream(url)
-          .on('response', response => {
+      try {
+        await pipeline(
+          request({ url }).on('response', response => {
             ({ statusCode } = response);
-          })
-          .on('error', (error, body, response) => {
-            console.debug(error, body, response);
-            remove(tempPath).catch(console.warn);
-          })
-          .pipe(createWriteStream(tempPath))
-          .on('finish', async () => {
-            console.debug('finished');
-            if (statusCode >= 300) {
-              remove(tempPath).catch(console.warn);
+          }),
+          createWriteStream(tempPath),
+        );
 
-              reject(new Error(`download error, statusCode: ${statusCode}`));
-              return;
-            }
+        if (statusCode >= 300) {
+          throw new Error(`download error, statusCode: ${statusCode}`);
+        }
 
-            move(tempPath, realPath)
-              .then(() => {
-                resolve(realPath);
-              })
-              .catch(reject);
-          });
-      })
-        .then(() => {
-          deferred.resolve();
-        })
-        .catch(e => {
-          deferred.reject(e);
-        });
+        await move(tempPath, realPath);
+        deferred.resolve(realPath);
+      } catch (e) {
+        console.debug(e);
+        remove(tempPath).catch(console.warn);
+        deferred.reject(e);
+      }
     }
 
     // 延迟删除
     setTimeout(() => {
+      deferred = null;
+      this.cacheMap[cacheKey] = null;
       delete this.cacheMap[cacheKey];
+
+      console.info(Object.keys(this.cacheMap));
     }, 0);
 
     return deferred.promise;
