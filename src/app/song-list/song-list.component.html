@@ -1,9 +1,8 @@
-<div cdkDropList class="song-list" (cdkDropListDropped)="drop($event)">
+<div class="song-list">
   <div
     [ngClass]="{ playing: playerService.meta.currentIndex === i }"
     class="song-box"
     *ngFor="let song of playList; index as i"
-    cdkDrag
     (click)="play(i)"
   >
     <span class="song-info">
@@ -11,16 +10,20 @@
         class="song-name"
         matTooltip="{{ song.name }}"
         matTooltipPosition="above"
-        matTooltipShowDelay="1000"
+        matTooltipShowDelay="500"
         >[{{ song.provider }}]-{{ song.name }}
       </span>
 
-      <span class="song-artists">
+      <span
+        class="song-artists"
+        matTooltip="{{ formatArtists(song.artists) }}"
+        matTooltipPosition="above"
+        matTooltipShowDelay="500"
+      >
         <span *ngFor="let artist of song.artists"> {{ artist.name }} </span>
       </span>
     </span>
     <span class="song-control" (click)="$event.stopPropagation()">
-      <i class="material-icons drag" cdkDragHandle>drag_handle</i>
       <i class="material-icons" (click)="remove(i)">delete</i>
     </span>
   </div>

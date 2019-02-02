@@ -1,7 +1,7 @@
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { Component, OnInit } from '@angular/core';
 
-import { SongDetail } from '../graphql/generated';
+import { SongDetail, ISearchArtist } from '../graphql/generated';
 import { PlayerService } from '../services/player.service';
 
 @Component({
@@ -28,5 +28,13 @@ export class SongListComponent implements OnInit {
 
   remove(index: number) {
     this.playerService.remove(index);
+  }
+
+  formatArtists(artists: ISearchArtist[]) {
+    return artists
+      .map(({ name }) => {
+        return name;
+      })
+      .join(' ');
   }
 }
