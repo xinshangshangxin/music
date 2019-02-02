@@ -72,7 +72,9 @@ export class SongPeakService {
 
   private async fillOtherDuration({ id, provider, peaks }) {
     console.info('fillOtherDuration', id, provider);
-    let arr = [10, 15, 20, 25, 30, 35, 40];
+    let arr = new Array(11).fill(5).map((step, index) => {
+      return step * (index + 2);
+    });
 
     Promise.all(
       arr.map(async duration => {
