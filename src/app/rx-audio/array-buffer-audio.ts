@@ -58,7 +58,13 @@ export class ArrayBufferAudio extends EventEmitter {
     this.startRunTime = this.audioContext.currentTime;
     this.startTime = start;
 
-    this.source.start(0, start);
+    try {
+      this.source.start(0, start);
+    } catch (e) {
+      console.warn(e);
+      this.emit('error', e);
+      return;
+    }
 
     this.playing = true;
     this.emit('play');

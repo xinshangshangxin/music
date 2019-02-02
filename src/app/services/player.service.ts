@@ -13,7 +13,7 @@ import {
 import { environment } from 'src/environments/environment';
 
 import { AddPeakTimeGQL, GetGQL, Provider, SongDetail } from '../graphql/generated';
-import { MyAudio } from '../rx-audio/my-audio';
+import { IPeakConfig, MyAudio } from '../rx-audio/my-audio';
 import { SongList } from './song-list';
 
 export interface ISongState {
@@ -30,10 +30,10 @@ export class PlayerService extends SongList {
 
   private preLoadNextSongLength = 2;
 
-  constructor(private readonly addPeakTimeGQL: AddPeakTimeGQL, private readonly getGel: GetGQL) {
+  constructor(private readonly addPeakTimeGQL: AddPeakTimeGQL, private readonly getGql: GetGQL) {
     super();
 
-    this.myAudio = new MyAudio();
+    this.myAudio = new MyAudio({ duration: this.meta.duration });
 
     this.songState = {
       playing: false,
@@ -48,6 +48,27 @@ export class PlayerService extends SongList {
 
   private static buildSongUrl(song: SongDetail) {
     return `${environment.proxyUrl}?id=${song.id}&provider=${song.provider}`;
+  }
+
+  get duration() {
+    return this.meta.duration;
+  }
+
+  changeConfig({ duration }: IPeakConfig) {
+    this.myAudio.changeConfig({ duration });
+
+    if (duration === undefined || duration === null) {
+      return;
+    }
+
+    this.meta.duration = duration;
+
+    if (duration === 0) {
+      this.meta.isPeak = false;
+    } else {
+      this.meta.isPeak = true;
+    }
+    this.saveMeta();
   }
 
   add(song: SongDetail) {
@@ -173,17 +194,18 @@ export class PlayerService extends SongList {
   }
 
   private async play(song: SongDetail) {
-    console.info('wait to play song: ', song);
+    console.info('wait to play song: ', this.meta.isPeak, song);
 
     this.songState.song = song;
     if (this.meta.isPeak) {
-      if (!song.peakStartTime) {
+      if (!song.peakStartTime || song.peakDuration !== this.meta.duration) {
         try {
-          console.info('get server peakStartTime');
-          let { data } = await this.getGel
+          console.info(`get server peakStartTime with duration ${this.meta.duration}`);
+          let { data } = await this.getGql
             .fetch({
               id: song.id,
               provider: song.provider,
+              peakDuration: this.meta.duration,
             })
             .toPromise();
 
@@ -203,6 +225,12 @@ export class PlayerService extends SongList {
           this.myAudio.errorSubject.next(e);
           return;
         }
+      } else {
+        console.info(
+          `${song.name} play with local peakTime ${song.peakStartTime} duration ${
+            this.meta.duration
+          }`
+        );
       }
     }
 
@@ -313,23 +341,40 @@ export class PlayerService extends SongList {
     console.time(`${song.name}`);
     console.info(`start loadNext ${song.name}`);
 
-    if (song.peakStartTime) {
-      console.info(`end loadNext ${song.name} with peakTime ${song.peakStartTime}`);
+    if (this.meta.duration === 0) {
+      console.info(`end loadNext ${song.name}`, {
+        peak: this.meta.isPeak,
+        duration: this.meta.duration,
+      });
+      return of(undefined);
+    }
+
+    if (song.peakStartTime && song.peakDuration === this.meta.duration) {
+      console.info(
+        `end loadNext ${song.name} use local peakTime ${song.peakStartTime} duration ${
+          this.meta.duration
+        }`
+      );
       console.timeEnd(`${song.name}`);
       return of(undefined);
     }
 
-    return this.getGel
+    return this.getGql
       .fetch({
         id: song.id,
         provider: song.provider,
+        peakDuration: this.meta.duration,
       })
       .pipe(
         filter(({ data: { get } }) => {
           let { peakStartTime, peakDuration } = get;
 
           if (peakStartTime) {
-            console.info(`end loadNext ${song.name} use server peakTime ${peakStartTime}`);
+            console.info(
+              `end loadNext ${song.name} use server peakTime ${peakStartTime} duration ${
+                this.meta.duration
+              }`
+            );
             console.timeEnd(`${song.name}`);
             this.saveSongPeakTime(song.id, song.provider, peakStartTime, peakDuration);
 

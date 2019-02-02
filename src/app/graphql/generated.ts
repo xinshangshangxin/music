@@ -13,6 +13,8 @@ export interface Query {
 
   get?: SongDetail | null;
 
+  url?: string | null;
+
   rank?: (ISearchItem | null)[] | null;
 
   playlist?: (ISearchItem | null)[] | null;
@@ -138,6 +140,13 @@ export interface GetQueryArgs {
 
   peakDuration?: number | null;
 }
+export interface UrlQueryArgs {
+  id: string;
+
+  provider: Provider;
+
+  br?: BitRate | null;
+}
 export interface RankQueryArgs {
   provider: Provider;
 
@@ -217,6 +226,7 @@ export namespace Get {
     id: string;
     provider: Provider;
     br?: BitRate | null;
+    peakDuration?: number | null;
   };
 
   export type Query = {
@@ -432,8 +442,8 @@ export class AddPeakTimeGQL extends Apollo.Mutation<AddPeakTime.Mutation, AddPea
 })
 export class GetGQL extends Apollo.Query<Get.Query, Get.Variables> {
   document: any = gql`
-    query get($id: ID!, $provider: Provider!, $br: BitRate) {
-      get(id: $id, provider: $provider, br: $br) {
+    query get($id: ID!, $provider: Provider!, $br: BitRate, $peakDuration: Int) {
+      get(id: $id, provider: $provider, br: $br, peakDuration: $peakDuration) {
         provider
         id
         name

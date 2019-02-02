@@ -15,19 +15,19 @@ interface IPlaySong {
 }
 
 // 总共播放时长 = duration + before + end
-interface IPeakConfig {
+export interface IPeakConfig {
   // 高潮音乐时长
-  duration: number;
+  duration?: number;
   // 渐入时长
-  layIn: number;
+  layIn?: number;
   // 渐出时长
-  layOut: number;
+  layOut?: number;
   // 高潮音乐前置时间
-  before: number;
+  before?: number;
   // 高潮音乐后置时间
-  after: number;
+  after?: number;
   // peak 数组的精确度
-  precision: number;
+  precision?: number;
 }
 
 export interface IAudioState {
@@ -77,6 +77,20 @@ export class MyAudio {
     );
 
     this.init();
+  }
+
+  changeConfig(peakConfig?: IPeakConfig) {
+    this.peakConfig = Object.assign(
+      {
+        duration: 20,
+        layIn: 2,
+        layOut: 3,
+        before: 6,
+        after: 4,
+        precision: 10,
+      },
+      peakConfig
+    );
   }
 
   play() {
