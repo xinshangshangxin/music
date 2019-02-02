@@ -141,9 +141,10 @@ export class SrcAudio extends EventEmitter {
     this.eventListeners.timeupdate.push(timeupdateFn);
 
     let errorFn = (event: ErrorEvent) => {
-      if (this.browser && this.browser.name === 'firefox') {
+      console.info('=======', this.browser);
+      if (this.browser && this.browser.name !== 'chrome') {
         if (event.isTrusted && this.audio.error.code === 2) {
-          console.debug('ignore firefox MEDIA_ERR_NETWORK: ', event);
+          console.debug('ignore MEDIA_ERR_NETWORK: ', event);
           return;
         }
       }
