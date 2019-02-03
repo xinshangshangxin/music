@@ -75,9 +75,9 @@ export class AudioPeak {
     let current = 0;
     let peaks = new Array(width);
     for (let i = 0; i < width; i++) {
-      let start = ~~current;
+      let start = parseInt(`${current}`, 10);
       current = current + size;
-      let end = ~~current;
+      let end = parseInt(`${current}`, 10);
       peaks[i] = this.getMaxInRange(data, start, end);
     }
 

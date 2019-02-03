@@ -1,38 +1,55 @@
-import { SongDetail, Provider } from '../graphql/generated';
+import uuid from 'uuid/v4';
 
-export interface IPlayList {
-  id: string;
-  name?: string;
-}
-
-export interface IMeta {
-  currentPlayListId: string;
-  currentIndex: number;
-  isPeak: boolean;
-  playList: IPlayList[];
-}
+import { Provider, SongDetail } from '../graphql/generated';
+import { ISongDuration } from '../rx-audio/my-audio';
 
 interface ISearchSong {
   id: string;
   provider: Provider;
 }
 
+export interface IPlaylistBrief {
+  id: string;
+  name: string;
+}
+
+export interface IPlaylist extends IPlaylistBrief {
+  songs: SongDetail[];
+}
+
+export interface IMeta {
+  // 高潮时间, duration === 0 表示整首播放
+  duration: ISongDuration;
+  currentIndex: number;
+  currentPlaylistId: string;
+  playlists: IPlaylist[];
+}
+
 type IUpdateSong<T> = { [P in keyof T]?: T[P] };
 
 export class SongList {
-  public songList: SongDetail[];
+  public readonly tempPlaylistId = '__temp__';
+
+  public songs: SongDetail[] = [];
+
   protected meta: IMeta;
 
-  public readonly tempPlatListId = '__temp__';
-
   private musicPrefix = 'shang-music';
-  private songListMap: { [key: number]: SongDetail[] } = {};
+
+  private readonly metaId = '__meta__';
 
   constructor() {
     this.init();
   }
 
-  private static getStorageItem(key: string, defaultValue?: any) {
+  private tempPlaylist = {
+    id: this.tempPlaylistId,
+    name: '临时歌单',
+    songs: [],
+  };
+
+  private getStorageItem(id: string, defaultValue?: any) {
+    let key = `${this.musicPrefix}-${id}`;
     let str = localStorage.getItem(key);
     try {
       return JSON.parse(str);
@@ -41,7 +58,9 @@ export class SongList {
     }
   }
 
-  private static setStorageItem(key: string, value: object) {
+  private setStorageItem(id: string, value: object) {
+    let key = `${this.musicPrefix}-${id}`;
+
     let str = '';
     try {
       str = JSON.stringify(value);
@@ -52,178 +71,202 @@ export class SongList {
     localStorage.setItem(key, str);
   }
 
-  saveMeta() {
-    SongList.setStorageItem(this.getMetaId(), this.meta);
+  private persistPlaylist(playlistId: string) {
+    if (playlistId === this.meta.currentPlaylistId) {
+      this.updateCurrentSongs();
+    }
+
+    let playlist = this.getPlaylist(playlistId);
+
+    this.setStorageItem(playlistId, playlist.songs);
   }
 
-  rmPlayList(playListId: string) {
-    if (playListId === this.tempPlatListId) {
-      this.setPlayList([], playListId);
-    } else {
-      let key = this.getKey(playListId);
-      delete this.songListMap[key];
+  protected persistMeta() {
+    let persistsPlaylists = this.meta.playlists.map(({ id, name }) => {
+      return { id, name };
+    });
+    this.setStorageItem(this.metaId, { ...this.meta, playlists: persistsPlaylists });
+  }
 
-      this.updatePlayListInfo(playListId, undefined, true);
+  getPlaylists() {
+    return this.meta.playlists;
+  }
+
+  changePlaylist(playlistId: string) {
+    this.meta.currentPlaylistId = playlistId;
+    this.persistMeta();
+    this.updateCurrentSongs();
+
+    console.info(this.songs);
+  }
+
+  createPlaylist(name: string, songs: SongDetail[] = []) {
+    let id = uuid();
+
+    this.meta.playlists.push({
+      id,
+      name,
+      songs,
+    });
+
+    this.persistMeta();
+    this.persistPlaylist(id);
+  }
+
+  removePlaylist(playlistId: string) {
+    let index = this.meta.playlists.findIndex(({ id }) => {
+      return id === playlistId;
+    });
+
+    if (index === -1) {
+      return;
+    }
+
+    this.meta.playlists.splice(index, 1);
+
+    // 临时列表 重新创建列表
+    if (playlistId === this.tempPlaylistId) {
+      this.meta.playlists.unshift(this.tempPlaylist);
+    }
+
+    if (this.meta.currentPlaylistId === playlistId) {
+      let { id, songs } = this.meta.playlists[0];
+      this.meta.currentPlaylistId = id;
+
+      this.songs.length = 0;
+      this.songs.push(...songs);
+    }
+
+    // 保存到storage
+    this.persistMeta();
+    this.persistPlaylist(playlistId);
+  }
+
+  updatePlaylist(id: string = this.meta.currentPlaylistId, name?: string, songs?: SongDetail[]) {
+    let playlist = this.getPlaylist(id);
+
+    if (!playlist) {
+      throw new Error('no playlist found');
+    }
+
+    if (name) {
+      playlist.name = name;
+
+      this.persistMeta();
+    }
+
+    if (songs) {
+      playlist.songs = songs;
+
+      this.persistPlaylist(id);
     }
   }
 
-  setPlayList(arr: SongDetail[], playListId = this.tempPlatListId) {
-    let key = this.getKey(playListId);
-    this.songListMap[key] = this.songListMap[key] || [];
-    this.songListMap[key].length = 0;
-    this.songListMap[key].push(...arr);
-
-    this.savePlayList(playListId);
-    this.updatePlayListInfo(playListId);
-  }
-
-  addSong(song: SongDetail, playListId = '__temp__', index?: number) {
-    let playList = this.getPlayList(playListId);
+  protected addSong(song: SongDetail, playlistId = this.meta.currentPlaylistId, index?: number) {
+    let playlist = this.getPlaylist(playlistId);
 
     if (typeof index === 'undefined') {
-      playList.push(song);
-    } else if (index > playList.length + 1) {
-      playList.push(song);
+      playlist.songs.push(song);
+    } else if (index > playlist.songs.length + 1) {
+      playlist.songs.push(song);
     } else {
-      playList.splice(index, 0, song);
+      playlist.songs.splice(index, 0, song);
     }
 
-    this.savePlayList(playListId);
+    this.persistPlaylist(playlistId);
   }
 
-  rmSong(param: number | SongDetail, playListId = '__temp__') {
-    let playList = this.getPlayList(playListId);
+  protected delSong(param: number | SongDetail, playlistId = this.meta.currentPlaylistId) {
+    let playlist = this.getPlaylist(playlistId);
 
     if (typeof param === 'number') {
-      playList.splice(param, 1);
+      playlist.songs.splice(param, 1);
     } else {
-      let index = playList.findIndex(({ id, provider }) => {
+      let index = playlist.songs.findIndex(({ id, provider }) => {
         return param.id === id && param.provider === provider;
       });
 
       if (index > -1) {
-        playList.splice(index, 1);
+        playlist.songs.splice(index, 1);
       }
     }
 
-    this.savePlayList(playListId);
+    this.persistPlaylist(playlistId);
   }
 
-  updateSong(
+  protected updateSong(
     param: number | ISearchSong,
     song: Pick<IUpdateSong<SongDetail>, Exclude<keyof SongDetail, 'id' | 'provider'>>,
-    playListId = '__temp__'
+    playlistId = this.meta.currentPlaylistId
   ) {
-    let playList = this.getPlayList(playListId);
+    let playlist = this.getPlaylist(playlistId);
     let index = -1;
 
     if (typeof param === 'number') {
       index = param;
     } else {
-      index = playList.findIndex(({ id, provider }) => {
+      index = playlist.songs.findIndex(({ id, provider }) => {
         return param.id === id && param.provider === provider;
       });
     }
 
-    if (index >= 0 && index < this.songList.length) {
-      let oldSong = playList[index];
-
-      this.songList.splice(index, 1, {
+    if (index >= 0 && index < playlist.songs.length) {
+      let oldSong = playlist.songs[index];
+      playlist.songs.splice(index, 1, {
         ...oldSong,
         ...song,
       });
     }
 
-    this.savePlayList(playListId);
+    this.persistPlaylist(playlistId);
   }
 
   protected checkIndex(index: number) {
-    if (index < 0 || index >= this.songList.length) {
+    if (index < 0 || index >= this.songs.length) {
       throw new Error('over length');
     }
-  }
-
-  private updatePlayListInfo(playListId: string, playListName?: string, rm = false) {
-    if (rm) {
-      let index = this.meta.playList.findIndex(({ id }) => {
-        return id === playListId;
-      });
-
-      if (index >= 0) {
-        this.meta.playList.splice(index, 1);
-      }
-
-      this.saveMeta();
-      return;
-    }
-
-    let playList = this.meta.playList.find(({ id }) => {
-      return id === playListId;
-    });
-
-    if (!playList) {
-      playList = {
-        id: playListId,
-      };
-
-      this.meta.playList.push(playList);
-    }
-
-    if (playListName) {
-      playList.name = playListName;
-    }
-
-    this.saveMeta();
-  }
-
-  private getPlayList(playListId = this.tempPlatListId): SongDetail[] {
-    // __temp__ 是 临时列表
-    // 其它 uuid 是用户自建列表
-
-    let key = this.getKey(playListId);
-
-    this.songListMap[key] = this.songListMap[key] || [];
-    return this.songListMap[key];
   }
 
   private init() {
     this.initMeta();
 
-    this.meta.playList.forEach(({ id }) => {
-      this.initPlayList(id);
+    this.meta.playlists.forEach((item) => {
+      this.fillPlaylistSongs(item);
     });
 
-    this.songList = this.getPlayList(this.meta.currentPlayListId);
+    // TODO: check data is valid
+
+    this.updateCurrentSongs();
+
+    console.info('init done with data: ', this.meta);
+  }
+
+  private updateCurrentSongs() {
+    let playlist = this.getPlaylist(this.meta.currentPlaylistId);
+    this.songs.length = 0;
+    this.songs.push(...((playlist && playlist.songs) || []));
   }
 
   private initMeta() {
-    let metaId = this.getMetaId();
-    let info = SongList.getStorageItem(metaId, {});
+    let storageMetaInfo: IMeta = this.getStorageItem(this.metaId, {});
+
     this.meta = {
       currentIndex: 0,
-      isPeak: true,
-      playList: [],
-      ...info,
+      duration: 20,
+      currentPlaylistId: this.tempPlaylist.id,
+      playlists: [this.tempPlaylist],
+      ...storageMetaInfo,
     };
   }
 
-  private initPlayList(playListId: string) {
-    let playListKey = this.getKey(playListId);
-    // TODO: add value check
-    let arr: SongDetail[] = SongList.getStorageItem(playListKey, []);
-    this.songListMap[playListKey] = arr;
+  private fillPlaylistSongs(playlist: IPlaylist) {
+    let arr: SongDetail[] = this.getStorageItem(playlist.id, []);
+    playlist.songs = arr || [];
   }
 
-  private getMetaId() {
-    return `${this.musicPrefix}-__meta__`;
-  }
-
-  private getKey(playListId: string) {
-    return `${this.musicPrefix}-${playListId}`;
-  }
-
-  private savePlayList(playListId: string) {
-    let arr = this.getPlayList(playListId);
-    SongList.setStorageItem(this.getKey(playListId), arr);
+  private getPlaylist(playlistId = this.tempPlaylistId): IPlaylist {
+    return this.meta.playlists.find(({ id }) => {
+      return id === playlistId;
+    });
   }
 }

@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { from, Observable, of } from 'rxjs';
+import { EMPTY, from, Observable, of } from 'rxjs';
 import {
   catchError,
   concatMap,
@@ -16,16 +16,38 @@ import { AddPeakTimeGQL, GetGQL, Provider, SongDetail } from '../graphql/generat
 import { IPeakConfig, MyAudio } from '../rx-audio/my-audio';
 import { SongList } from './song-list';
 
-export interface ISongState {
-  playing: boolean;
-  currentTime: number;
-  bufferedTime: number;
-  song?: SongDetail;
+export enum SongState {
+  // 正在播放
+  playing = 'playing',
+  // 点击播放了, 由于网络或者高潮build, 而还没开始播放
+  loading = 'loading',
+
+  // 停止播放了
+  paused = 'paused',
+  // 点击停止了, 由于网络或者高潮build, 而还没暂停播放
+  pausing = 'pausing',
+}
+
+interface IPeak {
+  peaks: {
+    precision: number;
+    data: number[];
+  };
+  peak: {
+    startTime: number;
+    duration: number;
+  };
+  id: string;
+  provider: string;
 }
 
 @Injectable()
 export class PlayerService extends SongList {
-  private songState: ISongState;
+  public currentTime: number;
+
+  private songState: SongState;
+  private currentSong: SongDetail;
+
   private myAudio: MyAudio;
 
   private preLoadNextSongLength = 2;
@@ -35,11 +57,7 @@ export class PlayerService extends SongList {
 
     this.myAudio = new MyAudio({ duration: this.meta.duration });
 
-    this.songState = {
-      playing: false,
-      currentTime: 0,
-      bufferedTime: 0,
-    };
+    this.songState = SongState.paused;
 
     this.catchNext();
     this.updatePeakTime();
@@ -63,12 +81,7 @@ export class PlayerService extends SongList {
 
     this.meta.duration = duration;
 
-    if (duration === 0) {
-      this.meta.isPeak = false;
-    } else {
-      this.meta.isPeak = true;
-    }
-    this.saveMeta();
+    this.persistMeta();
   }
 
   add(song: SongDetail) {
@@ -78,11 +91,13 @@ export class PlayerService extends SongList {
   remove(index: number) {
     this.checkIndex(index);
 
-    this.rmSong(index);
+    this.delSong(index);
+
     if (index === this.meta.currentIndex) {
       // 如果当前播放歌曲被删除, 正好播放下一首
       this.meta.currentIndex = this.meta.currentIndex - 1;
-      if (this.songState.playing) {
+
+      if (this.songState !== SongState.paused) {
         this.next();
       }
     } else if (index < this.meta.currentIndex) {
@@ -93,7 +108,7 @@ export class PlayerService extends SongList {
 
   addAndPlay(song: SongDetail) {
     this.add(song);
-    this.playAt(this.songList.length - 1);
+    this.playAt(this.songs.length - 1);
   }
 
   playCurrent(): void {
@@ -103,26 +118,26 @@ export class PlayerService extends SongList {
       return null;
     }
 
+    this.songState = SongState.loading;
     this.play(song);
-    this.saveMeta();
+    this.persistMeta();
   }
 
   previous(): void {
-    if (!this.songList.length) {
+    if (!this.songs.length) {
       return null;
     }
 
-    this.meta.currentIndex =
-      (this.meta.currentIndex - 1 + this.songList.length) % this.songList.length;
+    this.meta.currentIndex = (this.meta.currentIndex - 1 + this.songs.length) % this.songs.length;
     this.playCurrent();
   }
 
   next(): void {
-    if (!this.songList.length) {
+    if (!this.songs.length) {
       return null;
     }
 
-    this.meta.currentIndex = (this.meta.currentIndex + 1) % this.songList.length;
+    this.meta.currentIndex = (this.meta.currentIndex + 1) % this.songs.length;
     this.playCurrent();
   }
 
@@ -134,25 +149,30 @@ export class PlayerService extends SongList {
   }
 
   playLast() {
-    this.playAt(this.songList.length - 1);
+    this.playAt(this.songs.length - 1);
   }
 
   togglePlay() {
-    if (this.songState.playing) {
-      this.songState.playing = false;
-      this.myAudio.pause();
-    } else {
-      if (this.myAudio.play()) {
-        this.songState.playing = true;
-      } else {
+    if ([SongState.paused, SongState.pausing].includes(this.songState)) {
+      this.songState = SongState.loading;
+
+      if (!this.myAudio.play()) {
         this.playCurrent();
       }
+    } else if ([SongState.loading, SongState.playing].includes(this.songState)) {
+      this.songState = SongState.pausing;
+      this.myAudio.pause();
     }
+  }
+
+  pause() {
+    this.songState = SongState.pausing;
+    this.myAudio.pause();
   }
 
   private getCurrent(): SongDetail {
     this.checkIndex(this.meta.currentIndex);
-    return this.songList[this.meta.currentIndex];
+    return this.songs[this.meta.currentIndex];
   }
 
   private catchNext() {
@@ -161,43 +181,62 @@ export class PlayerService extends SongList {
     let MAX_SONG_RETRY = 1;
     let MAX_SONG_LIST_RETRY = 1;
 
-    this.myAudio.endedSubject.subscribe(() => {
-      console.info('endedSubject emit');
+    this.myAudio.events
+      .pipe(
+        filter(({ type }) => {
+          return type === 'ended';
+        }),
+        map(() => {
+          songRetryNu = 0;
+          songListRetryNu = 0;
 
-      songRetryNu = 0;
-      songListRetryNu = 0;
-
-      this.next();
-    });
-
-    this.myAudio.errorSubject.subscribe((e) => {
-      console.warn(e);
-
-      if (songListRetryNu >= MAX_SONG_LIST_RETRY * this.songList.length) {
-        console.log(new Error('song list retry over ' + MAX_SONG_LIST_RETRY));
-        return null;
-      }
-
-      if (songRetryNu >= MAX_SONG_RETRY) {
-        console.warn('song retryNu = ' + songRetryNu);
-        songRetryNu = 0;
-        songListRetryNu += 1;
-        setTimeout(() => {
           this.next();
-        }, songListRetryNu * 200);
-        return null;
-      }
+        }),
+        catchError((e) => {
+          console.error('this error should not exists: ', e);
+          return EMPTY;
+        })
+      )
+      .subscribe(() => {});
 
-      songRetryNu += 1;
-      this.playCurrent();
-    });
+    this.myAudio.events
+      .pipe(
+        filter(({ type }) => {
+          return type === 'error';
+        }),
+        catchError((e) => {
+          console.error('this error should not exists: ', e);
+          return EMPTY;
+        })
+      )
+      .subscribe(() => {
+        if (songListRetryNu >= MAX_SONG_LIST_RETRY * this.songs.length) {
+          console.log(new Error('song list retry over ' + MAX_SONG_LIST_RETRY));
+          return null;
+        }
+
+        if (songRetryNu >= MAX_SONG_RETRY) {
+          console.warn('song retryNu = ' + songRetryNu);
+          songRetryNu = 0;
+          songListRetryNu += 1;
+          setTimeout(() => {
+            this.next();
+          }, songListRetryNu * 200);
+          return null;
+        }
+
+        songRetryNu += 1;
+        this.playCurrent();
+      });
   }
 
   private async play(song: SongDetail) {
-    console.info('wait to play song: ', this.meta.isPeak, song);
+    console.info('wait to play song: ', this.meta.duration, song);
 
-    this.songState.song = song;
-    if (this.meta.isPeak) {
+    this.currentSong = song;
+    this.songState = SongState.loading;
+
+    if (this.meta.duration !== 0) {
       if (!song.peakStartTime || song.peakDuration !== this.meta.duration) {
         try {
           console.info(`get server peakStartTime with duration ${this.meta.duration}`);
@@ -222,7 +261,10 @@ export class PlayerService extends SongList {
             );
           }
         } catch (e) {
-          this.myAudio.errorSubject.next(e);
+          this.myAudio.events.next({
+            type: 'error',
+            error: e,
+          });
           return;
         }
       } else {
@@ -234,12 +276,11 @@ export class PlayerService extends SongList {
       }
     }
 
-    if (song.id !== this.songState.song.id || song.provider !== this.songState.song.provider) {
+    if (song.id !== this.currentSong.id || song.provider !== this.currentSong.provider) {
       console.warn('not in current loop song, skip play');
       return;
     }
 
-    this.songState.playing = true;
     this.myAudio.playSong(
       {
         url: PlayerService.buildSongUrl(song),
@@ -247,13 +288,16 @@ export class PlayerService extends SongList {
         provider: song.provider as string,
         peakStartTime: song.peakStartTime,
       },
-      this.meta.isPeak
+      this.meta.duration !== 0
     );
   }
 
   private initLoadNext() {
-    this.myAudio.playSubject
+    this.myAudio.events
       .pipe(
+        filter(({ type }) => {
+          return type === 'playing';
+        }),
         concatMap(() => {
           return from(
             new Array(this.preLoadNextSongLength).fill(0).map((item, index) => {
@@ -266,15 +310,18 @@ export class PlayerService extends SongList {
         }),
         catchError((e) => {
           console.warn(e);
-          return of(null);
+          return EMPTY;
         })
       )
       .subscribe(() => {});
   }
 
   private async updatePeakTime() {
-    this.myAudio.peakTimeUpdateSubject
+    this.myAudio.events
       .pipe(
+        filter(({ type }) => {
+          return type === 'peakUpdate';
+        }),
         tap((peakResult) => {
           console.info('updatePeakTime: ', peakResult);
         }),
@@ -288,7 +335,7 @@ export class PlayerService extends SongList {
 
           return peakResult;
         }),
-        mergeMap((peakResult) => {
+        mergeMap((peakResult: IPeak) => {
           return this.addPeakTimeGQL.mutate({
             peakTime: {
               ...peakResult,
@@ -298,18 +345,18 @@ export class PlayerService extends SongList {
         }),
         catchError((e) => {
           console.warn(e);
-          return null;
+          return EMPTY;
         })
       )
       .subscribe(() => {});
   }
 
   private getNextSong(step = 1) {
-    if (!this.songList.length) {
+    if (!this.songs.length) {
       return null;
     }
 
-    return this.songList[(this.meta.currentIndex + step) % this.songList.length];
+    return this.songs[(this.meta.currentIndex + step) % this.songs.length];
   }
 
   private saveSongPeakTime(
@@ -327,7 +374,7 @@ export class PlayerService extends SongList {
         peakStartTime: peakStartTime,
         peakDuration: peakDuration,
       },
-      this.meta.currentPlayListId
+      this.meta.currentPlaylistId
     );
   }
 
@@ -343,7 +390,6 @@ export class PlayerService extends SongList {
 
     if (this.meta.duration === 0) {
       console.info(`end loadNext ${song.name}`, {
-        peak: this.meta.isPeak,
         duration: this.meta.duration,
       });
       return of(undefined);

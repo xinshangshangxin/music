@@ -77,7 +77,7 @@ export class SearchComponent implements OnInit {
                   return result.data.parseUrl || [];
                 }),
                 map((songs) => {
-                  this.playerService.setPlayList(songs);
+                  this.playerService.updatePlaylist(undefined, undefined, songs);
                   this.playerService.playAt(0);
                 }),
                 delay(200),
@@ -104,7 +104,7 @@ export class SearchComponent implements OnInit {
                   return result.data.rank || [];
                 }),
                 map((songs) => {
-                  this.playerService.setPlayList(songs);
+                  this.playerService.updatePlaylist(undefined, undefined, songs);
                   this.playerService.playAt(0);
                 }),
                 delay(200),

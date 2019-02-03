@@ -1,15 +1,15 @@
 import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { Component, OnInit } from '@angular/core';
 
-import { SongDetail, ISearchArtist } from '../graphql/generated';
+import { ISearchArtist, SongDetail } from '../graphql/generated';
 import { PlayerService } from '../services/player.service';
 
 @Component({
-  selector: 'app-song-list',
-  templateUrl: './song-list.component.html',
-  styleUrls: ['./song-list.component.scss'],
+  selector: 'app-song-drop-list',
+  templateUrl: './song-drop-list.component.html',
+  styleUrls: ['./song-drop-list.component.scss'],
 })
-export class SongListComponent implements OnInit {
+export class SongDropListComponent implements OnInit {
   public playList: SongDetail[];
 
   constructor(public playerService: PlayerService) {}

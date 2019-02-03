@@ -5,7 +5,7 @@
     "branch": "develop"
   },
   "prod": {
-    "url": "",
+    "url": "git@git.dev.tencent.com:xinshangshangxin/music.git",
     "remote": "prod",
     "branch": "master"
   }
