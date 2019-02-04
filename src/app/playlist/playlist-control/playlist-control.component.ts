@@ -21,11 +21,15 @@ export class PlaylistControlComponent implements OnInit {
   @Output()
   playlistIdChange: EventEmitter<string> = new EventEmitter();
 
+  ranks;
+
   contextMenuPosition = { x: '0px', y: '0px' };
 
   constructor(private matDialog: MatDialog, private playerService: PlayerService) {}
 
-  ngOnInit() {}
+  ngOnInit() {
+    this.ranks = this.playerService.ranks;
+  }
 
   create() {
     let data = {};

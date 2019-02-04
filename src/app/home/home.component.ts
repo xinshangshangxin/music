@@ -4,7 +4,7 @@ import { Router } from '@angular/router';
 import { of } from 'rxjs';
 import { catchError, debounceTime, filter } from 'rxjs/operators';
 
-import { ISearchItem, SongDetail } from '../graphql/generated';
+import { ISearchItem } from '../graphql/generated';
 import { PlayerService } from '../services/player.service';
 import { SearchService } from '../services/search.service';
 import { IPlaylist } from '../services/song-list';
@@ -18,7 +18,6 @@ export class HomeComponent implements OnInit {
   public searchValue = '';
 
   public searchList: ISearchItem[];
-  public playList: SongDetail[];
   public allPlaylist: IPlaylist[];
   public duration = 0;
 
@@ -65,6 +64,8 @@ export class HomeComponent implements OnInit {
     },
   ];
 
+  public playlistName = '';
+
   private homeUrl = '/';
 
   @ViewChild('sidenav')
@@ -89,6 +90,8 @@ export class HomeComponent implements OnInit {
       .subscribe(() => {
         this.searchValue = '';
       });
+
+    this.setPlaylistName();
   }
 
   ngOnInit() {
@@ -129,9 +132,31 @@ export class HomeComponent implements OnInit {
   }
 
   playlistIdChange(id: string) {
-    this.playerService.changePlaylist(id);
     this.playerService.pause();
 
+    let rank = this.playerService.rankMap[id];
+    if (rank) {
+      this.playerService.changePlaylist(this.playerService.tempPlaylistId);
+      this.playlistName = rank.name;
+      this.loadRankPlaylist(id);
+    } else {
+      this.playerService.changePlaylist(id);
+      this.setPlaylistName();
+    }
+
     this.sidenav.close();
+  }
+
+  loadRankPlaylist(id) {
+    this.router.navigate(['search']);
+    this.searchService.searchSubject.next(id);
+  }
+
+  private setPlaylistName() {
+    let playlist = this.playerService.getPlaylist();
+
+    if (playlist) {
+      this.playlistName = playlist.name;
+    }
   }
 }

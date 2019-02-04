@@ -45,6 +45,42 @@ interface IPeak {
 export class PlayerService extends SongList {
   public currentTime: number;
 
+  public ranks = [
+    {
+      id: 'rank-kugou-new',
+      name: '酷狗新歌',
+    },
+    {
+      id: 'rank-kugou-hot',
+      name: '酷狗热歌',
+    },
+    {
+      id: 'rank-netease-new',
+      name: '网易新歌',
+    },
+    {
+      id: 'rank-netease-hot',
+      name: '网易热歌',
+    },
+    {
+      id: 'rank-xiami-new',
+      name: '虾米新歌',
+    },
+    {
+      id: 'rank-xiami-hot',
+      name: '虾米热歌',
+    },
+  ];
+
+  public rankMap = Object.assign(
+    {},
+    ...this.ranks.map((item) => {
+      return {
+        [item.id]: item,
+      };
+    })
+  );
+
   private songState: SongState;
   private currentSong: SongDetail;
 
@@ -62,6 +98,7 @@ export class PlayerService extends SongList {
     this.catchNext();
     this.updatePeakTime();
     this.initLoadNext();
+    this.updateCurrentSongs();
   }
 
   private static buildSongUrl(song: SongDetail) {
@@ -338,7 +375,11 @@ export class PlayerService extends SongList {
         mergeMap((peakResult: IPeak) => {
           return this.addPeakTimeGQL.mutate({
             peakTime: {
-              ...peakResult,
+              ...Object.assign(
+                {},
+                ...['id', 'peak', 'peaks'].map((key) => ({ [key]: peakResult[key] }))
+              ),
+
               provider: peakResult.provider as Provider,
             },
           });

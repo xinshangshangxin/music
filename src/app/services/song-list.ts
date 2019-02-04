@@ -149,7 +149,7 @@ export class SongList {
       throw new Error('no playlist found');
     }
 
-    if (name) {
+    if (name && this.tempPlaylistId !== id) {
       playlist.name = name;
 
       this.persistMeta();
@@ -160,6 +160,12 @@ export class SongList {
 
       this.persistPlaylist(id);
     }
+  }
+
+  getPlaylist(playlistId = this.meta.currentPlaylistId): IPlaylist {
+    return this.meta.playlists.find(({ id }) => {
+      return id === playlistId;
+    });
   }
 
   protected addSong(song: SongDetail, playlistId = this.meta.currentPlaylistId, index?: number) {
@@ -227,6 +233,12 @@ export class SongList {
     }
   }
 
+  protected updateCurrentSongs() {
+    let playlist = this.getPlaylist(this.meta.currentPlaylistId);
+    this.songs.length = 0;
+    this.songs.push(...((playlist && playlist.songs) || []));
+  }
+
   private init() {
     this.initMeta();
 
@@ -235,16 +247,7 @@ export class SongList {
     });
 
     // TODO: check data is valid
-
-    this.updateCurrentSongs();
-
     console.info('init done with data: ', this.meta);
-  }
-
-  private updateCurrentSongs() {
-    let playlist = this.getPlaylist(this.meta.currentPlaylistId);
-    this.songs.length = 0;
-    this.songs.push(...((playlist && playlist.songs) || []));
   }
 
   private initMeta() {
@@ -262,11 +265,5 @@ export class SongList {
   private fillPlaylistSongs(playlist: IPlaylist) {
     let arr: SongDetail[] = this.getStorageItem(playlist.id, []);
     playlist.songs = arr || [];
-  }
-
-  private getPlaylist(playlistId = this.tempPlaylistId): IPlaylist {
-    return this.meta.playlists.find(({ id }) => {
-      return id === playlistId;
-    });
   }
 }

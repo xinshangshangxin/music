@@ -1,10 +1,13 @@
 <mat-sidenav-container>
   <mat-sidenav #sidenav (openedStart)="openedStart()" mode="push">
-    <app-playlist-control (playlistIdChange)="playlistIdChange($event)" [allPlaylist]="allPlaylist"></app-playlist-control>
+    <app-playlist-control
+      (playlistIdChange)="playlistIdChange($event)"
+      [allPlaylist]="allPlaylist"
+    ></app-playlist-control>
   </mat-sidenav>
   <mat-sidenav-content class="main">
     <div class="header">
-      <button mat-button (click)="sidenav.toggle()">歌单</button>
+      <button mat-button (click)="sidenav.toggle()">{{ playlistName }}</button>
 
       <mat-form-field class="search">
         <input

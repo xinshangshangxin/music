@@ -23,6 +23,20 @@
         </button>
       </mat-list-item>
 
+      <mat-list-item *ngFor="let item of ranks">
+        <button mat-button (click)="changePlaylist(item)">
+          {{ item.name }}
+
+          <div
+            style="position: fixed"
+            [style.left]="contextMenuPosition.x"
+            [style.top]="contextMenuPosition.y"
+            [matMenuTriggerFor]="operationMenu"
+            [matMenuTriggerData]="{ item: item }"
+          ></div>
+        </button>
+      </mat-list-item>
+
       <mat-list-item> <button mat-button (click)="create()">创建</button> </mat-list-item>
 
       <!-- <mat-menu #operationMenu="matMenu" let-item="item">
@@ -31,10 +45,10 @@
       </mat-menu> -->
 
       <mat-menu #operationMenu="matMenu">
-          <ng-template matMenuContent let-item="item">
-            <button mat-menu-item (click)="delete(item)">delete</button>
-          </ng-template>
-        </mat-menu>
+        <ng-template matMenuContent let-item="item">
+          <button mat-menu-item (click)="delete(item)">delete</button>
+        </ng-template>
+      </mat-menu>
     </mat-list>
   </div>
 </div>
