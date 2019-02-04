@@ -126,6 +126,13 @@ export class SrcAudio extends EventEmitter {
     this.eventListeners.play = this.eventListeners.play || [];
     this.eventListeners.play.push(playFn);
 
+    let playingFn = (event) => {
+      this.emit('playing', { event });
+    };
+    this.audio.addEventListener('playing', playingFn);
+    this.eventListeners.playing = this.eventListeners.playing || [];
+    this.eventListeners.playing.push(playingFn);
+
     let pauseFn = (event) => {
       this.emit('pause', { event });
     };

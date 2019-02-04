@@ -36,56 +36,16 @@ export class SongList {
 
   private musicPrefix = 'shang-music';
 
-  private readonly metaId = '__meta__';
-
-  constructor() {
-    this.init();
-  }
-
   private tempPlaylist = {
     id: this.tempPlaylistId,
     name: '临时歌单',
     songs: [],
   };
 
-  private getStorageItem(id: string, defaultValue?: any) {
-    let key = `${this.musicPrefix}-${id}`;
-    let str = localStorage.getItem(key);
-    try {
-      return JSON.parse(str);
-    } catch (e) {
-      return defaultValue;
-    }
-  }
+  private readonly metaId = '__meta__';
 
-  private setStorageItem(id: string, value: object) {
-    let key = `${this.musicPrefix}-${id}`;
-
-    let str = '';
-    try {
-      str = JSON.stringify(value);
-    } catch (e) {
-      str = '';
-    }
-
-    localStorage.setItem(key, str);
-  }
-
-  private persistPlaylist(playlistId: string) {
-    if (playlistId === this.meta.currentPlaylistId) {
-      this.updateCurrentSongs();
-    }
-
-    let playlist = this.getPlaylist(playlistId);
-
-    this.setStorageItem(playlistId, playlist.songs);
-  }
-
-  protected persistMeta() {
-    let persistsPlaylists = this.meta.playlists.map(({ id, name }) => {
-      return { id, name };
-    });
-    this.setStorageItem(this.metaId, { ...this.meta, playlists: persistsPlaylists });
+  constructor() {
+    this.init();
   }
 
   getPlaylists() {
@@ -237,6 +197,46 @@ export class SongList {
     let playlist = this.getPlaylist(this.meta.currentPlaylistId);
     this.songs.length = 0;
     this.songs.push(...((playlist && playlist.songs) || []));
+  }
+
+  protected persistMeta() {
+    let persistsPlaylists = this.meta.playlists.map(({ id, name }) => {
+      return { id, name };
+    });
+    this.setStorageItem(this.metaId, { ...this.meta, playlists: persistsPlaylists });
+  }
+
+  private getStorageItem(id: string, defaultValue?: any) {
+    let key = `${this.musicPrefix}-${id}`;
+    let str = localStorage.getItem(key);
+    try {
+      return JSON.parse(str);
+    } catch (e) {
+      return defaultValue;
+    }
+  }
+
+  private setStorageItem(id: string, value: object) {
+    let key = `${this.musicPrefix}-${id}`;
+
+    let str = '';
+    try {
+      str = JSON.stringify(value);
+    } catch (e) {
+      str = '';
+    }
+
+    localStorage.setItem(key, str);
+  }
+
+  private persistPlaylist(playlistId: string) {
+    if (playlistId === this.meta.currentPlaylistId) {
+      this.updateCurrentSongs();
+    }
+
+    let playlist = this.getPlaylist(playlistId);
+
+    this.setStorageItem(playlistId, playlist.songs);
   }
 
   private init() {

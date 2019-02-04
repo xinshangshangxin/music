@@ -68,6 +68,7 @@ export class ArrayBufferAudio extends EventEmitter {
 
     this.playing = true;
     this.emit('play');
+    this.emit('playing');
   }
 
   async layOutPause() {

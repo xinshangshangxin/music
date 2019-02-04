@@ -147,12 +147,6 @@ export class MyAudio {
           console.info(peakPlay ? 'peak 播放' : '整首播放', song);
         }),
         switchMap(([song, peak]) => {
-          this.events.next({
-            type: 'loading',
-            song,
-            peak: peak,
-          });
-
           this.state.song = song;
           this.state.peak = peak;
 

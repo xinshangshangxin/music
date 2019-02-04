@@ -45,7 +45,7 @@ interface IPeak {
 export class PlayerService extends SongList {
   public currentTime: number;
 
-  public ranks = [
+  public readonly ranks = [
     {
       id: 'rank-kugou-new',
       name: '酷狗新歌',
@@ -72,7 +72,7 @@ export class PlayerService extends SongList {
     },
   ];
 
-  public rankMap = Object.assign(
+  public readonly rankMap = Object.assign(
     {},
     ...this.ranks.map((item) => {
       return {
@@ -99,6 +99,7 @@ export class PlayerService extends SongList {
     this.updatePeakTime();
     this.initLoadNext();
     this.updateCurrentSongs();
+    this.checkStatus();
   }
 
   private static buildSongUrl(song: SongDetail) {
@@ -107,6 +108,10 @@ export class PlayerService extends SongList {
 
   get duration() {
     return this.meta.duration;
+  }
+
+  get currentPlaylistId() {
+    return this.meta.currentPlaylistId;
   }
 
   changeConfig({ duration }: IPeakConfig) {
@@ -192,11 +197,11 @@ export class PlayerService extends SongList {
   togglePlay() {
     if ([SongState.paused, SongState.pausing].includes(this.songState)) {
       this.songState = SongState.loading;
-
       if (!this.myAudio.play()) {
         this.playCurrent();
       }
     } else if ([SongState.loading, SongState.playing].includes(this.songState)) {
+      console.info('change SongState to pausing');
       this.songState = SongState.pausing;
       this.myAudio.pause();
     }
@@ -252,18 +257,22 @@ export class PlayerService extends SongList {
           return null;
         }
 
-        if (songRetryNu >= MAX_SONG_RETRY) {
-          console.warn('song retryNu = ' + songRetryNu);
-          songRetryNu = 0;
-          songListRetryNu += 1;
-          setTimeout(() => {
-            this.next();
-          }, songListRetryNu * 200);
-          return null;
-        }
+        console.info('this.songState: ', this.songState);
+        if (!['pausing', 'paused'].includes(this.songState)) {
+          if (songRetryNu >= MAX_SONG_RETRY) {
+            console.warn('song retryNu = ' + songRetryNu);
+            songRetryNu = 0;
+            songListRetryNu += 1;
 
-        songRetryNu += 1;
-        this.playCurrent();
+            setTimeout(() => {
+              this.next();
+            }, songListRetryNu * 200);
+            return null;
+          }
+
+          songRetryNu += 1;
+          this.playCurrent();
+        }
       });
   }
 
@@ -490,5 +499,36 @@ export class PlayerService extends SongList {
           return of(undefined);
         })
       );
+  }
+
+  private checkStatus() {
+    this.myAudio.events.subscribe(({ type }) => {
+      let before = this.songState;
+
+      //  current\last    playing    loading     paused      pausing
+      //  playing         /             /  do pause, pausing      do pause, pausing
+      //  pause           /               /      paused      paused
+
+      if (this.songState === SongState.pausing || this.songState === SongState.paused) {
+        if (type !== 'pause') {
+          this.songState = SongState.pausing;
+          try {
+            this.myAudio.pause();
+          } catch (e) {
+            // do nothing
+          }
+        } else {
+          this.songState = SongState.paused;
+        }
+      } else if (this.songState === SongState.loading && type === 'playing') {
+        this.songState = SongState.playing;
+      }
+
+      console.info('checkStatus: ', {
+        eventType: type,
+        before,
+        after: this.songState,
+      });
+    });
   }
 }

@@ -132,16 +132,18 @@ export class HomeComponent implements OnInit {
   }
 
   playlistIdChange(id: string) {
-    this.playerService.pause();
+    if (id !== this.playerService.currentPlaylistId) {
+      this.playerService.pause();
 
-    let rank = this.playerService.rankMap[id];
-    if (rank) {
-      this.playerService.changePlaylist(this.playerService.tempPlaylistId);
-      this.playlistName = rank.name;
-      this.loadRankPlaylist(id);
-    } else {
-      this.playerService.changePlaylist(id);
-      this.setPlaylistName();
+      let rank = this.playerService.rankMap[id];
+      if (rank) {
+        this.playerService.changePlaylist(this.playerService.tempPlaylistId);
+        this.playlistName = rank.name;
+        this.loadRankPlaylist(id);
+      } else {
+        this.playerService.changePlaylist(id);
+        this.setPlaylistName();
+      }
     }
 
     this.sidenav.close();
