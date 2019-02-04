@@ -1,6 +1,6 @@
 <mat-sidenav-container>
   <mat-sidenav #sidenav (openedStart)="openedStart()" mode="push">
-    <app-playlist-control [allPlaylist]="allPlaylist"></app-playlist-control>
+    <app-playlist-control (playlistIdChange)="playlistIdChange($event)" [allPlaylist]="allPlaylist"></app-playlist-control>
   </mat-sidenav>
   <mat-sidenav-content class="main">
     <div class="header">

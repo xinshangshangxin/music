@@ -1,5 +1,5 @@
-import { Component, OnInit } from '@angular/core';
-import { MatSelectChange } from '@angular/material';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { MatSelectChange, MatSidenav } from '@angular/material';
 import { Router } from '@angular/router';
 import { of } from 'rxjs';
 import { catchError, debounceTime, filter } from 'rxjs/operators';
@@ -7,7 +7,7 @@ import { catchError, debounceTime, filter } from 'rxjs/operators';
 import { ISearchItem, SongDetail } from '../graphql/generated';
 import { PlayerService } from '../services/player.service';
 import { SearchService } from '../services/search.service';
-import { IPlaylistBrief, IPlaylist } from '../services/song-list';
+import { IPlaylist } from '../services/song-list';
 
 @Component({
   selector: 'app-home',
@@ -67,6 +67,9 @@ export class HomeComponent implements OnInit {
 
   private homeUrl = '/';
 
+  @ViewChild('sidenav')
+  sidenav: MatSidenav;
+
   constructor(
     private readonly router: Router,
     private readonly searchService: SearchService,
@@ -123,5 +126,12 @@ export class HomeComponent implements OnInit {
     this.allPlaylist = this.playerService.getPlaylists();
 
     console.info(this.allPlaylist);
+  }
+
+  playlistIdChange(id: string) {
+    this.playerService.changePlaylist(id);
+    this.playerService.pause();
+
+    this.sidenav.close();
   }
 }

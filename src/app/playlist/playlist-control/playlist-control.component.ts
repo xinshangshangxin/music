@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { HammerInput, MatDialog, MatMenuTrigger } from '@angular/material';
 import { filter, map } from 'rxjs/operators';
 import { PlayerService } from 'src/app/services/player.service';
@@ -17,6 +17,9 @@ export class PlaylistControlComponent implements OnInit {
 
   @ViewChild(MatMenuTrigger)
   operationMenu: MatMenuTrigger;
+
+  @Output()
+  playlistIdChange: EventEmitter<string> = new EventEmitter();
 
   contextMenuPosition = { x: '0px', y: '0px' };
 
@@ -62,8 +65,7 @@ export class PlaylistControlComponent implements OnInit {
 
   changePlaylist({ id }: IPlaylist) {
     console.info('changePlaylist: ', id);
-    this.playerService.changePlaylist(id);
-    this.playerService.pause();
+    this.playlistIdChange.emit(id);
   }
 
   delete(item: IPlaylist) {
