@@ -7,6 +7,8 @@
 
 `npm install @s4p/music-api`
 
+**see [test folder](https://github.com/shang-music/api/tree/develop/test) to learn more**
+
 ```ts
 declare function search(
   query: string | ISearchQuery,
@@ -26,5 +28,3 @@ async function playlist(provider: Provider, id: string): Promise<ISearchItem[]>;
 
 async function album(provider: Provider, id: string): Promise<ISearchItem[]>;
 ```
-
-**see [test](./tree/develop/test) folder to learn more**
