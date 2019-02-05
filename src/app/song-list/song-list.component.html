@@ -1,5 +1,6 @@
 <div class="song-list">
   <div
+    #perSong
     [ngClass]="{ playing: playerService.meta.currentIndex === i }"
     class="song-box"
     *ngFor="let song of playList; index as i"

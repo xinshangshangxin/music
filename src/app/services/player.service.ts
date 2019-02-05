@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { EMPTY, from, Observable, of } from 'rxjs';
+import { BehaviorSubject, EMPTY, from, Observable, of } from 'rxjs';
 import {
   catchError,
   concatMap,
@@ -81,6 +81,8 @@ export class PlayerService extends SongList {
     })
   );
 
+  public locateCurrentSongSubject = new BehaviorSubject(undefined);
+
   private songState: SongState;
   private currentSong: SongDetail;
 
@@ -112,6 +114,10 @@ export class PlayerService extends SongList {
 
   get currentPlaylistId() {
     return this.meta.currentPlaylistId;
+  }
+
+  get currentIndex() {
+    return this.meta.currentIndex;
   }
 
   changeConfig({ duration }: IPeakConfig) {

@@ -26,4 +26,8 @@ export class ControlsComponent implements OnInit {
   previous() {
     this.playerService.previous();
   }
+
+  locate() {
+    this.playerService.locateCurrentSongSubject.next(undefined);
+  }
 }
