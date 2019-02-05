@@ -1,11 +1,11 @@
 {
   "dev": {
-    "url": "git@gitlab.com:shang-music/music-backend.git",
+    "url": "git@gitlab.com:shang-music/music-api.git",
     "remote": "gitlab",
     "branch": "develop"
   },
   "prod": {
-    "url": "git@gitlab.com:demoshang/server-projects.git",
+    "url": "",
     "remote": "prod",
     "branch": "__package_name__"
   }
