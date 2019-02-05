@@ -19,3 +19,15 @@ test('playlist xiami', async (t) => {
   t.true(songs.length > 10);
   t.is(songs[0].provider, Provider.xiami);
 });
+
+test('playlist with not support provider', async (t) => {
+  let err;
+  try {
+    await playlist('unknown-provider' as Provider,'');
+  } catch (e) {
+    err = e;
+  }
+
+  t.truthy(err);
+  t.is(err.message, 'unknown-provider not support');
+});

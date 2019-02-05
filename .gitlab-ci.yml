@@ -9,14 +9,15 @@ stages:
 
 test-build:
   stage: test-build
+  coverage: '/Lines\s*:\s*(\d+(?:\.\d+)?)%/'
   artifacts:
     name: 'music-api-${CI_COMMIT_SHA}'
     paths:
       - ${PUBLISH_PATH}
   script:
     - yarn
+    - yarn run coverage
     - yarn run build
-    - yarn run test
 
 release:
   stage: release

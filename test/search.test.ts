@@ -74,7 +74,7 @@ test('search "Aragaki Yui" limit 5', async (t) => {
   t.deepEqual(arr[2], searchResultMap.xiami);
 });
 
-test('search "Aragaki Yui" with kugou', async (t) => {
+test('search "Aragaki Yui" with kugou limit 1', async (t) => {
   let arr = await search({ keyword: 'Aragaki Yui', limit: 1 }, Provider.kugou);
 
   t.is(arr.length, 1);
@@ -82,7 +82,15 @@ test('search "Aragaki Yui" with kugou', async (t) => {
   t.deepEqual(arr[0], searchResultMap.kugou);
 });
 
-test('search "Aragaki Yui" with netease', async (t) => {
+test('search "Aragaki Yui" with kugou', async (t) => {
+  let arr = await search('Aragaki Yui', Provider.kugou);
+
+  t.is(arr.length, 10);
+
+  t.deepEqual(arr[0], searchResultMap.kugou);
+});
+
+test('search "Aragaki Yui" with netease limit 1', async (t) => {
   let arr = await search({ keyword: 'Aragaki Yui', limit: 1 }, Provider.netease);
 
   t.is(arr.length, 1);
@@ -90,10 +98,84 @@ test('search "Aragaki Yui" with netease', async (t) => {
   t.deepEqual(arr[0], searchResultMap.netease);
 });
 
-test('search "Aragaki Yui" with xiami', async (t) => {
+test('search "Aragaki Yui" with netease', async (t) => {
+  let arr = await search('Aragaki Yui', Provider.netease);
+
+  t.is(arr.length, 10);
+
+  t.deepEqual(arr[0], searchResultMap.netease);
+});
+
+test('search "Aragaki Yui" with xiami limit 1', async (t) => {
   let arr = await search({ keyword: 'Aragaki Yui', limit: 1 }, Provider.xiami);
 
   t.is(arr.length, 1);
 
   t.deepEqual(arr[0], searchResultMap.xiami);
+});
+
+test('search "Aragaki Yui" with xiami', async (t) => {
+  let arr = await search('Aragaki Yui', Provider.xiami);
+
+  t.is(arr.length, 10);
+
+  t.deepEqual(arr[0], searchResultMap.xiami);
+});
+
+test('search "Aragaki Yui"', async (t) => {
+  let arr = await search('Aragaki Yui');
+
+  t.is(arr.length, 30);
+
+  t.deepEqual(arr[0], searchResultMap.kugou);
+  t.deepEqual(arr[1], searchResultMap.netease);
+  t.deepEqual(arr[2], searchResultMap.xiami);
+});
+
+test('search without keyword', async (t) => {
+  let err;
+  try {
+    await search({ keyword: '', limit: 1 });
+  } catch (e) {
+    err = e;
+  }
+
+  t.truthy(err);
+  t.is(err.message, 'query need keyword');
+});
+
+test('search with not support query', async (t) => {
+  let err;
+  let fn: any = () => {};
+  try {
+    await search(fn);
+  } catch (e) {
+    err = e;
+  }
+
+  t.truthy(err);
+  t.is(err.message, 'query not support');
+});
+
+
+test('search with kugou and xiami provider', async (t) => {
+  let arr = await search('Aragaki Yui', [Provider.kugou, Provider.xiami]);
+
+  t.is(arr.length, 20);
+
+  t.deepEqual(arr[0], searchResultMap.kugou);
+  t.deepEqual(arr[1], searchResultMap.xiami);
+});
+
+
+test('search with not support provider', async (t) => {
+  let err;
+  try {
+    await search('Aragaki Yui', 'unknown-provider' as Provider);
+  } catch (e) {
+    err = e;
+  }
+
+  t.truthy(err);
+  t.is(err.message, 'unknown-provider not support');
 });

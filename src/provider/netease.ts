@@ -10,7 +10,9 @@ import neteaseRequest from 'NeteaseCloudMusicApi/util/request';
 
 import { Provider } from '..';
 import { RankType } from '../common/rank';
-import { INeteaseSearch, ISearchItem, ISearchSong } from '../common/search';
+import {
+  INeteaseSearch, ISearchItem, ISearchSong, NeteaseSearchType
+} from '../common/search';
 import { BitRate, ISong } from '../common/song';
 
 export class Netease {
@@ -65,7 +67,7 @@ export class Netease {
     return { ...detailResult, ...songUrlResult, ...lyricResult };
   }
 
-  async rank(type: RankType = RankType.new, limit = 0, skip = 0) {
+  async rank(type: RankType, limit = 0, skip = 0) {
     let id;
 
     if (type === RankType.hot) {
@@ -94,7 +96,7 @@ export class Netease {
 
   private async searchList({
     keyword,
-    type = 1,
+    type = NeteaseSearchType.single,
     skip = 0,
     limit = 10,
   }: INeteaseSearch): Promise<ISearchSong[]> {

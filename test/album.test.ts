@@ -34,3 +34,15 @@ test('album xiami', async (t) => {
     t.true(!!singer);
   });
 });
+
+test('album with not support provider', async (t) => {
+  let err;
+  try {
+    await album('unknown-provider' as Provider, '');
+  } catch (e) {
+    err = e;
+  }
+
+  t.truthy(err);
+  t.is(err.message, 'unknown-provider not support');
+});

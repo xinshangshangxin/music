@@ -1,5 +1,8 @@
 # music-api
 
+![build](https://gitlab.com/shang-music/music-api/badges/develop/build.svg)
+![coverage](https://gitlab.com/shang-music/music-api/badges/develop/coverage.svg)
+
 ## how to use
 
 **see [test](https://github.com/xinshangshangxin/music/tree/api/test) folder to learn more**

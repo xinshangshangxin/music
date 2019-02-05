@@ -96,7 +96,7 @@ class Xiami {
     return this.getPlaylist(id);
   }
 
-  async rank(type: RankType = RankType.new, limit = 100, skip = 0): Promise<ISearchItem[]> {
+  async rank(type: RankType, limit = 100, skip = 0): Promise<ISearchItem[]> {
     let qs = {
       v: '2.0',
       app_key: '1',

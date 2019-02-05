@@ -20,20 +20,17 @@ export interface INeteaseSearch extends ISearchQuery {
 
 interface ISearchArtist {
   id?: string;
-  // eslint-disable-next-line no-restricted-globals
   name: string;
 }
 
 interface ISearchAlbum {
   id: string;
-  // eslint-disable-next-line no-restricted-globals
   name: string;
   img?: string;
 }
 
 export interface ISearchSong {
   id: string;
-  // eslint-disable-next-line no-restricted-globals
   name: string;
   artists: ISearchArtist[];
   needPay?: boolean;

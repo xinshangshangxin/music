@@ -5,6 +5,7 @@ import { Provider } from '../common/provider';
 import { RankType } from '../common/rank';
 import { ISearchItem, ISearchQuery, ISearchSong } from '../common/search';
 import { BitRate, ISong } from '../common/song';
+import { formatStr } from '../common/util';
 
 class Kugou {
   private request: typeof rp;
@@ -20,6 +21,10 @@ class Kugou {
     this.request = rp.defaults({
       json: true,
     });
+  }
+
+  private static getId(song: any) {
+    return song.hash || song['320hash'] || song.sqhash;
   }
 
   async search(query: string | ISearchQuery): Promise<ISearchSong[]> {
@@ -39,7 +44,7 @@ class Kugou {
     return this.getDetail(id, br);
   }
 
-  async rank(type: RankType = RankType.new, limit = 500, skip = 0) {
+  async rank(type: RankType, limit = 500, skip = 0) {
     if (type === RankType.hot) {
       // 酷狗TOP500
       return this.concatRankList('8888', limit, skip);
@@ -57,7 +62,11 @@ class Kugou {
     return this.getAlbum(id);
   }
 
-  private async concatRankList(rankId: string, limit = 100, skip = 0): Promise<ISearchItem[]> {
+  private async concatRankList(
+    rankId: string,
+    limit: number,
+    skip: number
+  ): Promise<ISearchItem[]> {
     let page = parseInt(`${skip / limit}`, 10) + 1;
 
     let result = await this.request({
@@ -72,15 +81,14 @@ class Kugou {
     let songs = get(result, 'data.info', []);
 
     return songs.map((song: any) => {
-      let filename = song.filename || '';
+      let filename = formatStr(song.filename);
 
       let [singer, songName] = filename.split('-');
       return {
         provider: Provider.kugou,
-        id: song.hash || song['320hash'] || song.sqhash,
-        name: `${songName || ''}`.trim(),
-        artists: `${singer || ''}`
-          .trim()
+        id: Kugou.getId(song),
+        name: formatStr(songName),
+        artists: formatStr(singer)
           .split('、')
           .map((name) => {
             return {
@@ -111,7 +119,7 @@ class Kugou {
 
     return songs.map((song: any) => {
       return {
-        id: song.hash || song['320hash'] || song.sqhash,
+        id: Kugou.getId(song),
         name: song.songname,
         artists: get(song, 'singername', '')
           .split('、')
@@ -189,15 +197,14 @@ class Kugou {
     let songs = get(result, 'data.info', []);
 
     return songs.map((song: any) => {
-      let filename = song.filename || '';
+      let filename = formatStr(song.filename);
 
       let [singer, songName] = filename.split('-');
       return {
         provider: Provider.kugou,
-        id: song.hash || song['320hash'] || song.sqhash,
-        name: `${songName || ''}`.trim(),
-        artists: `${singer || ''}`
-          .trim()
+        id: Kugou.getId(song),
+        name: formatStr(songName),
+        artists: formatStr(singer)
           .split('、')
           .map((name) => {
             return {
@@ -221,18 +228,20 @@ class Kugou {
     let songs = get(result, 'list', []);
 
     return songs.map((song: any) => {
-      let name = song.songname || '';
+      let filename = formatStr(song.songname);
 
-      let [singer, songName] = name.split('-');
+      let [singer, songName] = filename.split('-');
       return {
         provider: Provider.kugou,
-        id: song.hash,
-        name: `${songName || ''}`.trim(),
-        artists: [
-          {
-            name: `${singer || ''}`.trim(),
-          },
-        ],
+        id: Kugou.getId(song),
+        name: formatStr(songName),
+        artists: formatStr(singer)
+          .split('、')
+          .map((name) => {
+            return {
+              name,
+            };
+          }),
       };
     });
   }

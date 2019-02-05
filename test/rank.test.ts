@@ -41,3 +41,15 @@ test('hot rank xiami', async (t) => {
   let songs = await rank(Provider.xiami, RankType.hot, 11);
   t.true(songs.length === 11);
 });
+
+test('rank with not support provider', async (t) => {
+  let err;
+  try {
+    await rank('unknown-provider' as Provider, RankType.hot);
+  } catch (e) {
+    err = e;
+  }
+
+  t.truthy(err);
+  t.is(err.message, 'unknown-provider not support');
+});

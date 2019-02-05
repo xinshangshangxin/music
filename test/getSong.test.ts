@@ -50,3 +50,16 @@ test('getSong', async (t) => {
     })
   );
 });
+
+
+test('getSong with not support provider', async (t) => {
+  let err;
+  try {
+    await getSong('id', 'unknown-provider' as Provider);
+  } catch (e) {
+    err = e;
+  }
+
+  t.truthy(err);
+  t.is(err.message, 'unknown-provider not support');
+});
