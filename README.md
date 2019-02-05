@@ -1,79 +1,56 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo_text.svg" width="320" alt="Nest Logo" /></a>
-</p>
+# music backend
 
-[travis-image]: https://api.travis-ci.org/nestjs/nest.svg?branch=master
-[travis-url]: https://travis-ci.org/nestjs/nest
-[linux-image]: https://img.shields.io/travis/nestjs/nest/master.svg?label=linux
-[linux-url]: https://travis-ci.org/nestjs/nest
-  
-  <p align="center">A progressive <a href="http://nodejs.org" target="blank">Node.js</a> framework for building efficient and scalable server-side applications, heavily inspired by <a href="https://angular.io" target="blank">Angular</a>.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore"><img src="https://img.shields.io/npm/dm/@nestjs/core.svg" alt="NPM Downloads" /></a>
-<a href="https://travis-ci.org/nestjs/nest"><img src="https://api.travis-ci.org/nestjs/nest.svg?branch=master" alt="Travis" /></a>
-<a href="https://travis-ci.org/nestjs/nest"><img src="https://img.shields.io/travis/nestjs/nest/master.svg?label=linux" alt="Linux" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#5" alt="Coverage" /></a>
-<a href="https://gitter.im/nestjs/nestjs?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=body_badge"><img src="https://badges.gitter.im/nestjs/nestjs.svg" alt="Gitter" /></a>
-<a href="https://opencollective.com/nest#backer"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec"><img src="https://img.shields.io/badge/Donate-PayPal-dc3d53.svg"/></a>
-  <a href="https://twitter.com/nestframework"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
-
-## Description
-
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
-
-## Installation
+## Usage
 
 ```bash
-$ npm install
+# use node with yarn
+yarn
+yarn start
+
+# or use node with npm
+npm i
+npm start
+
+# or use docker
+docker build -t music-backend .
+docker run --env=NMDB_URL="nedb://memory" --env=PORT=80 -p 3000:80 music-backend
 ```
 
-## Running the app
+> if you don't have mongodb, you can change `mongodb://localhost/music-backend` to `nedb://memory` under `src/config/development.js`  
+> or use `ENV config` `NMDB_URL=nedb://memory npm start`, this means use memory to storage song info.  
+> more info about `nmdb` to check repository [`@s4p/nmdb`](https://github.com/shang-music/nmdb.git)
+
+then open [`http://localhost:3000/graphql`](http://localhost:3000/graphql)  
+or use next curls
+
+- search
 
 ```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# incremental rebuild (webpack)
-$ npm run webpack
-$ npm run start:hmr
-
-# production mode
-$ npm run start:prod
+curl 'http://localhost:3000/graphql' -H 'Accept-Encoding: gzip, deflate, br' -H 'Content-Type: application/json' -H 'Accept: application/json' -H 'Connection: keep-alive' -H 'DNT: 1' -H 'Origin: http://localhost:3000' --data-binary '{"query":"query($keyword: String!, $providers: [Provider]) {\n  search(keyword: $keyword, providers: $providers) {\n    id\n    name\n    provider\n    artists {\n      name\n    }\n    album {\n      name\n    }\n  }\n}\n","variables":{"keyword":"田馥甄","providers":["kugou"]}}'
 ```
 
-## Test
+- get
 
 ```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+curl 'http://localhost:3000/graphql' -H 'Accept-Encoding: gzip, deflate, br' -H 'Content-Type: application/json' -H 'Accept: application/json' -H 'Connection: keep-alive' -H 'DNT: 1' -H 'Origin: http://localhost:3000' --data-binary '{"query":"query($id: ID!, $provider: Provider!, $br: BitRate) {\n  get(id: $id, provider: $provider, br: $br) {\n    provider\n    id\n    name\n    lrc\n    klyric\n    artists {\n      id\n      name\n    }\n    album {\n      name\n      img\n    }\n  }\n}\n","variables":{"id":"0de83c11190b47251b14e3494ee2f842","provider":"kugou","br":"mid"}}'
 ```
 
-## Support
+- rank
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+```bash
+curl 'http://localhost:3000/graphql' -H 'Accept-Encoding: gzip, deflate, br' -H 'Content-Type: application/json' -H 'Accept: application/json' -H 'Connection: keep-alive' -H 'DNT: 1' -H 'Origin: http://localhost:3000' --data-binary '{"query":"query($provider: Provider!, $rankType: RankType) {\n  rank(provider: $provider, rankType: $rankType) {\n    id\n    name\n    provider\n    artists {\n      name\n    }\n  }\n}\n","variables":{"provider":"xiami","rankType":"new"}}'
+```
 
-## Stay in touch
+- url
 
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+```bash
+curl 'http://localhost:3000/graphql' -H 'Accept-Encoding: gzip, deflate, br' -H 'Content-Type: application/json' -H 'Accept: application/json' -H 'Connection: keep-alive' -H 'DNT: 1' -H 'Origin: http://localhost:3000' --data-binary '{"query":"query($id: ID!, $provider: Provider!, $br: BitRate) {\n  url(id: $id, provider: $provider, br: $br)\n}\n","variables":{"id":"504D039E327F73E64C32A77E9FE5722C","provider":"kugou","br":"mid"}}'
+```
 
-## License
+## Technical details
 
-  Nest is [MIT licensed](LICENSE).
+- framework is [nestjs](https://github.com/nestjs/nest)
+
+- [`kugou/netease/xiami` music-api](https://github.com/shang-music/api)
+
+- storage is [`@s4p/nmdb`](https://github.com/shang-music/nmdb.git)
