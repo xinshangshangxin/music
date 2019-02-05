@@ -1,6 +1,6 @@
 import test from 'ava';
 
-import { album, Provider } from '../dist';
+import { album, Provider } from '../src';
 
 test('album kugou', async (t) => {
   let songs = await album(Provider.kugou, '976931');

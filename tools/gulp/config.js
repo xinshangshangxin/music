@@ -8,7 +8,7 @@ const config = {
     },
   },
   server: {
-    src: ['**/*', '!**/*.d.ts'],
+    src: ['**/*', '!views/**/*', '!**/*.d.ts'],
     opt: {
       cwd: 'src/',
       base: 'src/',
@@ -16,12 +16,12 @@ const config = {
     dest: distBasePath,
   },
   replace: {
-    src: ['index.js'],
+    src: [],
     regexp: '',
     newSubstr: '',
   },
   cp: {
-    src: ['package.json', 'README.md'],
+    src: ['package.json'],
     opt: {
       cwd: './',
       base: './',
@@ -31,7 +31,7 @@ const config = {
   nodemon: {
     config: {
       script: 'src/index.ts',
-      ext: 'js,ts',
+      ext: 'ts',
       watch: ['src/'],
       verbose: true,
       restartable: 'rs',
@@ -39,11 +39,10 @@ const config = {
         NODE_ENV: 'development',
       },
       args: [
-        '--extensions=".ts"',
         // if you want use attach debug, use `INSPECT=9229 gulp`
         process.env.INSPECT ? [`--inspect=${process.env.INSPECT}`] : '',
       ],
-      exec: 'babel-node',
+      exec: './node_modules/.bin/ts-node --project=tsconfig.json --files src/index.ts',
     },
     events: {
       crash: true,

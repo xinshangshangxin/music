@@ -4,42 +4,31 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "start": "./node_modules/.bin/babel-node --extensions '.ts' src",
     "lint": "gulp lint",
     "lint-fix": "./node_modules/.bin/eslint src/**/*.ts --fix",
     "watch": "gulp",
     "build": "gulp build",
-    "test": "ava --fail-fast -v"
+    "test": "TS_NODE_FILES=true ava --fail-fast -v"
   },
   "dependencies": {
-    "@babel/runtime": "^7.1.2",
     "NeteaseCloudMusicApi": "Binaryify/NeteaseCloudMusicApi",
     "lodash": "^4.17.11",
     "request": "^2.88.0",
-    "request-promise": "^4.2.2"
+    "request-promise": "^4.2.2",
+    "tslib": "^1.9.3"
   },
   "devDependencies": {
-    "@babel/cli": "^7.1.2",
-    "@babel/core": "^7.1.2",
-    "@babel/node": "^7.0.0",
-    "@babel/plugin-proposal-class-properties": "^7.1.0",
-    "@babel/plugin-proposal-object-rest-spread": "^7.0.0",
-    "@babel/plugin-transform-runtime": "^7.1.0",
-    "@babel/preset-env": "^7.1.0",
-    "@babel/preset-typescript": "^7.1.0",
-    "@s4p/eslint-config": "^1.0.0",
+    "@s4p/eslint-config": "^2.0.1",
     "@types/lodash": "^4.14.117",
     "@types/node": "^10.11.7",
     "@types/request-promise": "^4.1.42",
-    "ava": "1.0.0-rc.1",
-    "babel-eslint": "^10.0.1",
+    "@typescript-eslint/eslint-plugin": "^1.2.0",
+    "ava": "1.2.0",
     "del": "^3.0.0",
     "eslint": "^5.8.0",
     "eslint-config-airbnb-base": "^13.1.0",
     "eslint-plugin-import": "^2.14.0",
-    "eslint-plugin-typescript": "^0.12.0",
     "gulp": "4.0.0",
-    "gulp-babel": "^8.0.0-beta.2",
     "gulp-cached": "^1.1.1",
     "gulp-eslint": "^5.0.0",
     "gulp-filter": "^5.1.0",
@@ -51,9 +40,8 @@
     "node-notifier": "^5.2.1",
     "nodemon": "^1.17.4",
     "streamqueue": "^1.1.2",
-    "ts-node": "^7.0.1",
-    "typescript": "3.1.1",
-    "typescript-eslint-parser": "20.0.0"
+    "ts-node": "^8.0.2",
+    "typescript": "~3.2.1"
   },
   "publishConfig": {
     "access": "public"

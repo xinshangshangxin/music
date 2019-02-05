@@ -4,18 +4,17 @@
 const notifier = require('node-notifier');
 const gulp = require('gulp');
 const nodemon = require('nodemon');
-const sourcemaps = require('gulp-sourcemaps');
-const babel = require('gulp-babel');
-const replace = require('gulp-replace');
 const gulpLoadPlugins = require('gulp-load-plugins');
 const ts = require('gulp-typescript');
 const { spawn } = require('child_process');
 
-const tsProject = ts.createProject('tsconfig.json');
-const tsDeclarationProject = ts.createProject('tsconfig.json', {
+const tsProject = ts.createProject('tsconfig.json', {
   allowJs: false,
-  declaration: true,
-  declarationMap: true,
+  checkJs: false,
+  declaration: false,
+  declarationMap: false,
+  sourceMap: true,
+  rootDir: './src',
   outDir: './dist',
   noEmit: false,
 });
@@ -82,19 +81,29 @@ gulp.task('eslint', (done) => {
     .pipe($.remember('eslint'));
 });
 
+gulp.task('lint', gulp.series('eslint'));
+
 gulp.task('tsc', (done) => {
   if (!validConfig(config.server)) {
     return done();
   }
 
-  return tsProject.src().pipe(tsProject(ts.reporter.longReporter()));
+  let replaceFilter = $.filter(config.replace.src, { restore: true });
+
+  return tsProject
+    .src()
+    .pipe($.sourcemaps.init())
+    .pipe(tsProject(ts.reporter.longReporter()))
+    .pipe($.sourcemaps.write('.', { includeContent: false, sourceRoot: '../src' }))
+    .pipe(replaceFilter)
+    .pipe($.replace(config.replace.regexp, config.replace.newSubstr))
+    .pipe(replaceFilter.restore)
+    .pipe(gulp.dest(config.server.dest));
 });
 
 gulp.task('tscWatch', () => {
   spawn('tsc', ['-w', '--preserveWatchOutput'], { stdio: 'inherit' });
 });
-
-gulp.task('lint', gulp.parallel('eslint', 'tsc'));
 
 gulp.task('wlint', (done) => {
   if (!validConfig(config.server)) {
@@ -165,36 +174,12 @@ gulp.task('nodemon', (done) => {
   return done();
 });
 
-gulp.task('babel', () => {
-  let f = $.filter(['**/*.ts'], { restore: true });
-  let replaceFilter = $.filter(config.replace.src, { restore: true });
-
-  return gulp
-    .src(config.server.src, config.server.opt)
-    .pipe(f)
-    .pipe(sourcemaps.init())
-    .pipe(babel())
-    .pipe(sourcemaps.write('.'))
-    .pipe(f.restore)
-    .pipe(replaceFilter)
-    .pipe(replace(config.replace.regexp, config.replace.newSubstr))
-    .pipe(replaceFilter.restore)
-    .pipe(gulp.dest(config.server.dest));
-});
-
 gulp.task('cp', () => {
   return gulp.src(config.cp.src, config.cp.opt).pipe(gulp.dest(config.cp.dest));
 });
 
-gulp.task('types', () => {
-  return tsDeclarationProject
-    .src()
-    .pipe(tsDeclarationProject(ts.reporter.longReporter()))
-    .dts.pipe(gulp.dest('dist'));
-});
-
 gulp.task('default', gulp.parallel('nodemon', 'wlint'));
 
-gulp.task('build:dist', gulp.series('clean', gulp.parallel('lint', 'types', gulp.series('babel', 'cp'))));
+gulp.task('build', gulp.series('clean', gulp.parallel('eslint', 'tsc', 'cp')));
 
-gulp.task('build', gulp.series('build:dist'));
+gulp.task('build:dist', gulp.series('build'));

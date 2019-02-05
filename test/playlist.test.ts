@@ -1,6 +1,6 @@
 import test from 'ava';
 
-import { playlist, Provider } from '../dist/index';
+import { playlist, Provider } from '../src';
 
 test('playlist kugou', async (t) => {
   let songs = await playlist(Provider.kugou, '235427');

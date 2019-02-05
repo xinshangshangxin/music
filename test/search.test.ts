@@ -1,6 +1,6 @@
 import test from 'ava';
 
-import { search, Provider } from '../dist/index';
+import { Provider, search } from '../src';
 
 const searchResultMap = {
   kugou: {

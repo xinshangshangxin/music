@@ -1,5 +1,7 @@
 module.exports = {
   globals: {},
   extends: ['@s4p/eslint-config'],
-  rules: {},
+  rules: {
+    '@typescript-eslint/camelcase': ['error', { allow: ['app_key'] }],
+  },
 };

@@ -1,6 +1,6 @@
 import test from 'ava';
 
-import { getSong, Provider, BitRate } from '../dist/index';
+import { BitRate, getSong, Provider } from '../src';
 
 const testCases = [
   {
