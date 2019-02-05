@@ -83,7 +83,8 @@ export class PlayerService extends SongList {
 
   public locateCurrentSongSubject = new BehaviorSubject(undefined);
 
-  private songState: SongState;
+  public songState: SongState;
+
   private currentSong: SongDetail;
 
   private myAudio: MyAudio;

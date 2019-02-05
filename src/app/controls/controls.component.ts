@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 
-import { PlayerService } from '../services/player.service';
+import { PlayerService, SongState } from '../services/player.service';
 
 @Component({
   selector: 'app-controls',
@@ -14,6 +14,10 @@ export class ControlsComponent implements OnInit {
   public currentPercent = 0;
 
   ngOnInit() {}
+
+  get isPaused() {
+    return [SongState.paused, SongState.pausing].includes(this.playerService.songState);
+  }
 
   togglePlay() {
     this.playerService.togglePlay();
