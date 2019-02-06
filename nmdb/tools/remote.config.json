@@ -1,0 +1,12 @@
+{
+  "dev": {
+    "url": "git@gitlab.com:shang-music/nmdb.git",
+    "remote": "gitlab",
+    "branch": "develop"
+  },
+  "prod": {
+    "url": "",
+    "remote": "prod",
+    "branch": "__package_name__"
+  }
+}
