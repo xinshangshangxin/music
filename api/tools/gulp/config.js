@@ -21,7 +21,7 @@ const config = {
     newSubstr: '',
   },
   cp: {
-    src: ['package.json'],
+    src: ['package.json', 'README.md'],
     opt: {
       cwd: './',
       base: './',
