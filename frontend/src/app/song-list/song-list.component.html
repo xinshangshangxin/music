@@ -1,0 +1,31 @@
+<div class="song-list">
+  <div
+    #perSong
+    [ngClass]="{ playing: playerService.meta.currentIndex === i }"
+    class="song-box"
+    *ngFor="let song of playList; index as i"
+    (click)="play(i)"
+  >
+    <span class="song-info">
+      <span
+        class="song-name"
+        matTooltip="{{ song.name }}"
+        matTooltipPosition="above"
+        matTooltipShowDelay="500"
+        >[{{ song.provider }}]-{{ song.name }}
+      </span>
+
+      <span
+        class="song-artists"
+        matTooltip="{{ formatArtists(song.artists) }}"
+        matTooltipPosition="above"
+        matTooltipShowDelay="500"
+      >
+        <span *ngFor="let artist of song.artists"> {{ artist.name }} </span>
+      </span>
+    </span>
+    <span class="song-control" (click)="$event.stopPropagation()">
+      <i class="material-icons" (click)="remove(i)">delete</i>
+    </span>
+  </div>
+</div>

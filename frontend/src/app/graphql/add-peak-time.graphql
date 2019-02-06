@@ -1,0 +1,3 @@
+mutation addPeakTime($peakTime: PeakTimeInput!) {
+  addPeakTime(peakTime:$peakTime)
+}

@@ -1,0 +1,54 @@
+<div class="main">
+  <div><p class="header">歌单列表</p></div>
+  <div class="body">
+    <mat-list>
+      <mat-list-item *ngFor="let item of allPlaylist">
+        <button
+          mat-button
+          [matBadge]="item.songs.length"
+          matBadgePosition="after"
+          matBadgeColor="accent"
+          (press)="press($event, item)"
+          (click)="changePlaylist(item)"
+        >
+          {{ item.name }}
+
+          <div
+            style="position: fixed"
+            [style.left]="contextMenuPosition.x"
+            [style.top]="contextMenuPosition.y"
+            [matMenuTriggerFor]="operationMenu"
+            [matMenuTriggerData]="{ item: item }"
+          ></div>
+        </button>
+      </mat-list-item>
+
+      <mat-list-item *ngFor="let item of ranks">
+        <button mat-button (click)="changePlaylist(item)">
+          {{ item.name }}
+
+          <div
+            style="position: fixed"
+            [style.left]="contextMenuPosition.x"
+            [style.top]="contextMenuPosition.y"
+            [matMenuTriggerFor]="operationMenu"
+            [matMenuTriggerData]="{ item: item }"
+          ></div>
+        </button>
+      </mat-list-item>
+
+      <mat-list-item> <button mat-button (click)="create()">创建</button> </mat-list-item>
+
+      <!-- <mat-menu #operationMenu="matMenu" let-item="item">
+        <button mat-menu-item>Item 1</button>
+        <button mat-menu-item>Item 2</button>
+      </mat-menu> -->
+
+      <mat-menu #operationMenu="matMenu">
+        <ng-template matMenuContent let-item="item">
+          <button mat-menu-item (click)="delete(item)">delete</button>
+        </ng-template>
+      </mat-menu>
+    </mat-list>
+  </div>
+</div>

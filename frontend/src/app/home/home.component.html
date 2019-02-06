@@ -1,0 +1,47 @@
+<mat-sidenav-container>
+  <mat-sidenav #sidenav (openedStart)="openedStart()" mode="push">
+    <app-playlist-control
+      (playlistIdChange)="playlistIdChange($event)"
+      [allPlaylist]="allPlaylist"
+    ></app-playlist-control>
+  </mat-sidenav>
+  <mat-sidenav-content class="main">
+    <div class="header">
+      <button mat-button (click)="sidenav.toggle()">{{ playlistName }}</button>
+
+      <mat-form-field class="search">
+        <input
+          matInput
+          type="text"
+          placeholder="search"
+          [(ngModel)]="searchValue"
+          (keyup)="inputKeyup($event)"
+        />
+        <button
+          mat-button
+          *ngIf="searchValue"
+          matSuffix
+          mat-icon-button
+          aria-label="Clear"
+          (click)="clear()"
+        >
+          <mat-icon>close</mat-icon>
+        </button>
+      </mat-form-field>
+
+      <mat-form-field class="duration">
+        <mat-select [(ngModel)]="duration" name="item" (selectionChange)="selectionChange($event)">
+          <mat-option *ngFor="let item of peaks" [value]="item.duration">
+            {{ item.name }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <div class="body">
+      <router-outlet></router-outlet>
+    </div>
+
+    <div class="footer"><app-controls></app-controls></div>
+  </mat-sidenav-content>
+</mat-sidenav-container>

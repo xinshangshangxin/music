@@ -1,0 +1,10 @@
+query rank($provider: Provider!, $rankType: RankType) {
+  rank(provider: $provider, rankType: $rankType) {
+    id
+    name
+    provider
+    artists {
+      name
+    }
+  }
+}
