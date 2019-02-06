@@ -3,6 +3,10 @@
   "version": "1.8.0",
   "main": "index.js",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/xinshangshangxin/music/tree/develop/api"
+  },
   "scripts": {
     "lint": "gulp lint",
     "lint-fix": "./node_modules/.bin/eslint src/**/*.ts --fix",
