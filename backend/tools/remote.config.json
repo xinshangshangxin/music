@@ -1,0 +1,12 @@
+{
+  "dev": {
+    "url": "git@gitlab.com:xinshangshangxin/music-backend.git",
+    "remote": "gitlab",
+    "branch": "develop"
+  },
+  "prod": {
+    "url": "git@gitlab.com:demoshang/server-projects.git",
+    "remote": "prod",
+    "branch": "__package_name__"
+  }
+}

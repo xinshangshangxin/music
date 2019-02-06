@@ -1,0 +1,36 @@
+image: demoshang/docker-bash:18
+
+services:
+  - docker:dind
+
+variables:
+  # GIT_SUBMODULE_STRATEGY: recursive
+  CONTAINER_USER_NAME: gitlab-ci-token
+  CONTAINER_PASSWORD: ${CI_JOB_TOKEN}
+  CONTAINER_HOST: registry.gitlab.com
+  ALI_CONTAINER_IMAGE: ${ALI_CONTAINER_HOST}/${ALI_CONTAINER_NAMESPACE}/${CI_PROJECT_NAME}:${CI_COMMIT_REF_NAME}
+
+stages:
+  - build
+  - deploy
+
+build:
+  stage: build
+  script:
+    - apk add jq parallel rsync
+    - bash tools/local/gitlab-build.sh
+
+
+deploy:
+  stage: deploy
+  variables:
+    DEPLOY_PASSWORD: ${SERVER_PASS}
+    DEPLOY_HOST: ${SERVER_HOST}
+    DEPLOY_PORT: ${SERVER_PORT}
+    DEPLOY_NAME: ${SERVER_NAMER}
+    DEPLOY_DIR: ${DEPLOY_DIR}
+  # only:
+  #   - tags
+  script:
+    - apk add rsync sshpass openssh-client
+    - bash tools/local/deploy.sh 

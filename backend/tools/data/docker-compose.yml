@@ -1,0 +1,14 @@
+version: "3"
+services:
+  music-backend:
+    restart: always
+    image: ${IMAGE}
+    environment:
+      - NODE_ENV=docker
+      - PORT=80
+      - SAVE_DIR=/app/.music
+      - NMDB_URL=${NMDB_URL}
+    volumes:
+      - /home/deploy/data/.music:/app/.music
+    ports:
+     - "8001:80"

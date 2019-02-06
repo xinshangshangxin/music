@@ -1,0 +1,92 @@
+enum Provider {
+  kugou
+  netease
+  xiami
+}
+
+enum BitRate {
+  mid
+  high
+  sq
+  hq
+}
+
+enum RankType {
+  new
+  hot
+}
+
+input ISearchQuery {
+  keyword: String!
+  skip: Int
+  limit: Int
+}
+
+type ISearchArtist {
+  id: String
+  name: String!
+}
+type ISearchAlbum {
+  id: String
+  name: String
+  img: String
+}
+
+type ISearchItem {
+  provider: Provider!
+  id: String!
+  name: String!
+  artists: [ISearchArtist]!
+  album: ISearchAlbum
+}
+
+type IPeaks {
+  precision: Int!
+  data: [Float]!
+}
+
+type SongDetail {
+  id: String!
+  name: String!
+  provider: Provider!
+  artists: [ISearchArtist]!
+  lrc: String
+  klyric: String
+  album: ISearchAlbum
+  peakStartTime: Float
+  peakDuration: Int
+  peaks: [IPeaks]
+}
+
+input PeakInput {
+  duration: Int!
+  startTime: Float!
+}
+
+input PeaksInput {
+  precision: Int!
+  data: [Float]!
+}
+
+input PeakTimeInput {
+  id: String!
+  provider: Provider!
+  peaks: PeaksInput!
+  peak: PeakInput
+}
+
+type Query {
+  search(keyword: String!, providers: [Provider]): [ISearchItem]
+  get(id: ID!, provider: Provider!, br: BitRate, peakDuration: Int): SongDetail
+  url(id: ID!, provider: Provider!, br: BitRate): String
+  rank(provider: Provider!, rankType: RankType): [ISearchItem]
+  playlist(provider: Provider!, id: String): [ISearchItem]
+  album(provider: Provider!, id: String): [ISearchItem]
+  parseUrl(url: String!): [ISearchItem]
+}
+
+type Mutation {
+  triggerPeak(id: ID!, provider: Provider!): Boolean
+  addPeakTime(peakTime: PeakTimeInput!): Boolean
+  deletePeakTime(id: ID!, provider: Provider!): Boolean
+}
