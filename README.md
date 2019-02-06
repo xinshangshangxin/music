@@ -27,10 +27,20 @@
 
 基于 `Angular 6` 提供简易的界面
 
-## [proxy](./proxy)
+### [proxy](./proxy)
 
-提供跨域歌曲URL
+提供跨域歌曲 URL
 
-## [nmdb](./nmdb)
+### [nmdb](./nmdb)
 
-提供 [mongodb](https://github.com/mongodb/mongo) 和 [nedb](https://github.com/louischatriot/nedb) 以相似有限接口访问
+提供 [mongodb](https://github.com/mongodb/mongo) 和 [nedb](https://github.com/louischatriot/nedb) 以相似接口
+
+## TODO
+
+- [ ] 歌曲进度调整
+- [ ] 歌词显示
+- [ ] 完整 `docker` 镜像 build
+- [ ] 完善桌面浏览器下界面样式
+- [ ] `Electron` 构建桌面应用
+- [ ] 音量调整
+- [ ] 设置界面, 添加渐近渐出,排行榜隐藏等配置
