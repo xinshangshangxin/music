@@ -1,0 +1,29 @@
+image: node:8-alpine
+
+variables:
+  PUBLISH_PATH: 'dist/'
+
+stages:
+  - test-build
+  - release
+
+test-build:
+  stage: test-build
+  coverage: '/Lines\s*:\s*(\d+(?:\.\d+)?)%/'
+  artifacts:
+    name: 'music-api-${CI_COMMIT_SHA}'
+    paths:
+      - ${PUBLISH_PATH}
+  script:
+    - yarn
+    - yarn run coverage
+    - yarn run build
+
+release:
+  stage: release
+  script:
+    - cd ${PUBLISH_PATH}
+    - echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > ~/.npmrc
+    - npm publish
+  only:
+    - tags
