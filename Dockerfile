@@ -2,6 +2,8 @@ FROM node:lts-alpine as build
 
 WORKDIR /app
 
+RUN apk add git --no-cache
+
 COPY package.json package.json
 COPY yarn.lock yarn.lock
 RUN yarnpkg
