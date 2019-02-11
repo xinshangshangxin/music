@@ -1,0 +1,27 @@
+{
+  "url": "git@gitlab.com:shang-music/index.git",
+  "remote": "gitlab",
+  "branch": "develop",
+  "subtree": [
+    {
+      "prefix": "api",
+      "url": "git@gitlab.com:shang-music/music-api.git",
+      "branch": "develop"
+    },
+    {
+      "prefix": "nmdb",
+      "url": "git@gitlab.com:shang-music/nmdb.git",
+      "branch": "develop"
+    },
+    {
+      "prefix": "frontend",
+      "url": "git@gitlab.com:shang-music/music-frontend.git",
+      "branch": "develop"
+    },
+    {
+      "prefix": "proxy",
+      "url": "git@gitlab.com:shang-music/music-proxy.git",
+      "branch": "develop"
+    }
+  ]
+}
