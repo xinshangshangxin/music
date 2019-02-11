@@ -34,6 +34,11 @@ case ${key} in
     source push.sh $*
     shift $#
     ;;
+    pull)
+    shift 1
+    source pull.sh $*
+    shift $#
+    ;;
     *)
     echo ${key}
     exit 1
