@@ -53,8 +53,8 @@ docker-compose -f devops/data/docker-compose-build-memory.yml up
 ### mongodb 存储
 
 ```bash
-docker-compose -f devops/data/docker-compose-build-mongo build
-docker-compose -f devops/data/docker-compose-build-mongo up
+docker-compose -f devops/data/docker-compose-build-mongo.yml build
+docker-compose -f devops/data/docker-compose-build-mongo.yml up
 ```
 
 访问 [http://localhost:8000](http://localhost:8000)
