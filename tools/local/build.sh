@@ -16,7 +16,7 @@ function baseBuild() {
   
   echo "copy package.json"
 
-  cat package.json | jq ".scripts={} | .scripts.start=\"NODE_ENV=${nodeEnv} pm2-docker start .\/index.js -i 1 --max-memory-restart 240M --raw\" | .devDependencies={}" > ${buildDir}/package.json
+  cat package.json | jq ".scripts={} | .scripts.start=\"NODE_ENV=${nodeEnv} pm2-docker start .\/index.js -i 1 --raw\" | .devDependencies={}" > ${buildDir}/package.json
 
   _generateLog
   _dockerConfig ${nodeEnv} ${projectDir}/${DockerfilePath}/${nodeEnv}
