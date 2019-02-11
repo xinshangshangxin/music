@@ -19,6 +19,11 @@
       "branch": "develop"
     },
     {
+      "prefix": "backend",
+      "url": "git@gitlab.com:shang-music/music-backend.git",
+      "branch": "develop"
+    },
+    {
       "prefix": "proxy",
       "url": "git@gitlab.com:shang-music/music-proxy.git",
       "branch": "develop"
