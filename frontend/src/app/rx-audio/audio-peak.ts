@@ -8,7 +8,7 @@ export class AudioPeak {
    *
    * @param audioUrl audio url
    * @param cutSeconds high music seconds
-   * @param precision return peaks weith (1 seconds / precision)
+   * @param precision return peaks width (1 seconds / precision)
    */
   async get(audioUrl: string, cutSeconds: number, precision = 10) {
     let response = await fetch(audioUrl);
