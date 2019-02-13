@@ -1,12 +1,8 @@
 {
   "name": "@s4p/music-api",
   "version": "1.8.1",
+  "description": "music api for kugou,netease,xiami",
   "main": "index.js",
-  "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/xinshangshangxin/music/tree/develop/api"
-  },
   "scripts": {
     "lint": "gulp lint",
     "lint-fix": "./node_modules/.bin/eslint src/**/*.ts --fix",
@@ -15,6 +11,23 @@
     "test": "TS_NODE_FILES=true ava --fail-fast -v",
     "coverage": "TS_NODE_FILES=true nyc ava --fail-fast -v"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/xinshangshangxin/music/tree/develop/api"
+  },
+  "keywords": [
+    "music",
+    "api",
+    "kugou",
+    "netease",
+    "xiami"
+  ],
+  "author": "xinshangshangxin",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/xinshangshangxin/music/issues"
+  },
+  "homepage": "https://github.com/xinshangshangxin/music/tree/develop/api#music-api",
   "dependencies": {
     "NeteaseCloudMusicApi": "Binaryify/NeteaseCloudMusicApi",
     "lodash": "^4.17.11",
