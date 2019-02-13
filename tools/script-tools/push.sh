@@ -26,6 +26,13 @@ function push() {
 
   _initGit ${pushRemote} ${pushUrl}
 
+  local pushInfo=( $(_getPushInfo ${projectDir}/${defaultConfigPath} ${projectDir} ${env}) )
+
+  local pushUrl=${pushInfo[0]}
+  local pushRemote=${pushInfo[1]}
+  local currentBranch=${pushInfo[2]}
+  local pushBranch=${pushInfo[3]}
+
   if [ ${env} = "prod" ]
   then
     resetDir
