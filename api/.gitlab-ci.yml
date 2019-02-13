@@ -10,6 +10,7 @@ stages:
 test-build:
   stage: test-build
   coverage: '/Lines\s*:\s*(\d+(?:\.\d+)?)%/'
+  retry: 2
   artifacts:
     name: 'music-api-${CI_COMMIT_SHA}'
     paths:
