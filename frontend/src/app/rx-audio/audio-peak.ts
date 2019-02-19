@@ -59,7 +59,7 @@ export class AudioPeak {
     let step = parseInt(`${(end - start) / 15}`, 10);
 
     for (let i = start; i < end; i = i + step) {
-      current = array[i];
+      current = Math.abs(array[i]);
       if (current > max) {
         max1 = max;
         max = current;
