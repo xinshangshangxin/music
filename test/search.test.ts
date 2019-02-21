@@ -49,7 +49,7 @@ const searchResultMap = {
     album: {
       id: '334114',
       name: 'hug',
-      img: 'http://pic.xiami.net/images/album/img42/56642/3341141375436694.jpg@1e_1c_0i_1o_100Q_100w_100h',
+      img: 'http://pic.xiami.net/images/album/img42/56642/3341141375436694.jpg',
     },
   },
 };
