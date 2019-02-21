@@ -3,6 +3,7 @@ import get from 'lodash/get';
 import isArray from 'lodash/isArray';
 import isUndefined from 'lodash/isUndefined';
 import maxBy from 'lodash/maxBy';
+import { CoreOptions } from 'request';
 
 import { Provider } from './common/provider';
 import { RankType } from './common/rank';
@@ -15,6 +16,29 @@ import { Xiami } from './provider/xiami';
 const kugouMusic = new Kugou();
 const neteaseMusic = new Netease();
 const xiamiMusic = new Xiami();
+
+function setRequestOptions(
+  options?: CoreOptions,
+  providers = [Provider.kugou, Provider.netease, Provider.xiami]
+) {
+  providers.forEach((provider) => {
+    if (provider === Provider.kugou) {
+      kugouMusic.setRequestOptions(options);
+    } else if (provider === Provider.netease) {
+      // netease only support proxy config
+      neteaseMusic.setRequestOptions(options);
+    } else if (provider === Provider.xiami) {
+      xiamiMusic.setRequestOptions(options);
+    }
+  });
+}
+
+// if have proxy environment, set proxy
+if (process.env.MUSIC_API_PROXY) {
+  setRequestOptions({
+    proxy: process.env.MUSIC_API_PROXY,
+  });
+}
 
 async function searchOne(query: string | ISearchQuery, provider: Provider): Promise<ISearchItem[]> {
   let result: ISearchSong[];
@@ -127,5 +151,15 @@ async function album(provider: Provider, id: string): Promise<ISearchItem[]> {
 }
 
 export {
-  search, rank, getSong, playlist, album, ISearchItem, ISong, Provider, BitRate, RankType
+  search,
+  rank,
+  getSong,
+  playlist,
+  album,
+  ISearchItem,
+  ISong,
+  Provider,
+  BitRate,
+  RankType,
+  setRequestOptions,
 };

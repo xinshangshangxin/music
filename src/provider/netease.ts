@@ -15,6 +15,9 @@ import {
 } from '../common/search';
 import { BitRate, ISong } from '../common/song';
 
+interface INeteaseRequestOptions {
+  proxy?: string;
+}
 export class Netease {
   private request: any;
 
@@ -26,7 +29,7 @@ export class Netease {
   };
 
   constructor() {
-    this.request = neteaseRequest;
+    this.request = this.setRequestOptions();
   }
 
   private static parsePlaylist(songs: any[]): ISearchItem[] {
@@ -48,6 +51,18 @@ export class Netease {
         },
       };
     });
+  }
+
+  setRequestOptions(options?: INeteaseRequestOptions) {
+    if (!options) {
+      this.request = neteaseRequest;
+    } else {
+      this.request = (method: any, url: any, data: any, originOptions = {}) => {
+        return neteaseRequest(method, url, data, { ...originOptions, ...options });
+      };
+    }
+
+    return this.request;
   }
 
   async search(query: string | INeteaseSearch): Promise<ISearchSong[]> {

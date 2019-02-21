@@ -1,4 +1,5 @@
 import get from 'lodash/get';
+import { CoreOptions } from 'request';
 import rp from 'request-promise';
 
 import { Provider } from '../common/provider';
@@ -8,6 +9,11 @@ import { BitRate, ISong } from '../common/song';
 import { formatStr } from '../common/util';
 
 class Kugou {
+  private defaultConfig = {
+    json: true,
+    timeout: 10000,
+  };
+
   private request: typeof rp;
 
   private bitRateMap = {
@@ -18,13 +24,24 @@ class Kugou {
   };
 
   constructor() {
-    this.request = rp.defaults({
-      json: true,
-    });
+    this.request = this.setRequestOptions();
   }
 
   private static getId(song: any) {
     return song.hash || song['320hash'] || song.sqhash;
+  }
+
+  setRequestOptions(options?: CoreOptions) {
+    if (!options) {
+      this.request = rp.defaults(this.defaultConfig);
+    } else {
+      this.request = rp.defaults({
+        ...this.defaultConfig,
+        ...options,
+      });
+    }
+
+    return this.request;
   }
 
   async search(query: string | ISearchQuery): Promise<ISearchSong[]> {
