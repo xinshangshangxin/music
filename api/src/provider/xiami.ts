@@ -1,5 +1,6 @@
 import get from 'lodash/get';
 import isPlainObject from 'lodash/isPlainObject';
+import { CoreOptions } from 'request';
 import rp from 'request-promise';
 
 import { Provider } from '../common/provider';
@@ -8,17 +9,20 @@ import { ISearchItem, ISearchQuery, ISearchSong } from '../common/search';
 import { ISong } from '../common/song';
 
 class Xiami {
+  private defaultConfig = {
+    json: true,
+    headers: {
+      referer: 'http://h.xiami.com/', // must options
+      userAgent:
+        'Mozilla/5.0 (iPhone; CPU iPhone OS 11_0 like Mac OS X) AppleWebKit/604.1.38 (KHTML, like Gecko) Version/11.0 Mobile/15A372 Safari/604.1',
+    },
+    timeout: 10000,
+  };
+
   private request: typeof rp;
 
   constructor() {
-    this.request = rp.defaults({
-      json: true,
-      headers: {
-        referer: 'http://h.xiami.com/', // must options
-        userAgent:
-          'Mozilla/5.0 (iPhone; CPU iPhone OS 11_0 like Mac OS X) AppleWebKit/604.1.38 (KHTML, like Gecko) Version/11.0 Mobile/15A372 Safari/604.1',
-      },
-    });
+    this.request = this.setRequestOptions();
   }
 
   private static handleProtocolRelativeUrl(url: string) {
@@ -79,6 +83,19 @@ class Xiami {
         },
       };
     });
+  }
+
+  setRequestOptions(options?: CoreOptions) {
+    if (!options) {
+      this.request = rp.defaults(this.defaultConfig);
+    } else {
+      this.request = rp.defaults({
+        ...this.defaultConfig,
+        ...options,
+      });
+    }
+
+    return this.request;
   }
 
   async search(query: string | ISearchQuery): Promise<ISearchSong[]> {
