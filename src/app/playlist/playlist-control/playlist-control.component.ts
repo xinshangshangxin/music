@@ -56,10 +56,6 @@ export class PlaylistControlComponent implements OnInit {
     console.info('pressed', event, item);
     event.preventDefault();
 
-    if (item.id === this.playerService.tempPlaylistId) {
-      return null;
-    }
-
     this.contextMenuPosition.x = event.center.x + 'px';
     this.contextMenuPosition.y = event.center.y + 'px';
 
