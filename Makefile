@@ -1,6 +1,8 @@
 .PHONY:*
 prodNodeEnv:=$(shell cat Makefile.rsync.env.private 2>&1)
 
+start:
+	@ npm start
 build:
 	@ bash tools/script-tools/index.sh build $(RUN_ARGS)
 push:

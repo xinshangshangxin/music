@@ -58,11 +58,10 @@ export class SearchComponent implements OnInit {
 
     combineLatest(providersSubject, searchSubject)
       .pipe(
-        tap((params) => {
-          console.log('combineLatest params: ', params);
-        }),
         debounceTime(300),
         switchMap(([providers, keyword]) => {
+          console.log('combineLatest params: ', { providers, keyword });
+
           if (!keyword) {
             return of([]);
           }
