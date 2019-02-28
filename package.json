@@ -33,18 +33,18 @@
     "NeteaseCloudMusicApi": "Binaryify/NeteaseCloudMusicApi",
     "lodash": "^4.17.11",
     "request": "^2.88.0",
-    "request-promise": "^4.2.2",
+    "request-promise": "^4.2.4",
     "tslib": "^1.9.3"
   },
   "devDependencies": {
     "@s4p/eslint-config": "^2.0.1",
-    "@types/lodash": "^4.14.117",
+    "@types/lodash": "^4.14.121",
     "@types/node": "^11.9.5",
     "@types/request-promise": "^4.1.42",
-    "@typescript-eslint/eslint-plugin": "^1.2.0",
+    "@typescript-eslint/eslint-plugin": "^1.4.2",
     "ava": "^1.2.1",
     "del": "^3.0.0",
-    "eslint": "^5.8.0",
+    "eslint": "^5.14.1",
     "eslint-config-airbnb-base": "^13.1.0",
     "eslint-plugin-import": "^2.14.0",
     "gulp": "4.0.0",
@@ -54,15 +54,15 @@
     "gulp-load-plugins": "^1.5.0",
     "gulp-remember": "^1.0.1",
     "gulp-replace": "^1.0.0",
-    "gulp-sourcemaps": "^2.6.4",
+    "gulp-sourcemaps": "^2.6.5",
     "gulp-typescript": "^5.0.0-alpha.3",
     "node-notifier": "^5.2.1",
-    "nodemon": "^1.17.4",
-    "nyc": "^13.2.0",
+    "nodemon": "^1.18.10",
+    "nyc": "^13.3.0",
     "source-map-support": "^0.5.10",
     "streamqueue": "^1.1.2",
     "ts-node": "^8.0.2",
-    "typescript": "~3.2.1"
+    "typescript": "~3.3.3333"
   },
   "publishConfig": {
     "access": "public"
