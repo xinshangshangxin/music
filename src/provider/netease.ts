@@ -9,6 +9,7 @@ import neteaseSongUrl from 'NeteaseCloudMusicApi/module/song_url';
 import neteaseRequest from 'NeteaseCloudMusicApi/util/request';
 
 import { Provider } from '..';
+import { Privilege } from '../common/privilege';
 import { RankType } from '../common/rank';
 import {
   INeteaseSearch, ISearchItem, ISearchSong, NeteaseSearchType
@@ -32,9 +33,10 @@ export class Netease {
     this.request = this.setRequestOptions();
   }
 
-  private static parsePlaylist(songs: any[]): ISearchItem[] {
-    return songs.map((song: any) => {
+  private static parsePlaylist(songs: any[], privileges: any[]): ISearchItem[] {
+    return songs.map((song: any, index) => {
       return {
+        privilege: Netease.getPrivilege(privileges[index]),
         provider: Provider.netease,
         id: `${song.id}`,
         name: song.name,
@@ -51,6 +53,21 @@ export class Netease {
         },
       };
     });
+  }
+
+  private static getPrivilege(data: any) {
+    let copyrightId = get(data, 'copyrightId');
+    let st = get(data, 'st');
+
+    if (copyrightId === 1007) {
+      return Privilege.deny;
+    }
+
+    if (st === -200 || st === -300) {
+      return Privilege.deny;
+    }
+
+    return Privilege.allow;
   }
 
   setRequestOptions(options?: INeteaseRequestOptions) {
@@ -129,6 +146,7 @@ export class Netease {
 
     return songs.map((song: any) => {
       return {
+        privilege: Netease.getPrivilege(song),
         id: `${song.id}`,
         name: song.name,
         artists: get(song, 'artists', []).map((item: any) => {
@@ -150,8 +168,10 @@ export class Netease {
   private async detail(id: string) {
     let result = await neteaseSongDetail({ ids: id }, this.request);
     let song = get(result, 'body.songs[0]');
+    let privilege = get(result, 'body.privileges[0]');
 
     return {
+      privilege: Netease.getPrivilege(privilege),
       id: `${song.id}`,
       name: song.name,
       artists: get(song, 'ar', []).map((item: any) => {
@@ -196,14 +216,19 @@ export class Netease {
   private async getPlaylist(id: string) {
     let result = await neteasePlayList({ id, s: 1 }, this.request);
     let songs = get(result, 'body.playlist.tracks', []);
+    let privileges = get(result, 'body.privileges', []);
 
-    return Netease.parsePlaylist(songs);
+    return Netease.parsePlaylist(songs, privileges);
   }
 
   private async getAlbum(id: string): Promise<ISearchItem[]> {
     let result = await neteaseAlbum({ id }, this.request);
     let songs = get(result, 'body.songs', []);
 
-    return Netease.parsePlaylist(songs);
+    let privileges = songs.map((item: any) => {
+      return item && item.privilege;
+    });
+
+    return Netease.parsePlaylist(songs, privileges);
   }
 }

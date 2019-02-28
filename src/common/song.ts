@@ -1,6 +1,11 @@
+import { Privilege } from './privilege';
+
 export enum BitRate {
+  // 128 kbit/s
   mid = 'mid',
+  // 320 kbit/s
   high = 'high',
+  // 无损
   sq = 'sq',
   hq = 'hq',
 }
@@ -17,11 +22,12 @@ export interface IAlbum {
 }
 
 export interface ISong {
+  privilege: Privilege;
   id: string;
   name: string;
   url: string;
-  lrc: string;
   album: IAlbum;
+  lrc?: string;
   artists?: IArtist[];
   duration?: number;
   mvId?: string;

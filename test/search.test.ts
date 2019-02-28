@@ -1,9 +1,10 @@
 import test from 'ava';
 
-import { Provider, search } from '../src';
+import { ISearchItem, Provider, search } from '../src';
 
 const searchResultMap = {
   kugou: {
+    privilege: 'allow',
     provider: 'kugou',
     id: 'f3205f0ff2f4891a2c344086b74b6d6e',
     name: '小さな恋のうた',
@@ -20,6 +21,7 @@ const searchResultMap = {
     mvId: 'dfeaf252379c17427b8c56d58ee3c483',
   },
   netease: {
+    privilege: 'allow',
     provider: 'netease',
     id: '29829683',
     name: '小さな恋のうた',
@@ -37,6 +39,7 @@ const searchResultMap = {
     mvId: '5347593',
   },
   xiami: {
+    privilege: 'allow',
     provider: 'xiami',
     id: '1768956303',
     name: 'piece',
@@ -69,9 +72,9 @@ test('search "Aragaki Yui" limit 5', async (t) => {
     }
   }
 
-  t.deepEqual(arr[0], searchResultMap.kugou);
-  t.deepEqual(arr[1], searchResultMap.netease);
-  t.deepEqual(arr[2], searchResultMap.xiami);
+  t.deepEqual(arr[0], searchResultMap.kugou as ISearchItem);
+  t.deepEqual(arr[1], searchResultMap.netease as ISearchItem);
+  t.deepEqual(arr[2], searchResultMap.xiami as ISearchItem);
 });
 
 test('search "Aragaki Yui" with kugou limit 1', async (t) => {
@@ -79,7 +82,7 @@ test('search "Aragaki Yui" with kugou limit 1', async (t) => {
 
   t.is(arr.length, 1);
 
-  t.deepEqual(arr[0], searchResultMap.kugou);
+  t.deepEqual(arr[0], searchResultMap.kugou as ISearchItem);
 });
 
 test('search "Aragaki Yui" with kugou', async (t) => {
@@ -87,7 +90,7 @@ test('search "Aragaki Yui" with kugou', async (t) => {
 
   t.is(arr.length, 10);
 
-  t.deepEqual(arr[0], searchResultMap.kugou);
+  t.deepEqual(arr[0], searchResultMap.kugou as ISearchItem);
 });
 
 test('search "Aragaki Yui" with netease limit 1', async (t) => {
@@ -95,7 +98,7 @@ test('search "Aragaki Yui" with netease limit 1', async (t) => {
 
   t.is(arr.length, 1);
 
-  t.deepEqual(arr[0], searchResultMap.netease);
+  t.deepEqual(arr[0], searchResultMap.netease as ISearchItem);
 });
 
 test('search "Aragaki Yui" with netease', async (t) => {
@@ -103,7 +106,7 @@ test('search "Aragaki Yui" with netease', async (t) => {
 
   t.is(arr.length, 10);
 
-  t.deepEqual(arr[0], searchResultMap.netease);
+  t.deepEqual(arr[0], searchResultMap.netease as ISearchItem);
 });
 
 test('search "Aragaki Yui" with xiami limit 1', async (t) => {
@@ -111,7 +114,7 @@ test('search "Aragaki Yui" with xiami limit 1', async (t) => {
 
   t.is(arr.length, 1);
 
-  t.deepEqual(arr[0], searchResultMap.xiami);
+  t.deepEqual(arr[0], searchResultMap.xiami as ISearchItem);
 });
 
 test('search "Aragaki Yui" with xiami', async (t) => {
@@ -119,7 +122,7 @@ test('search "Aragaki Yui" with xiami', async (t) => {
 
   t.is(arr.length, 10);
 
-  t.deepEqual(arr[0], searchResultMap.xiami);
+  t.deepEqual(arr[0], searchResultMap.xiami as ISearchItem);
 });
 
 test('search "Aragaki Yui"', async (t) => {
@@ -127,9 +130,9 @@ test('search "Aragaki Yui"', async (t) => {
 
   t.is(arr.length, 30);
 
-  t.deepEqual(arr[0], searchResultMap.kugou);
-  t.deepEqual(arr[1], searchResultMap.netease);
-  t.deepEqual(arr[2], searchResultMap.xiami);
+  t.deepEqual(arr[0], searchResultMap.kugou as ISearchItem);
+  t.deepEqual(arr[1], searchResultMap.netease as ISearchItem);
+  t.deepEqual(arr[2], searchResultMap.xiami as ISearchItem);
 });
 
 test('search without keyword', async (t) => {
@@ -157,16 +160,14 @@ test('search with not support query', async (t) => {
   t.is(err.message, 'query not support');
 });
 
-
 test('search with kugou and xiami provider', async (t) => {
   let arr = await search('Aragaki Yui', [Provider.kugou, Provider.xiami]);
 
   t.is(arr.length, 20);
 
-  t.deepEqual(arr[0], searchResultMap.kugou);
-  t.deepEqual(arr[1], searchResultMap.xiami);
+  t.deepEqual(arr[0], searchResultMap.kugou as ISearchItem);
+  t.deepEqual(arr[1], searchResultMap.xiami as ISearchItem);
 });
-
 
 test('search with not support provider', async (t) => {
   let err;

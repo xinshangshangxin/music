@@ -4,6 +4,7 @@
   "description": "music api for kugou,netease,xiami",
   "main": "index.js",
   "scripts": {
+    "start": "TS_NODE_FILES=true ./node_modules/.bin/ts-node src/index.ts",
     "lint": "gulp lint",
     "lint-fix": "./node_modules/.bin/eslint src/**/*.ts --fix",
     "watch": "gulp",
@@ -38,7 +39,7 @@
   "devDependencies": {
     "@s4p/eslint-config": "^2.0.1",
     "@types/lodash": "^4.14.117",
-    "@types/node": "^10.11.7",
+    "@types/node": "^11.9.5",
     "@types/request-promise": "^4.1.42",
     "@typescript-eslint/eslint-plugin": "^1.2.0",
     "ava": "^1.2.1",

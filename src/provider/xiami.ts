@@ -3,6 +3,7 @@ import isPlainObject from 'lodash/isPlainObject';
 import { CoreOptions } from 'request';
 import rp from 'request-promise';
 
+import { Privilege } from '../common/privilege';
 import { Provider } from '../common/provider';
 import { RankType } from '../common/rank';
 import { ISearchItem, ISearchQuery, ISearchSong } from '../common/search';
@@ -67,6 +68,7 @@ class Xiami {
   private static parseSongList(songs: any[]) {
     return songs.map((song: any) => {
       return {
+        privilege: Xiami.getPrivilege(song),
         provider: Provider.xiami,
         id: `${song.song_id}`,
         name: song.song_name,
@@ -83,6 +85,17 @@ class Xiami {
         },
       };
     });
+  }
+
+  private static getPrivilege(songInfo: any) {
+    let isListenFile = get(songInfo, 'listen_file');
+    let isLocation = get(songInfo, 'location');
+
+    if (isListenFile || isLocation) {
+      return Privilege.allow;
+    }
+
+    return Privilege.deny;
   }
 
   setRequestOptions(options?: CoreOptions) {
@@ -183,17 +196,30 @@ class Xiami {
 
   private async getDetail(id: string): Promise<ISong> {
     let result = await this.request({
-      url: `http://www.xiami.com/song/playlist/id/${id}/object_name/default/object_id/0/cat/json`,
+      url: `http://www.xiami.com/song/playlist/id/${id}/type/0/cat/json`,
     });
-
-    let { message } = result;
-    if (message) {
-      throw new Error(`${Provider.xiami} - ${message}`);
-    }
 
     let song = get(result, 'data.trackList[0]', {});
 
+    let privilege = Xiami.getPrivilege(song);
+
+    if (privilege === Privilege.deny) {
+      return {
+        privilege,
+        id,
+        name: '',
+        url: '',
+        lrc: '',
+        album: {
+          id: '',
+          name: '',
+          img: '',
+        },
+      };
+    }
+
     return {
+      privilege,
       id: `${song.songId}`,
       name: song.songName,
       url: Xiami.handleProtocolRelativeUrl(Xiami.caesar(song.location)),
