@@ -87,7 +87,10 @@ export class KugouUrlParseService {
     let query = querystringParse(urlParse(location).query);
 
     let result = await this.client('http://m.kugou.com/zlist/list', {
-      query,
+      query: {
+        ...query,
+        pagesize: 99999999,
+      },
       json: true,
     });
 
