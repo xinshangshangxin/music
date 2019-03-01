@@ -154,6 +154,7 @@ class Xiami {
 
     return songs.map((song: any) => {
       return {
+        privilege: Privilege.unknown,
         provider: Provider.xiami,
         id: `${song.song_id}`,
         name: song.song_name,

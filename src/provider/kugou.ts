@@ -33,17 +33,13 @@ class Kugou {
   }
 
   private static getPrivilege(data: any): Privilege {
-    let privilege = get(data, 'data.privilege', 0);
+    let privilege = get(data, 'privilege', 0);
 
     if (privilege === 5) {
       return Privilege.deny;
     }
 
-    if (privilege === 8) {
-      return Privilege.audition;
-    }
-
-    if (privilege === 0) {
+    if ([0, 8, 10].includes(privilege)) {
       return Privilege.allow;
     }
 
@@ -121,6 +117,7 @@ class Kugou {
 
       let [singer, songName] = filename.split('-');
       return {
+        privilege: Kugou.getPrivilege(song),
         provider: Provider.kugou,
         id: Kugou.getId(song),
         name: formatStr(songName),
@@ -155,7 +152,7 @@ class Kugou {
 
     return songs.map((song: any) => {
       return {
-        privilege: Kugou.getPrivilege({ data: song }),
+        privilege: Kugou.getPrivilege(song),
         id: Kugou.getId(song),
         name: song.songname,
         artists: get(song, 'singername', '')
@@ -201,7 +198,7 @@ class Kugou {
     });
 
     return {
-      privilege: Kugou.getPrivilege(result),
+      privilege: Kugou.getPrivilege(get(result, 'data', {})),
       id,
       name: get(result, 'data.song_name'),
       url: get(result, 'data.play_url'),
@@ -239,6 +236,7 @@ class Kugou {
 
       let [singer, songName] = filename.split('-');
       return {
+        privilege: Kugou.getPrivilege(song),
         provider: Provider.kugou,
         id: Kugou.getId(song),
         name: formatStr(songName),

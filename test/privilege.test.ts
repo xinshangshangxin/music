@@ -1,6 +1,8 @@
 import test from 'ava';
 
-import { getSong, Provider, search } from '../src';
+import {
+  getSong, Provider, rank, RankType, search, playlist
+} from '../src';
 import { Privilege } from '../src/common/privilege';
 
 type CheckInfo =
@@ -44,16 +46,6 @@ let testCaseMap = {
       id: 'mQ3vjR95254',
     },
   ],
-  [Privilege.audition]: [
-    {
-      provider: Provider.kugou,
-      keyword: '圆 AGA',
-    },
-    {
-      provider: Provider.kugou,
-      id: '504D039E327F73E64C32A77E9FE5722C',
-    },
-  ],
   [Privilege.deny]: [
     {
       provider: Provider.kugou,
@@ -66,7 +58,7 @@ let testCaseMap = {
 
     {
       provider: Provider.netease,
-      keyword: '告白气球 周杰伦的床边故事 ',
+      keyword: '告白气球 周杰伦的床边故事',
     },
     {
       provider: Provider.netease,
@@ -75,7 +67,7 @@ let testCaseMap = {
 
     {
       provider: Provider.xiami,
-      keyword: '告白气球 周杰伦的床边故事 ',
+      keyword: '告白气球 周杰伦的床边故事',
     },
     {
       provider: Provider.xiami,
@@ -108,6 +100,41 @@ test('test privilege', async (t) => {
           t.is(key, privilege, `privilege: ${privilege}, check: ${JSON.stringify(item)}`);
         })
       );
+    })
+  );
+});
+
+test('rank should have privilege', async (t) => {
+  await Promise.all(
+    [Provider.kugou, Provider.netease, Provider.xiami].map(async (provider) => {
+      let list = await rank(provider, RankType.new);
+      list.forEach((song) => {
+        t.truthy(song.privilege);
+      });
+    })
+  );
+});
+
+test('playlist should have privilege', async (t) => {
+  await Promise.all(
+    [
+      {
+        provider: Provider.kugou,
+        playlist: '235427',
+      },
+      {
+        provider: Provider.netease,
+        playlist: '24381616',
+      },
+      {
+        provider: Provider.xiami,
+        playlist: '277845506',
+      },
+    ].map(async ({ provider, playlist: id }) => {
+      let list = await playlist(provider, id);
+      list.forEach((song) => {
+        t.truthy(song.privilege);
+      });
     })
   );
 });

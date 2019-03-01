@@ -62,12 +62,19 @@ export class Netease {
     if (copyrightId === 1007) {
       return Privilege.deny;
     }
+    if (copyrightId) {
+      return Privilege.allow;
+    }
 
     if (st === -200 || st === -300) {
       return Privilege.deny;
     }
 
-    return Privilege.allow;
+    if (st === 0) {
+      return Privilege.allow;
+    }
+
+    return Privilege.unknown;
   }
 
   setRequestOptions(options?: INeteaseRequestOptions) {
