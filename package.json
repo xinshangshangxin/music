@@ -12,10 +12,6 @@
     "test": "TS_NODE_FILES=true ava --fail-fast -v",
     "coverage": "TS_NODE_FILES=true nyc ava --fail-fast -v"
   },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/xinshangshangxin/music/tree/develop/api"
-  },
   "keywords": [
     "music",
     "api",
@@ -25,10 +21,10 @@
   ],
   "author": "xinshangshangxin",
   "license": "MIT",
+  "homepage": "https://github.com/xinshangshangxin/music/tree/develop/api#music-api",
   "bugs": {
     "url": "https://github.com/xinshangshangxin/music/issues"
   },
-  "homepage": "https://github.com/xinshangshangxin/music/tree/develop/api#music-api",
   "dependencies": {
     "NeteaseCloudMusicApi": "Binaryify/NeteaseCloudMusicApi",
     "lodash": "^4.17.11",
