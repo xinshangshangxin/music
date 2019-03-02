@@ -58,6 +58,7 @@ export class Netease {
   private static getPrivilege(data: any) {
     let copyrightId = get(data, 'copyrightId');
     let st = get(data, 'st');
+    let fee = get(data, 'fee');
 
     if (copyrightId === 1007) {
       return Privilege.deny;
@@ -70,8 +71,12 @@ export class Netease {
       return Privilege.deny;
     }
 
-    if (st === 0) {
+    if (st === 0 && fee === 0) {
       return Privilege.allow;
+    }
+
+    if (st === 0 && fee > 0) {
+      return Privilege.deny;
     }
 
     return Privilege.unknown;
