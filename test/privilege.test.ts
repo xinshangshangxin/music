@@ -55,6 +55,10 @@ let testCaseMap = {
       provider: Provider.kugou,
       id: '41AC5854B48A8BFBE3DC43C1C414A464',
     },
+    {
+      provider: Provider.kugou,
+      id: '8073553A6BED5343372176746741682D',
+    },
 
     {
       provider: Provider.netease,

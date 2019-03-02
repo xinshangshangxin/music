@@ -34,6 +34,11 @@ class Kugou {
 
   private static getPrivilege(data: any): Privilege {
     let privilege = get(data, 'privilege', 0);
+    let privilege2 = get(data, 'privilege2', 0);
+
+    if (privilege2 === '1010') {
+      return Privilege.deny;
+    }
 
     if (privilege === 5) {
       return Privilege.deny;
