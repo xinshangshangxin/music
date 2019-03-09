@@ -1,61 +1,48 @@
 import test from 'ava';
+import Joi from 'joi';
 
 import { ISearchItem, Provider, search } from '../src';
+import { Privilege } from '../src/common/privilege';
 
-const searchResultMap = {
-  kugou: {
-    privilege: 'allow',
-    provider: 'kugou',
-    id: 'f3205f0ff2f4891a2c344086b74b6d6e',
-    name: '小さな恋のうた',
-    artists: [
-      {
-        name: '新垣結衣',
-      },
-    ],
-    album: {
-      id: '563098',
-      name: '小さな恋のうた',
-    },
-    duration: 324000,
-    mvId: 'dfeaf252379c17427b8c56d58ee3c483',
-  },
-  netease: {
-    privilege: 'allow',
-    provider: 'netease',
-    id: '29829683',
-    name: '小さな恋のうた',
-    artists: [
-      {
-        id: '15988',
-        name: '新垣結衣',
-      },
-    ],
-    album: {
-      id: '3086101',
-      name: '小さな恋のうた',
-    },
-    duration: 326034,
-    mvId: '5347593',
-  },
-  xiami: {
-    privilege: 'allow',
-    provider: 'xiami',
-    id: '1768956303',
-    name: 'piece',
-    artists: [
-      {
-        id: '56642',
-        name: '新垣結衣',
-      },
-    ],
-    album: {
-      id: '334114',
-      name: 'hug',
-      img: 'http://pic.xiami.net/images/album/img42/56642/3341141375436694.jpg',
-    },
-  },
+const schema = {
+  privilege: Joi.string()
+    .valid([Privilege.allow, Privilege.deny])
+    .required(),
+  provider: Joi.string()
+    .valid([Provider.kugou, Provider.netease, Provider.xiami])
+    .required(),
+  id: Joi.string().required(),
+  name: Joi.string().required(),
+  artists: Joi.array()
+    .required()
+    .min(1)
+    .items(
+      Joi.object({
+        name: Joi.string().required(),
+      })
+    ),
+  album: Joi.object({
+    name: Joi.string().required().allow(''),
+    img: Joi.string(),
+  }),
+  duration: Joi.number(),
+  mvId: Joi.string().allow(''),
 };
+
+function shouldValid(searchResult: ISearchItem | ISearchItem[]) {
+  let arr: ISearchItem[];
+  if (!Array.isArray(searchResult)) {
+    arr = [searchResult];
+  } else {
+    arr = searchResult;
+  }
+
+  return arr
+    .map((item) => {
+      let { error } = Joi.validate(item, schema, { convert: false, allowUnknown: true });
+      return error && error.toString();
+    });
+}
 
 test('search "Aragaki Yui" limit 5', async (t) => {
   let arr = await search({ keyword: 'Aragaki Yui', limit: 5 });
@@ -72,9 +59,7 @@ test('search "Aragaki Yui" limit 5', async (t) => {
     }
   }
 
-  t.deepEqual(arr[0], searchResultMap.kugou as ISearchItem);
-  t.deepEqual(arr[1], searchResultMap.netease as ISearchItem);
-  t.deepEqual(arr[2], searchResultMap.xiami as ISearchItem);
+  t.deepEqual(shouldValid(arr), new Array(arr.length).fill(null));
 });
 
 test('search "Aragaki Yui" with kugou limit 1', async (t) => {
@@ -82,7 +67,7 @@ test('search "Aragaki Yui" with kugou limit 1', async (t) => {
 
   t.is(arr.length, 1);
 
-  t.deepEqual(arr[0], searchResultMap.kugou as ISearchItem);
+  t.deepEqual(shouldValid(arr), new Array(arr.length).fill(null));
 });
 
 test('search "Aragaki Yui" with kugou', async (t) => {
@@ -90,49 +75,42 @@ test('search "Aragaki Yui" with kugou', async (t) => {
 
   t.is(arr.length, 10);
 
-  t.deepEqual(arr[0], searchResultMap.kugou as ISearchItem);
+  t.deepEqual(shouldValid(arr), new Array(arr.length).fill(null));
 });
 
 test('search "Aragaki Yui" with netease limit 1', async (t) => {
   let arr = await search({ keyword: 'Aragaki Yui', limit: 1 }, Provider.netease);
 
   t.is(arr.length, 1);
-
-  t.deepEqual(arr[0], searchResultMap.netease as ISearchItem);
+  t.deepEqual(shouldValid(arr), new Array(arr.length).fill(null));
 });
 
 test('search "Aragaki Yui" with netease', async (t) => {
   let arr = await search('Aragaki Yui', Provider.netease);
 
   t.is(arr.length, 10);
-
-  t.deepEqual(arr[0], searchResultMap.netease as ISearchItem);
+  t.deepEqual(shouldValid(arr), new Array(arr.length).fill(null));
 });
 
 test('search "Aragaki Yui" with xiami limit 1', async (t) => {
   let arr = await search({ keyword: 'Aragaki Yui', limit: 1 }, Provider.xiami);
 
   t.is(arr.length, 1);
-
-  t.deepEqual(arr[0], searchResultMap.xiami as ISearchItem);
+  t.deepEqual(shouldValid(arr), new Array(arr.length).fill(null));
 });
 
 test('search "Aragaki Yui" with xiami', async (t) => {
   let arr = await search('Aragaki Yui', Provider.xiami);
 
   t.is(arr.length, 10);
-
-  t.deepEqual(arr[0], searchResultMap.xiami as ISearchItem);
+  t.deepEqual(shouldValid(arr), new Array(arr.length).fill(null));
 });
 
 test('search "Aragaki Yui"', async (t) => {
   let arr = await search('Aragaki Yui');
 
   t.is(arr.length, 30);
-
-  t.deepEqual(arr[0], searchResultMap.kugou as ISearchItem);
-  t.deepEqual(arr[1], searchResultMap.netease as ISearchItem);
-  t.deepEqual(arr[2], searchResultMap.xiami as ISearchItem);
+  t.deepEqual(shouldValid(arr), new Array(arr.length).fill(null));
 });
 
 test('search without keyword', async (t) => {
@@ -164,9 +142,7 @@ test('search with kugou and xiami provider', async (t) => {
   let arr = await search('Aragaki Yui', [Provider.kugou, Provider.xiami]);
 
   t.is(arr.length, 20);
-
-  t.deepEqual(arr[0], searchResultMap.kugou as ISearchItem);
-  t.deepEqual(arr[1], searchResultMap.xiami as ISearchItem);
+  t.deepEqual(shouldValid(arr), new Array(arr.length).fill(null));
 });
 
 test('search with not support provider', async (t) => {

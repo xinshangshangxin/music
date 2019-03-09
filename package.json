@@ -34,6 +34,7 @@
   },
   "devDependencies": {
     "@s4p/eslint-config": "^2.0.1",
+    "@types/joi": "^14.3.2",
     "@types/lodash": "^4.14.121",
     "@types/node": "^11.9.5",
     "@types/request-promise": "^4.1.42",
@@ -52,6 +53,7 @@
     "gulp-replace": "^1.0.0",
     "gulp-sourcemaps": "^2.6.5",
     "gulp-typescript": "^5.0.0-alpha.3",
+    "joi": "^14.3.1",
     "node-notifier": "^5.2.1",
     "nodemon": "^1.18.10",
     "nyc": "^13.3.0",
