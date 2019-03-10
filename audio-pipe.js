@@ -44,7 +44,7 @@ async function audioPipe(res, filePath, rangeHeader) {
     res.setHeader('Content-Length', size);
   } else {
     res.statusCode = 206;
-    res.setHeader('Content-Length', len);
+    res.setHeader('Content-Length', end - start + 1);
 
     res.setHeader('Accept-Ranges', 'bytes');
     res.setHeader('Content-Range', `bytes ${start}-${end}/${size}`);
