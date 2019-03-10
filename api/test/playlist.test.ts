@@ -23,7 +23,7 @@ test('playlist xiami', async (t) => {
 test('playlist with not support provider', async (t) => {
   let err;
   try {
-    await playlist('unknown-provider' as Provider,'');
+    await playlist('unknown-provider' as Provider, '');
   } catch (e) {
     err = e;
   }

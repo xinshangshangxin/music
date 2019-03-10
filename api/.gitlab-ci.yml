@@ -27,4 +27,13 @@ release:
     - echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > ~/.npmrc
     - npm publish
   only:
-    - tags
+    - /^v\d+\.\d+\.\d+$/
+
+prerelease:
+  stage: release
+  script:
+    - cd ${PUBLISH_PATH}
+    - echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > ~/.npmrc
+    - npm publish --tag beta
+  only:
+    - /^v\d+\.\d+\.\d+-.*$/

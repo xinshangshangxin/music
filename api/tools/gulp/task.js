@@ -11,8 +11,8 @@ const { spawn } = require('child_process');
 const tsProject = ts.createProject('tsconfig.json', {
   allowJs: false,
   checkJs: false,
-  declaration: false,
-  declarationMap: false,
+  declaration: true,
+  declarationMap: true,
   sourceMap: true,
   rootDir: './src',
   outDir: './dist',

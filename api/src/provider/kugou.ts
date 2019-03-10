@@ -2,6 +2,7 @@ import get from 'lodash/get';
 import { CoreOptions } from 'request';
 import rp from 'request-promise';
 
+import { Privilege } from '../common/privilege';
 import { Provider } from '../common/provider';
 import { RankType } from '../common/rank';
 import { ISearchItem, ISearchQuery, ISearchSong } from '../common/search';
@@ -29,6 +30,25 @@ class Kugou {
 
   private static getId(song: any) {
     return song.hash || song['320hash'] || song.sqhash;
+  }
+
+  private static getPrivilege(data: any): Privilege {
+    let privilege = get(data, 'privilege', 0);
+    let privilege2 = get(data, 'privilege2', 0);
+
+    if (privilege2 === '1010') {
+      return Privilege.deny;
+    }
+
+    if (privilege === 5) {
+      return Privilege.deny;
+    }
+
+    if ([0, 8, 10].includes(privilege)) {
+      return Privilege.allow;
+    }
+
+    return Privilege.unknown;
   }
 
   setRequestOptions(options?: CoreOptions) {
@@ -102,6 +122,7 @@ class Kugou {
 
       let [singer, songName] = filename.split('-');
       return {
+        privilege: Kugou.getPrivilege(song),
         provider: Provider.kugou,
         id: Kugou.getId(song),
         name: formatStr(songName),
@@ -136,6 +157,7 @@ class Kugou {
 
     return songs.map((song: any) => {
       return {
+        privilege: Kugou.getPrivilege(song),
         id: Kugou.getId(song),
         name: song.songname,
         artists: get(song, 'singername', '')
@@ -181,6 +203,7 @@ class Kugou {
     });
 
     return {
+      privilege: Kugou.getPrivilege(get(result, 'data', {})),
       id,
       name: get(result, 'data.song_name'),
       url: get(result, 'data.play_url'),
@@ -218,6 +241,7 @@ class Kugou {
 
       let [singer, songName] = filename.split('-');
       return {
+        privilege: Kugou.getPrivilege(song),
         provider: Provider.kugou,
         id: Kugou.getId(song),
         name: formatStr(songName),
