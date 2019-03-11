@@ -1,6 +1,6 @@
 {
   "name": "@s4p/music-api",
-  "version": "1.10.0-5",
+  "version": "1.10.0-6",
   "description": "music api for kugou,netease,xiami",
   "main": "index.js",
   "scripts": {
