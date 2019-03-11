@@ -208,12 +208,10 @@ export class Netease {
       let result = await neteaseSongUrl({ id, cookie: {}, br: this.bitRateMap[br] }, this.request);
       url = await get(result, 'body.data[0].url');
     } catch (e) {
-      url = `http://music.163.com/song/media/outer/url?id=${id}.mp3`;
+      url = undefined;
     }
-    if (!url) {
-      url = `http://music.163.com/song/media/outer/url?id=${id}.mp3`;
-    }
-    return { url };
+
+    return { url, privilege: url ? Privilege.allow : Privilege.deny };
   }
 
   private async lyric(id: string) {
