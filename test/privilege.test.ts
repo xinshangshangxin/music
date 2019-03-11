@@ -36,6 +36,14 @@ let testCaseMap = {
       provider: Provider.netease,
       id: '29829683',
     },
+    {
+      provider: Provider.netease,
+      id: '1338695683',
+    },
+    {
+      provider: Provider.netease,
+      id: '1344897943',
+    },
 
     {
       provider: Provider.xiami,
