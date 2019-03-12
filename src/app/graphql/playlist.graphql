@@ -1,5 +1,6 @@
 query playlist($provider: Provider!, $id: String!) {
   playlist(provider: $provider, id: $id) {
+    privilege
     provider
     id
     name

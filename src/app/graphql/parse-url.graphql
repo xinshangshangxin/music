@@ -1,5 +1,6 @@
 query parseUrl($url: String!) {
   parseUrl(url: $url) {
+    privilege
     id
     name
     provider

@@ -4,12 +4,10 @@
 
 export const environment = {
   production: false,
-  // backendUrl: 'http://127.0.0.1:3000',
-  // proxyUrl: 'http://127.0.0.1:3000/proxy',
-  backendUrl: '//music.leanapp.cn',
-  proxyUrl: '//music-proxy.leanapp.cn',
-  // backendUrl: '//music-backend.xinshangshangxin.com',
-  // proxyUrl: '//music-backend.xinshangshangxin.com/proxy',
+  backendUrl: 'http://127.0.0.1:3000',
+  proxyUrl: 'http://127.0.0.1:3000/proxy',
+  // backendUrl: '//music.leanapp.cn',
+  // proxyUrl: '//music-proxy.leanapp.cn',
 };
 
 /*

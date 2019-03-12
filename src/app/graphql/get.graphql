@@ -1,5 +1,6 @@
 query get($id: ID!, $provider: Provider!, $br: BitRate, $peakDuration: Int) {
   get(id: $id, provider: $provider, br: $br, peakDuration: $peakDuration) {
+    privilege
     provider
     id
     name

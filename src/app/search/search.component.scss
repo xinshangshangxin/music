@@ -6,8 +6,8 @@
     border-radius: 4px;
     overflow: hidden;
 
-    .playing {
-        background-color: #ededed;
+    .disabled {
+        opacity: 0.45;
     }
 }
 

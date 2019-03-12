@@ -1,5 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
+import { untilDestroyed } from 'ngx-take-until-destroy';
 import { combineLatest, of } from 'rxjs';
 import {
   catchError,
@@ -15,10 +16,10 @@ import {
   GetGQL,
   ISearchItem,
   ParseUrlGQL,
-  SearchGQL,
-  RankGQL,
   Provider,
+  RankGQL,
   RankType,
+  SearchGQL,
 } from '../graphql/generated';
 import { PlayerService } from '../services/player.service';
 import { SearchService } from '../services/search.service';
@@ -28,7 +29,7 @@ import { SearchService } from '../services/search.service';
   templateUrl: './search.component.html',
   styleUrls: ['./search.component.scss'],
 })
-export class SearchComponent implements OnInit {
+export class SearchComponent implements OnInit, OnDestroy {
   public searchList: ISearchItem[];
 
   constructor(
@@ -45,6 +46,8 @@ export class SearchComponent implements OnInit {
     this.search();
   }
 
+  ngOnDestroy() {}
+
   search() {
     let providersSubject = this.searchService.providersSubject.pipe(distinctUntilChanged());
 
@@ -58,10 +61,11 @@ export class SearchComponent implements OnInit {
 
     combineLatest(providersSubject, searchSubject)
       .pipe(
+        tap(([providers, keyword]) => {
+          console.log('tap combineLatest params: ', { providers, keyword });
+        }),
         debounceTime(300),
         switchMap(([providers, keyword]) => {
-          console.log('combineLatest params: ', { providers, keyword });
-
           if (!keyword) {
             return of([]);
           }
@@ -124,10 +128,11 @@ export class SearchComponent implements OnInit {
               })
             );
         }),
-        catchError((e, caught) => {
+        catchError((e) => {
           console.warn(e);
-          return caught;
-        })
+          return of([]);
+        }),
+        untilDestroyed(this)
       )
       .subscribe((searchList) => {
         console.log('searchList: ', searchList);
@@ -135,7 +140,7 @@ export class SearchComponent implements OnInit {
       });
   }
 
-  add(song: ISearchItem, isPlay = false) {
+  add(song: ISearchItem, index: number, isPlay = false) {
     this.getGQL
       .fetch({
         id: song.id,
@@ -144,10 +149,15 @@ export class SearchComponent implements OnInit {
       .pipe(
         map((result) => {
           return result.data.get;
-        })
+        }),
+        untilDestroyed(this)
       )
       .subscribe((playSong) => {
-        this.playerService.add(playSong);
+        let searchSong = this.searchList[index];
+        this.playerService.add({
+          ...searchSong,
+          ...this.playerService.omitUnUsedKey(playSong),
+        });
         if (isPlay) {
           this.playerService.playLast();
         }
