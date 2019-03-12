@@ -1,4 +1,8 @@
 import { Injectable } from '@angular/core';
+import isNil from 'lodash/isNil';
+import omit from 'lodash/omit';
+import omitBy from 'lodash/omitBy';
+import { untilDestroyed } from 'ngx-take-until-destroy';
 import { BehaviorSubject, EMPTY, from, Observable, of } from 'rxjs';
 import {
   catchError,
@@ -12,9 +16,18 @@ import {
 } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
 
-import { AddPeakTimeGQL, GetGQL, Provider, SongDetail } from '../graphql/generated';
+import {
+  AddPeakTimeGQL,
+  GetGQL,
+  ISearchItem,
+  Privilege,
+  Provider,
+  SongDetail,
+} from '../graphql/generated';
 import { IPeakConfig, MyAudio } from '../rx-audio/my-audio';
 import { SongList } from './song-list';
+
+type UpdateSetSong<T> = { [P in keyof T]?: T[P] };
 
 export enum SongState {
   // 正在播放
@@ -219,6 +232,18 @@ export class PlayerService extends SongList {
     this.myAudio.pause();
   }
 
+  omitUnUsedKey(song: SongDetail | ISearchItem) {
+    return omitBy(song, (value) => {
+      let isOmit = false;
+      if (Array.isArray(value)) {
+        isOmit = !value.length;
+      } else {
+        isOmit = isNil(value) || value === '';
+      }
+      return isOmit;
+    });
+  }
+
   private getCurrent(): SongDetail {
     this.checkIndex(this.meta.currentIndex);
     return this.songs[this.meta.currentIndex];
@@ -290,7 +315,11 @@ export class PlayerService extends SongList {
     this.songState = SongState.loading;
 
     if (this.meta.duration !== 0) {
-      if (!song.peakStartTime || song.peakDuration !== this.meta.duration) {
+      if (
+        !song.peakStartTime ||
+        song.peakDuration !== this.meta.duration ||
+        song.privilege === Privilege.deny
+      ) {
         try {
           console.info(`get server peakStartTime with duration ${this.meta.duration}`);
           let { data } = await this.getGql
@@ -303,16 +332,12 @@ export class PlayerService extends SongList {
 
           let { __typename, ...newSong } = data.get;
 
-          if (newSong.peakStartTime) {
-            song = { ...song, ...newSong };
+          song = {
+            ...song,
+            ...this.omitUnUsedKey(newSong),
+          };
 
-            this.saveSongPeakTime(
-              song.id,
-              song.provider,
-              newSong.peakStartTime,
-              newSong.peakDuration
-            );
-          }
+          this.setNewSong(song.id, song.provider, song);
         } catch (e) {
           this.myAudio.events.next({
             type: 'error',
@@ -379,12 +404,10 @@ export class PlayerService extends SongList {
           console.info('updatePeakTime: ', peakResult);
         }),
         map((peakResult) => {
-          this.saveSongPeakTime(
-            peakResult.id,
-            peakResult.provider as Provider,
-            peakResult.peak.startTime,
-            peakResult.peak.duration
-          );
+          this.setNewSong(peakResult.id, peakResult.provider as Provider, {
+            peakStartTime: peakResult.peak.startTime,
+            peakDuration: peakResult.peak.duration,
+          });
 
           return peakResult;
         }),
@@ -416,21 +439,13 @@ export class PlayerService extends SongList {
     return this.songs[(this.meta.currentIndex + step) % this.songs.length];
   }
 
-  private saveSongPeakTime(
-    id: string,
-    provider: Provider,
-    peakStartTime: number,
-    peakDuration: number
-  ) {
+  private setNewSong(id: string, provider: Provider, updateSetSong: UpdateSetSong<SongDetail>) {
     this.updateSong(
       {
         id: id,
         provider: provider,
       },
-      {
-        peakStartTime: peakStartTime,
-        peakDuration: peakDuration,
-      },
+      omit(updateSetSong, ['id', 'provider']),
       this.meta.currentPlaylistId
     );
   }
@@ -479,7 +494,7 @@ export class PlayerService extends SongList {
               }`
             );
             console.timeEnd(`${song.name}`);
-            this.saveSongPeakTime(song.id, song.provider, peakStartTime, peakDuration);
+            this.setNewSong(song.id, song.provider, { peakStartTime, peakDuration });
 
             return false;
           }

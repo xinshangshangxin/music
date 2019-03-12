@@ -1,5 +1,14 @@
-import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  OnDestroy,
+  OnInit,
+  Output,
+  ViewChild,
+} from '@angular/core';
 import { HammerInput, MatDialog, MatMenuTrigger } from '@angular/material';
+import { untilDestroyed } from 'ngx-take-until-destroy';
 import { filter, map } from 'rxjs/operators';
 import { PlayerService } from 'src/app/services/player.service';
 
@@ -11,7 +20,7 @@ import { PlaylistCreateComponent } from '../playlist-create/playlist-create.comp
   templateUrl: './playlist-control.component.html',
   styleUrls: ['./playlist-control.component.scss'],
 })
-export class PlaylistControlComponent implements OnInit {
+export class PlaylistControlComponent implements OnInit, OnDestroy {
   @Input()
   allPlaylist: IPlaylist[];
 
@@ -31,6 +40,10 @@ export class PlaylistControlComponent implements OnInit {
     this.ranks = this.playerService.ranks;
   }
 
+  ngOnDestroy(): void {
+    throw new Error('Method not implemented.');
+  }
+
   create() {
     let data = {};
     const dialogRef = this.matDialog.open(PlaylistCreateComponent, { data });
@@ -43,7 +56,8 @@ export class PlaylistControlComponent implements OnInit {
         }),
         filter(({ name }) => {
           return !!name;
-        })
+        }),
+        untilDestroyed(this)
       )
       .subscribe(({ name }) => {
         this.playerService.createPlaylist(name);
@@ -55,10 +69,6 @@ export class PlaylistControlComponent implements OnInit {
   press(event: HammerInput, item: IPlaylist) {
     console.info('pressed', event, item);
     event.preventDefault();
-
-    if (item.id === this.playerService.tempPlaylistId) {
-      return null;
-    }
 
     this.contextMenuPosition.x = event.center.x + 'px';
     this.contextMenuPosition.y = event.center.y + 'px';

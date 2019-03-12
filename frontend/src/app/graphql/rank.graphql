@@ -1,5 +1,6 @@
 query rank($provider: Provider!, $rankType: RankType) {
   rank(provider: $provider, rankType: $rankType) {
+    privilege
     id
     name
     provider

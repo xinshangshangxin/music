@@ -8,6 +8,11 @@
     .playing {
         background-color: #ededed;
     }
+
+    .disabled {
+        background-color: #ededed;
+        opacity: 0.45;
+    }
 }
 
 .song-box {
@@ -50,11 +55,7 @@
         flex: 0 0 45px;
         display: flex;
         justify-content: space-around;
-
-        color: #ccc;
-        .drag {
-            cursor: move;
-        }
+        cursor: pointer;
 
         .material-icons {
             font-size: 20px;

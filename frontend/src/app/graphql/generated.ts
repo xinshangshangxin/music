@@ -36,6 +36,8 @@ export interface ISearchItem {
   artists: (ISearchArtist | null)[];
 
   album?: ISearchAlbum | null;
+
+  privilege: Privilege;
 }
 
 export interface ISearchArtist {
@@ -72,6 +74,8 @@ export interface SongDetail {
   peakDuration?: number | null;
 
   peaks?: (IPeaks | null)[] | null;
+
+  privilege: Privilege;
 }
 
 export interface IPeaks {
@@ -189,6 +193,13 @@ export enum Provider {
   xiami = 'xiami',
 }
 
+export enum Privilege {
+  deny = 'deny',
+  allow = 'allow',
+  audition = 'audition',
+  unknown = 'unknown',
+}
+
 export enum BitRate {
   mid = 'mid',
   high = 'high',
@@ -237,6 +248,8 @@ export namespace Get {
 
   export type Get = {
     __typename?: 'SongDetail';
+
+    privilege: Privilege;
 
     provider: Provider;
 
@@ -288,6 +301,8 @@ export namespace ParseUrl {
   export type ParseUrl = {
     __typename?: 'ISearchItem';
 
+    privilege: Privilege;
+
     id: string;
 
     name: string;
@@ -327,6 +342,8 @@ export namespace Playlist {
   export type Playlist = {
     __typename?: 'ISearchItem';
 
+    privilege: Privilege;
+
     provider: Provider;
 
     id: string;
@@ -358,6 +375,8 @@ export namespace Rank {
   export type Rank = {
     __typename?: 'ISearchItem';
 
+    privilege: Privilege;
+
     id: string;
 
     name: string;
@@ -388,6 +407,8 @@ export namespace Search {
 
   export type Search = {
     __typename?: 'ISearchItem';
+
+    privilege: Privilege;
 
     id: string;
 
@@ -444,6 +465,7 @@ export class GetGQL extends Apollo.Query<Get.Query, Get.Variables> {
   document: any = gql`
     query get($id: ID!, $provider: Provider!, $br: BitRate, $peakDuration: Int) {
       get(id: $id, provider: $provider, br: $br, peakDuration: $peakDuration) {
+        privilege
         provider
         id
         name
@@ -470,6 +492,7 @@ export class ParseUrlGQL extends Apollo.Query<ParseUrl.Query, ParseUrl.Variables
   document: any = gql`
     query parseUrl($url: String!) {
       parseUrl(url: $url) {
+        privilege
         id
         name
         provider
@@ -490,6 +513,7 @@ export class PlaylistGQL extends Apollo.Query<Playlist.Query, Playlist.Variables
   document: any = gql`
     query playlist($provider: Provider!, $id: String!) {
       playlist(provider: $provider, id: $id) {
+        privilege
         provider
         id
         name
@@ -507,6 +531,7 @@ export class RankGQL extends Apollo.Query<Rank.Query, Rank.Variables> {
   document: any = gql`
     query rank($provider: Provider!, $rankType: RankType) {
       rank(provider: $provider, rankType: $rankType) {
+        privilege
         id
         name
         provider
@@ -524,6 +549,7 @@ export class SearchGQL extends Apollo.Query<Search.Query, Search.Variables> {
   document: any = gql`
     query search($keyword: String!, $providers: [Provider]) {
       search(keyword: $keyword, providers: $providers) {
+        privilege
         id
         name
         provider

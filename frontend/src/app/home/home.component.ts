@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild, OnDestroy } from '@angular/core';
 import { MatSelectChange, MatSidenav } from '@angular/material';
 import { Router } from '@angular/router';
 import { of } from 'rxjs';
@@ -8,13 +8,14 @@ import { ISearchItem } from '../graphql/generated';
 import { PlayerService } from '../services/player.service';
 import { SearchService } from '../services/search.service';
 import { IPlaylist } from '../services/song-list';
+import { untilDestroyed } from 'ngx-take-until-destroy';
 
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss'],
 })
-export class HomeComponent implements OnInit {
+export class HomeComponent implements OnInit, OnDestroy {
   public searchValue = '';
 
   public searchList: ISearchItem[];
@@ -85,7 +86,8 @@ export class HomeComponent implements OnInit {
         catchError((e) => {
           console.warn(e);
           return of(false);
-        })
+        }),
+        untilDestroyed(this)
       )
       .subscribe(() => {
         this.searchValue = '';
@@ -97,7 +99,7 @@ export class HomeComponent implements OnInit {
   ngOnInit() {
     this.duration = this.playerService.duration;
 
-    this.searchService.searchSubject.subscribe((value) => {
+    this.searchService.searchSubject.pipe(untilDestroyed(this)).subscribe((value) => {
       if (value && this.router.url === this.homeUrl) {
         console.info('navigate to search');
         this.router.navigate(['search']);
@@ -153,6 +155,8 @@ export class HomeComponent implements OnInit {
     this.router.navigate(['search']);
     this.searchService.searchSubject.next(id);
   }
+
+  ngOnDestroy(): void {}
 
   private setPlaylistName() {
     let playlist = this.playerService.getPlaylist();

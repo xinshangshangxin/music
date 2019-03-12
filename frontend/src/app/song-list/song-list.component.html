@@ -1,9 +1,12 @@
 <div class="song-list">
   <div
     #perSong
-    [ngClass]="{ playing: playerService.meta.currentIndex === i }"
     class="song-box"
     *ngFor="let song of playList; index as i"
+    [ngClass]="{
+      playing: playerService.meta.currentIndex === i,
+      disabled: song.privilege === 'deny'
+    }"
     (click)="play(i)"
   >
     <span class="song-info">
@@ -25,7 +28,13 @@
       </span>
     </span>
     <span class="song-control" (click)="$event.stopPropagation()">
-      <i class="material-icons" (click)="remove(i)">delete</i>
+      <i class="material-icons" mat-button [matMenuTriggerFor]="menu">more_vert</i>
     </span>
+    <mat-menu #menu="matMenu">
+      <button mat-menu-item (click)="remove(i)">
+        <mat-icon>delete</mat-icon>
+        <span>delete</span>
+      </button>
+    </mat-menu>
   </div>
 </div>
