@@ -3,21 +3,22 @@ export const SongSchema = {
     type: String,
     required: true,
   },
+  privilege: {
+    type: String,
+    required: true,
+  },
   provider: {
     type: String,
     required: true,
   },
   name: {
     type: String,
-    required: true,
   },
   lrc: {
     type: String,
-    required: true,
   },
   album: {
     type: Object,
-    required: true,
   },
   artists: {
     type: Array,

@@ -7,6 +7,13 @@ import { parse as urlParse } from 'url';
 
 import { SongService } from '../song/song.service';
 
+enum Privilege {
+  allow = 'allow',
+  deny = 'deny',
+  audition = 'audition',
+  unknown = 'unknown',
+}
+
 @Injectable()
 export class KugouUrlParseService {
   supportedUrlReg = {
@@ -26,6 +33,24 @@ export class KugouUrlParseService {
           'Mozilla/5.0 (Linux; Android 5.0; SM-G900P Build/LRX21T) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.80 Mobile Safari/537.36',
       },
     });
+  }
+
+  private static getPrivilege(data: any): Privilege {
+    let privilege = get(data, 'data.privilege', 0);
+
+    if (privilege === 5) {
+      return Privilege.deny;
+    }
+
+    if (privilege === 8) {
+      return Privilege.audition;
+    }
+
+    if (privilege === 0) {
+      return Privilege.allow;
+    }
+
+    return Privilege.unknown;
   }
 
   async rawShare(url: string) {
@@ -100,6 +125,7 @@ export class KugouUrlParseService {
       let [singer, songName] = (item.name || '').split(' - ');
 
       return {
+        privilege: Privilege.unknown,
         provider: Provider.kugou,
         id: item.hash,
         name: (songName || '').trim(),

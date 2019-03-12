@@ -1,12 +1,17 @@
 import { Controller, Get, Headers, Query, Res } from '@nestjs/common';
 import { BitRate, Provider } from '@s4p/music-api';
+import bb from 'bluebird';
 
 import { audioPipe } from '../services/AudioPipeService';
 import { DownloadService } from '../song/download.service';
+import { ConfigService } from '../config/config.service';
 
 @Controller('proxy')
 export class ProxyController {
-  constructor(private downloadService: DownloadService) {}
+  constructor(
+    private downloadService: DownloadService,
+    private config: ConfigService,
+  ) {}
 
   @Get()
   async pipe(
@@ -19,7 +24,12 @@ export class ProxyController {
     console.info({ id, provider, br });
 
     try {
-      let realPath = await this.downloadService.download({ id, provider, br });
+      let realPath = await bb
+        .try(() => {
+          return this.downloadService.download({ id, provider, br });
+        })
+        .timeout(this.config.downloadTimeout);
+
       await audioPipe(res, realPath, range);
     } catch (e) {
       console.warn(e);

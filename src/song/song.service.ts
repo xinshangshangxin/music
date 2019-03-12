@@ -1,13 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import {
+  album,
   BitRate,
   getSong,
+  ISong,
   playlist,
   Provider,
   rank,
   RankType,
   search,
-  album,
 } from '@s4p/music-api';
 import { InjectModel } from '@s4p/nest-nmdb';
 import { IModel } from '@s4p/nmdb';
@@ -35,7 +36,11 @@ export class SongService {
       this.songPeakService.getPeak(id, provider, peakDuration),
     ]);
 
-    return { ...peak, provider, ...song };
+    return {
+      ...peak,
+      provider,
+      ...song,
+    };
   }
 
   async search({
@@ -83,7 +88,9 @@ export class SongService {
   }
 
   async rank(provider: Provider, rankType?: RankType) {
-    return rank(provider, rankType);
+    let data = await rank(provider, rankType);
+    console.info(data);
+    return data;
   }
 
   async playlist(provider: Provider, id: string) {
@@ -113,26 +120,39 @@ export class SongService {
     id: string,
     provider: Provider,
     br?: BitRate,
-  ): Promise<any> {
+  ): Promise<ISong> {
     let baseSong = await getSong(id, provider, br);
+    if (!baseSong.artists) {
+      baseSong.artists = [];
+    }
+
+    if (baseSong.album && !baseSong.album.name) {
+      delete baseSong.album;
+    }
+
+    console.info(baseSong);
 
     delete baseSong.url;
 
-    await this.SongModel.updateOne(
-      {
-        id: baseSong.id,
-        provider,
-      },
-      {
-        $set: {
+    try {
+      await this.SongModel.updateOne(
+        {
+          id: baseSong.id,
           provider,
-          ...baseSong,
         },
-      },
-      {
-        upsert: true,
-      },
-    );
+        {
+          $set: {
+            provider,
+            ...baseSong,
+          },
+        },
+        {
+          upsert: true,
+        },
+      );
+    } catch (e) {
+      console.warn(e);
+    }
 
     return baseSong;
   }

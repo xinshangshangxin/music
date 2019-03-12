@@ -7,6 +7,7 @@ interface EnvConfig {
   nmdbUrl: string;
   port: number;
   saveDir: string;
+  downloadTimeout: number;
 }
 
 @Injectable()
@@ -41,6 +42,10 @@ export class ConfigService {
     return this.envConfig.saveDir;
   }
 
+  get downloadTimeout(): number {
+    return this.envConfig.downloadTimeout;
+  }
+
   private validateInput(envConfig: EnvConfig): EnvConfig {
     const envVarsSchema: Joi.ObjectSchema = Joi.object({
       nmdbUrl: Joi.string().required(),
@@ -48,6 +53,7 @@ export class ConfigService {
       appId: Joi.string(),
       port: Joi.number().default(3000),
       saveDir: Joi.string(),
+      downloadTimeout: Joi.number().default(10000),
     });
 
     const { error, value: validatedEnvConfig } = Joi.validate(
