@@ -11,6 +11,13 @@ enum BitRate {
   hq
 }
 
+enum Privilege {
+  deny
+  allow
+  audition
+  unknown
+}
+
 enum RankType {
   new
   hot
@@ -33,6 +40,7 @@ type ISearchAlbum {
 }
 
 type ISearchItem {
+  privilege: Privilege!
   provider: Provider!
   id: String!
   name: String!
@@ -46,6 +54,7 @@ type IPeaks {
 }
 
 type SongDetail {
+  privilege: Privilege!
   id: String!
   name: String!
   provider: Provider!

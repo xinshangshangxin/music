@@ -161,15 +161,15 @@
   resolved "https://registry.npmjs.org/@protobufjs/utf8/-/utf8-1.1.0.tgz#a777360b5b39a1a2e5106f8e858f2fd2d060c570"
   integrity sha1-p3c2C1s5oaLlEG+OhY8v0tBgxXA=
 
-"@s4p/music-api@^1.8.0":
-  version "1.8.0"
-  resolved "https://registry.npmjs.org/@s4p/music-api/-/music-api-1.8.0.tgz#624aab0ba9ee34fab29f375c8e0faed9f6c7989f"
-  integrity sha512-lzngdMVi2qR1pud90xQsFz8q8cddBR4oDXGMEQysnnUQITVfDeWJ2i2Qkh4rAv8/MkHyc79sGMI8fE136xIbaA==
+"@s4p/music-api@^1.10.0-7":
+  version "1.10.0-7"
+  resolved "https://registry.npmjs.org/@s4p/music-api/-/music-api-1.10.0-7.tgz#46f39f69dccb972987f2cb9a10658a6aa9f26305"
+  integrity sha512-k2XvrYq/0mr+nuzI8ZAJMhtNIjK7r8mP6lLgSJKw2WLzpIvwTDzWu3cx+DMWbv94NDXSGsBUYglHL4lBsvutQQ==
   dependencies:
     NeteaseCloudMusicApi Binaryify/NeteaseCloudMusicApi
     lodash "^4.17.11"
     request "^2.88.0"
-    request-promise "^4.2.2"
+    request-promise "^4.2.4"
     tslib "^1.9.3"
 
 "@s4p/nest-nmdb@^0.0.1":
@@ -295,6 +295,11 @@
   version "0.0.29"
   resolved "https://registry.npmjs.org/@types/json5/-/json5-0.0.29.tgz#ee28707ae94e11d2b827bcbe5270bcea7f3e71ee"
   integrity sha1-7ihweulOEdK4J7y+UnC86n8+ce4=
+
+"@types/lodash@^4.14.121":
+  version "4.14.121"
+  resolved "https://registry.npmjs.org/@types/lodash/-/lodash-4.14.121.tgz#9327e20d49b95fc2bf983fc2f045b2c6effc80b9"
+  integrity sha512-ORj7IBWj13iYufXt/VXrCNMbUuCTJfhzme5kx9U/UtcIPdJYuvPDUAlHlbNhz/8lKCLy9XGIZnGrqXOtQbPGoQ==
 
 "@types/long@^4.0.0":
   version "4.0.0"
@@ -532,7 +537,7 @@
   resolved "https://registry.npmjs.org/@xtuc/long/-/long-4.2.1.tgz#5c85d662f76fa1d34575766c5dcd6615abcd30d8"
   integrity sha512-FZdkNBDqBRHKQ2MEbSC17xnPFOhZxeJ2YGSfr2BKf3sujG49Qe3bB+rGCwQfIaA7WHnGeGkSijX4FuBCdrzW/g==
 
-"NeteaseCloudMusicApi@github:Binaryify/NeteaseCloudMusicApi":
+NeteaseCloudMusicApi@Binaryify/NeteaseCloudMusicApi:
   version "3.4.0"
   resolved "https://codeload.github.com/Binaryify/NeteaseCloudMusicApi/tar.gz/01497fcd77297bf3c0cc7266e8e9ad5696e395bd"
   dependencies:
@@ -6335,6 +6340,13 @@ request-promise-core@1.1.1:
   dependencies:
     lodash "^4.13.1"
 
+request-promise-core@1.1.2:
+  version "1.1.2"
+  resolved "https://registry.npmjs.org/request-promise-core/-/request-promise-core-1.1.2.tgz#339f6aababcafdb31c799ff158700336301d3346"
+  integrity sha512-UHYyq1MO8GsefGEt7EprS8UrXsm1TxEvFUX1IMTuSLU2Rh7fTIdFtl8xD7JiEYiWU2dl+NYAjCTksTehQUxPag==
+  dependencies:
+    lodash "^4.17.11"
+
 request-promise-native@^1.0.5:
   version "1.0.5"
   resolved "https://registry.npmjs.org/request-promise-native/-/request-promise-native-1.0.5.tgz#5281770f68e0c9719e5163fd3fab482215f4fda5"
@@ -6344,15 +6356,15 @@ request-promise-native@^1.0.5:
     stealthy-require "^1.1.0"
     tough-cookie ">=2.3.3"
 
-request-promise@^4.2.2:
-  version "4.2.2"
-  resolved "https://registry.npmjs.org/request-promise/-/request-promise-4.2.2.tgz#d1ea46d654a6ee4f8ee6a4fea1018c22911904b4"
-  integrity sha1-0epG1lSm7k+O5qT+oQGMIpEZBLQ=
+request-promise@^4.2.4:
+  version "4.2.4"
+  resolved "https://registry.npmjs.org/request-promise/-/request-promise-4.2.4.tgz#1c5ed0d71441e38ad58c7ce4ea4ea5b06d54b310"
+  integrity sha512-8wgMrvE546PzbR5WbYxUQogUnUDfM0S7QIFZMID+J73vdFARkFy+HElj4T+MWYhpXwlLp0EQ8Zoj8xUA0he4Vg==
   dependencies:
     bluebird "^3.5.0"
-    request-promise-core "1.1.1"
-    stealthy-require "^1.1.0"
-    tough-cookie ">=2.3.3"
+    request-promise-core "1.1.2"
+    stealthy-require "^1.1.1"
+    tough-cookie "^2.3.3"
 
 request@^2.85.0, request@^2.87.0, request@^2.88.0:
   version "2.88.0"
@@ -6912,7 +6924,7 @@ std-env@^1.1.0:
   dependencies:
     is-ci "^1.1.0"
 
-stealthy-require@^1.1.0:
+stealthy-require@^1.1.0, stealthy-require@^1.1.1:
   version "1.1.1"
   resolved "https://registry.npmjs.org/stealthy-require/-/stealthy-require-1.1.1.tgz#35b09875b4ff49f26a777e509b3090a3226bf24b"
   integrity sha1-NbCYdbT/SfJqd35QmzCQoyJr8ks=
@@ -7298,7 +7310,7 @@ tough-cookie@>=2.3.3:
     psl "^1.1.28"
     punycode "^2.1.1"
 
-tough-cookie@^2.3.4:
+tough-cookie@^2.3.3, tough-cookie@^2.3.4:
   version "2.5.0"
   resolved "https://registry.npmjs.org/tough-cookie/-/tough-cookie-2.5.0.tgz#cd9fb2a0aa1d5a12b473bd9fb96fa3dcff65ade2"
   integrity sha512-nlLsUzgm1kfLXSXfRZMc1KLAugd4hqJHDTvc2hDIwS3mZAfMEuMbc03SujMF+GEcpaX/qboeycw6iO8JwVv2+g==
