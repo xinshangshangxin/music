@@ -71,12 +71,19 @@ export class Netease {
       return Privilege.deny;
     }
 
-    if (st === 0 && fee === 0) {
+    // 需要付费
+    if (fee === 4) {
+      return Privilege.deny;
+    }
+
+    // 128K 免费, 更高需要会员
+    if (fee === 8) {
       return Privilege.allow;
     }
 
-    if (st === 0 && fee > 0) {
-      return Privilege.deny;
+    // 免费
+    if (fee === 0) {
+      return Privilege.allow;
     }
 
     return Privilege.unknown;
@@ -102,13 +109,17 @@ export class Netease {
   }
 
   async getSong(id: string, br?: BitRate): Promise<ISong> {
-    let [detailResult, songUrlResult, lyricResult] = await Promise.all([
+    let [detailResult, { url }, lyricResult] = await Promise.all([
       this.detail(id),
       this.songUrl(id, br),
       this.lyric(id),
     ]);
 
-    return { ...detailResult, ...songUrlResult, ...lyricResult };
+    return {
+      ...detailResult,
+      ...lyricResult,
+      ...{ url: url || `http://music.163.com/song/media/outer/url?id=${id}.mp3` },
+    };
   }
 
   async rank(type: RankType, limit = 0, skip = 0) {
@@ -208,11 +219,9 @@ export class Netease {
       let result = await neteaseSongUrl({ id, cookie: {}, br: this.bitRateMap[br] }, this.request);
       url = await get(result, 'body.data[0].url');
     } catch (e) {
-      url = `http://music.163.com/song/media/outer/url?id=${id}.mp3`;
+      url = undefined;
     }
-    if (!url) {
-      url = `http://music.163.com/song/media/outer/url?id=${id}.mp3`;
-    }
+
     return { url };
   }
 
