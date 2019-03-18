@@ -26,7 +26,7 @@
     "@nestjs/common": "^5.1.0",
     "@nestjs/core": "^5.1.0",
     "@nestjs/graphql": "^5.4.0",
-    "@s4p/music-api": "^1.10.0-7",
+    "@s4p/music-api": "^1.10.0",
     "@s4p/nest-nmdb": "^0.0.1",
     "@s4p/nmdb": "^0.3.0",
     "apollo-server-express": "^2.1.0",
