@@ -9,7 +9,7 @@ const port = process.env.LEANCLOUD_APP_PORT || 3000;
 
 http
   .createServer(async (req, res) => {
-    res.setHeader('Access-Control-Allow-Origin', req.headers.headers || '*');
+    res.setHeader('Access-Control-Allow-Origin', req.headers.origin || '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
     res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
     res.setHeader('Access-Control-Allow-Credentials', true);
