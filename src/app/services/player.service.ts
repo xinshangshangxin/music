@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 import isNil from 'lodash/isNil';
 import omit from 'lodash/omit';
 import omitBy from 'lodash/omitBy';
-import { untilDestroyed } from 'ngx-take-until-destroy';
 import { BehaviorSubject, EMPTY, from, Observable, of } from 'rxjs';
 import {
   catchError,
@@ -146,6 +145,10 @@ export class PlayerService extends SongList {
     this.persistMeta();
   }
 
+  replace(index: number, song: SongDetail) {
+    this.updateSong(index, song, this.meta.currentPlaylistId);
+  }
+
   add(song: SongDetail) {
     this.addSong(song);
   }
@@ -183,6 +186,10 @@ export class PlayerService extends SongList {
     this.songState = SongState.loading;
     this.play(song);
     this.persistMeta();
+  }
+
+  playTemp(song: SongDetail): void {
+    this.play(song);
   }
 
   previous(): void {

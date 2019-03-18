@@ -7,11 +7,13 @@ import {
   QueryList,
   ViewChildren,
 } from '@angular/core';
+import { Router } from '@angular/router';
 import { untilDestroyed } from 'ngx-take-until-destroy';
 import { debounceTime, map } from 'rxjs/operators';
 
 import { ISearchArtist, SongDetail } from '../graphql/generated';
 import { PlayerService } from '../services/player.service';
+import { SearchService } from '../services/search.service';
 
 @Component({
   selector: 'app-song-list',
@@ -23,7 +25,11 @@ export class SongListComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private nativeSongDivs: HTMLDivElement[] = [];
 
-  constructor(public playerService: PlayerService) {}
+  constructor(
+    public playerService: PlayerService,
+    private router: Router,
+    private searchService: SearchService
+  ) {}
 
   @ViewChildren('perSong')
   songDivs: QueryList<any>;
@@ -75,6 +81,11 @@ export class SongListComponent implements OnInit, AfterViewInit, OnDestroy {
 
   remove(index: number) {
     this.playerService.remove(index);
+  }
+
+  searchSame(song: SongDetail, index: number) {
+    this.searchService.searchSubject.next(`${song.name} ${this.formatArtists(song.artists)}`);
+    this.router.navigate(['search'], { queryParams: { index, excludeProvider: song.provider } });
   }
 
   formatArtists(artists: ISearchArtist[]) {
