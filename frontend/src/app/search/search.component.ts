@@ -1,7 +1,7 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
-import { Router } from '@angular/router';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
 import { untilDestroyed } from 'ngx-take-until-destroy';
-import { combineLatest, of } from 'rxjs';
+import { combineLatest, from, of } from 'rxjs';
 import {
   catchError,
   debounceTime,
@@ -31,6 +31,7 @@ import { SearchService } from '../services/search.service';
 })
 export class SearchComponent implements OnInit, OnDestroy {
   public searchList: ISearchItem[];
+  public index = -1;
 
   constructor(
     private readonly searchService: SearchService,
@@ -39,7 +40,8 @@ export class SearchComponent implements OnInit, OnDestroy {
     private getGQL: GetGQL,
     private parseUrlGQL: ParseUrlGQL,
     private rankGQL: RankGQL,
-    private playerService: PlayerService
+    private playerService: PlayerService,
+    private activatedRoute: ActivatedRoute
   ) {}
 
   ngOnInit() {
@@ -59,74 +61,24 @@ export class SearchComponent implements OnInit, OnDestroy {
       })
     );
 
-    combineLatest(providersSubject, searchSubject)
+    combineLatest(providersSubject, searchSubject, this.activatedRoute.queryParams)
       .pipe(
-        tap(([providers, keyword]) => {
-          console.log('tap combineLatest params: ', { providers, keyword });
+        tap(([providers, keyword, { index, excludeProvider }]) => {
+          console.log('tap combineLatest params: ', { providers, keyword, index, excludeProvider });
         }),
         debounceTime(300),
-        switchMap(([providers, keyword]) => {
+        switchMap(([providers, keyword, { index, excludeProvider }]) => {
           if (!keyword) {
-            return of([]);
+            return from(this.router.navigate(['']));
+          } else if (index >= 0) {
+            return this.parseReplaceSong({ keyword, index: parseInt(index, 10), excludeProvider });
+          } else if (/^\s*http/.test(keyword)) {
+            return this.parseUrl(keyword);
+          } else if (/^\s*rank-(kugou|xiami|netease)(-(hot|new))?\s*$/.test(keyword)) {
+            return this.parseRank(keyword);
+          } else {
+            return this.parseSearch(keyword, providers);
           }
-
-          if (/^\s*http/.test(keyword)) {
-            return this.parseUrlGQL
-              .fetch({
-                url: keyword,
-              })
-              .pipe(
-                map((result) => {
-                  return result.data.parseUrl || [];
-                }),
-                map((songs) => {
-                  this.playerService.updatePlaylist(undefined, undefined, songs);
-                  this.playerService.playAt(0);
-                }),
-                delay(200),
-                map(() => {
-                  this.router.navigate(['']);
-                })
-              );
-          }
-
-          if (/^\s*rank-(kugou|xiami|netease)(-(hot|new))?\s*$/.test(keyword)) {
-            let providerName = RegExp.$1 as keyof Provider;
-            let rankTypeName = RegExp.$3 as keyof RankType;
-
-            console.info('providerName: ', providerName);
-            console.info('rankTypeName: ', rankTypeName);
-
-            return this.rankGQL
-              .fetch({
-                provider: Provider[providerName],
-                rankType: RankType[rankTypeName],
-              })
-              .pipe(
-                map((result) => {
-                  return result.data.rank || [];
-                }),
-                map((songs) => {
-                  this.playerService.updatePlaylist(undefined, undefined, songs);
-                  this.playerService.playAt(0);
-                }),
-                delay(200),
-                map(() => {
-                  this.router.navigate(['']);
-                })
-              );
-          }
-
-          return this.searchGQL
-            .fetch({
-              keyword,
-              providers,
-            })
-            .pipe(
-              map((result) => {
-                return result.data.search;
-              })
-            );
         }),
         catchError((e) => {
           console.warn(e);
@@ -134,10 +86,93 @@ export class SearchComponent implements OnInit, OnDestroy {
         }),
         untilDestroyed(this)
       )
-      .subscribe((searchList) => {
-        console.log('searchList: ', searchList);
-        this.searchList = searchList;
+      .subscribe(() => {});
+  }
+
+  parseUrl(keyword: string) {
+    return this.parseUrlGQL
+      .fetch({
+        url: keyword,
+      })
+      .pipe(
+        map((result) => {
+          return result.data.parseUrl || [];
+        }),
+        map((songs) => {
+          this.playerService.updatePlaylist(undefined, undefined, songs);
+          this.playerService.playAt(0);
+        }),
+        delay(200),
+        map(() => {
+          return from(this.router.navigate(['']));
+        })
+      );
+  }
+
+  parseRank(keyword: string) {
+    /^\s*rank-(kugou|xiami|netease)(-(hot|new))?\s*$/.test(keyword);
+
+    let providerName = RegExp.$1 as keyof Provider;
+    let rankTypeName = RegExp.$3 as keyof RankType;
+
+    console.info('providerName: ', providerName);
+    console.info('rankTypeName: ', rankTypeName);
+
+    return this.rankGQL
+      .fetch({
+        provider: Provider[providerName],
+        rankType: RankType[rankTypeName],
+      })
+      .pipe(
+        map((result) => {
+          return result.data.rank || [];
+        }),
+        map((songs) => {
+          this.playerService.updatePlaylist(undefined, undefined, songs);
+          this.playerService.playAt(0);
+        }),
+        delay(200),
+        map(() => {
+          return from(this.router.navigate(['']));
+        })
+      );
+  }
+
+  parseSearch(keyword: string, providers: Provider[]) {
+    return this.searchGQL
+      .fetch({
+        keyword,
+        providers,
+      })
+      .pipe(
+        map((result) => {
+          console.info('result.data.search: ', result.data.search);
+          this.searchList = result.data.search;
+          return of([]);
+        })
+      );
+  }
+
+  parseReplaceSong({
+    keyword,
+    excludeProvider,
+    index,
+  }: {
+    keyword: string;
+    excludeProvider: Provider;
+    index: number;
+  }) {
+    this.index = index;
+
+    let providers = Object.keys(Provider)
+      .filter((item) => {
+        return item !== excludeProvider;
+      })
+      .map((key) => {
+        return Provider[key as Provider];
       });
+
+    return this.parseSearch(keyword, providers);
   }
 
   add(song: ISearchItem, index: number, isPlay = false) {
@@ -161,6 +196,42 @@ export class SearchComponent implements OnInit, OnDestroy {
         if (isPlay) {
           this.playerService.playLast();
         }
+      });
+  }
+
+  play(song: ISearchItem) {
+    this.getGQL
+      .fetch({
+        id: song.id,
+        provider: song.provider,
+      })
+      .pipe(
+        map((result) => {
+          return result.data.get;
+        }),
+        untilDestroyed(this)
+      )
+      .subscribe((playSong) => {
+        this.playerService.playTemp(playSong);
+      });
+  }
+
+  replace(song: ISearchItem) {
+    this.getGQL
+      .fetch({
+        id: song.id,
+        provider: song.provider,
+      })
+      .pipe(
+        map((result) => {
+          return result.data.get;
+        }),
+        untilDestroyed(this)
+      )
+      .subscribe((playSong) => {
+        this.playerService.replace(this.index, playSong);
+        this.playerService.playAt(this.index);
+        this.router.navigate(['']);
       });
   }
 }
