@@ -161,10 +161,10 @@
   resolved "https://registry.npmjs.org/@protobufjs/utf8/-/utf8-1.1.0.tgz#a777360b5b39a1a2e5106f8e858f2fd2d060c570"
   integrity sha1-p3c2C1s5oaLlEG+OhY8v0tBgxXA=
 
-"@s4p/music-api@^1.10.0-7":
-  version "1.10.0-7"
-  resolved "https://registry.npmjs.org/@s4p/music-api/-/music-api-1.10.0-7.tgz#46f39f69dccb972987f2cb9a10658a6aa9f26305"
-  integrity sha512-k2XvrYq/0mr+nuzI8ZAJMhtNIjK7r8mP6lLgSJKw2WLzpIvwTDzWu3cx+DMWbv94NDXSGsBUYglHL4lBsvutQQ==
+"@s4p/music-api@^1.10.0":
+  version "1.10.0"
+  resolved "https://registry.npmjs.org/@s4p/music-api/-/music-api-1.10.0.tgz#d203120d90fd7269ca4e477fd5df0e44c2243792"
+  integrity sha512-w1ziNPYTdDhORxnVU+nTnxIGDREOlv/SmDTOP+Rb27KN9ZR2b/alaq5fDKDzM8xSZ0KU82eXcHWmtTJqjmoIRg==
   dependencies:
     NeteaseCloudMusicApi Binaryify/NeteaseCloudMusicApi
     lodash "^4.17.11"
@@ -537,9 +537,9 @@
   resolved "https://registry.npmjs.org/@xtuc/long/-/long-4.2.1.tgz#5c85d662f76fa1d34575766c5dcd6615abcd30d8"
   integrity sha512-FZdkNBDqBRHKQ2MEbSC17xnPFOhZxeJ2YGSfr2BKf3sujG49Qe3bB+rGCwQfIaA7WHnGeGkSijX4FuBCdrzW/g==
 
-NeteaseCloudMusicApi@Binaryify/NeteaseCloudMusicApi:
-  version "3.4.0"
-  resolved "https://codeload.github.com/Binaryify/NeteaseCloudMusicApi/tar.gz/01497fcd77297bf3c0cc7266e8e9ad5696e395bd"
+"NeteaseCloudMusicApi@github:Binaryify/NeteaseCloudMusicApi":
+  version "3.6.0"
+  resolved "https://codeload.github.com/Binaryify/NeteaseCloudMusicApi/tar.gz/7bf01f1e70ddfbf0fd8654827808e84a18789727"
   dependencies:
     apicache "^1.2.1"
     express "^4.16.3"

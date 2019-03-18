@@ -15,6 +15,7 @@ import { IModel } from '@s4p/nmdb';
 import promiseRetry from 'promise-retry';
 
 import { SongPeakService } from '../song-peak/song-peak.service';
+import { Privilege } from '@s4p/music-api/common/privilege';
 
 @Injectable()
 export class SongService {
@@ -107,9 +108,9 @@ export class SongService {
   }
 
   private async getSongBaseInfo(id: string, provider: Provider, br?: BitRate) {
-    let song = await this.SongModel.findOne({ id, provider });
+    let song: ISong = await this.SongModel.findOne({ id, provider });
 
-    if (song) {
+    if (song && song.privilege !== Privilege.deny) {
       return song;
     }
 
