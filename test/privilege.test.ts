@@ -51,7 +51,7 @@ let testCaseMap = {
     },
     {
       provider: Provider.xiami,
-      id: 'mQ3vjR95254',
+      id: '1769737211',
     },
   ],
   [Privilege.deny]: [

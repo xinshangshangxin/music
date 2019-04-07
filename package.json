@@ -27,17 +27,21 @@
   },
   "dependencies": {
     "NeteaseCloudMusicApi": "Binaryify/NeteaseCloudMusicApi",
+    "he": "^1.2.0",
     "lodash": "^4.17.11",
     "request": "^2.88.0",
     "request-promise": "^4.2.4",
-    "tslib": "^1.9.3"
+    "tslib": "^1.9.3",
+    "xml2js": "^0.4.19"
   },
   "devDependencies": {
     "@s4p/eslint-config": "^2.0.1",
+    "@types/he": "^1.1.0",
     "@types/joi": "^14.3.2",
     "@types/lodash": "^4.14.121",
     "@types/node": "^11.9.5",
     "@types/request-promise": "^4.1.42",
+    "@types/xml2js": "^0.4.4",
     "@typescript-eslint/eslint-plugin": "^1.4.2",
     "ava": "^1.2.1",
     "del": "^3.0.0",
