@@ -1,13 +1,18 @@
+import { decode } from 'he';
 import get from 'lodash/get';
 import isPlainObject from 'lodash/isPlainObject';
 import { CoreOptions } from 'request';
 import rp from 'request-promise';
+import { promisify } from 'util';
+import { convertableToString, OptionsV2, parseString } from 'xml2js';
 
 import { Privilege } from '../common/privilege';
 import { Provider } from '../common/provider';
 import { RankType } from '../common/rank';
 import { ISearchItem, ISearchQuery, ISearchSong } from '../common/search';
 import { ISong } from '../common/song';
+
+const xml2js = promisify<convertableToString, OptionsV2>(parseString);
 
 class Xiami {
   private defaultConfig = {
@@ -197,10 +202,12 @@ class Xiami {
 
   private async getDetail(id: string): Promise<ISong> {
     let result = await this.request({
-      url: `http://www.xiami.com/song/playlist/id/${id}/type/0/cat/json`,
+      url: `https://www.xiami.com/widget/xml-single/sid/${id}`,
+      json: false,
     });
 
-    let song = get(result, 'data.trackList[0]', {});
+    let obj = await xml2js(result, { explicitArray: false });
+    let song = get(obj, 'trackList.track', {});
 
     let privilege = Xiami.getPrivilege(song);
 
@@ -221,20 +228,20 @@ class Xiami {
 
     return {
       privilege,
-      id: `${song.songId}`,
-      name: song.songName,
+      id: `${song.song_id}`,
+      name: get(song, 'song_name', ''),
       url: Xiami.handleProtocolRelativeUrl(Xiami.caesar(song.location)),
-      lrc: Xiami.handleProtocolRelativeUrl(song.lyric_url),
-      artists: get(song, 'artistVOs', []).map((item: any) => {
-        return {
-          id: `${item.artistId}`,
-          name: item.artistName,
-        };
-      }),
+      artists: get(song, 'artist_name', '')
+        .split(';')
+        .map((name: string) => {
+          return {
+            name: name.trim(),
+          };
+        }),
       album: {
         id: `${song.album_id}`,
-        name: song.album_name,
-        img: Xiami.handleProtocolRelativeUrl(`${song.album_pic}`),
+        name: decode(song.album_name),
+        img: Xiami.handleProtocolRelativeUrl(`${song.album_cover}`),
       },
     };
   }

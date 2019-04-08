@@ -51,13 +51,13 @@ let testCaseMap = {
     },
     {
       provider: Provider.xiami,
-      id: 'mQ3vjR95254',
+      id: '1769737211',
     },
   ],
   [Privilege.deny]: [
     {
       provider: Provider.kugou,
-      keyword: '弦子 第三者的第三者 不爱最大',
+      keyword: '刘瑞琪 晴天 再次寻找周杰伦',
     },
     {
       provider: Provider.kugou,
