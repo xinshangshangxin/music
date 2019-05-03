@@ -1,4 +1,4 @@
-image: node:8-alpine
+image: node:10-alpine
 
 variables:
   PUBLISH_PATH: 'dist/'
@@ -16,9 +16,10 @@ test-build:
     paths:
       - ${PUBLISH_PATH}
   script:
-    - yarn
-    - yarn run coverage
-    - yarn run build
+    - apk add git
+    - npm install --verbose
+    - npm run coverage
+    - npm run build
 
 release:
   stage: release
