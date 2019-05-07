@@ -161,10 +161,10 @@
   resolved "https://registry.npmjs.org/@protobufjs/utf8/-/utf8-1.1.0.tgz#a777360b5b39a1a2e5106f8e858f2fd2d060c570"
   integrity sha1-p3c2C1s5oaLlEG+OhY8v0tBgxXA=
 
-"@s4p/music-api@^1.11.0":
-  version "1.11.0"
-  resolved "https://registry.npmjs.org/@s4p/music-api/-/music-api-1.11.0.tgz#5ad8a9feb81fda37bb8f2a64e733ad9923f68690"
-  integrity sha512-HIYX6o0GkIq+0A7eyrNeM9NOI+B1twIj44YDvuHNgy25IvfCZrjZrVMn48zesoferk/xKwY96TEdhtMPXzLA3A==
+"@s4p/music-api@^1.12.1":
+  version "1.12.1"
+  resolved "https://registry.npm.taobao.org/@s4p/music-api/download/@s4p/music-api-1.12.1.tgz#48befec4a8247fefbbd1e22a1ce2d5ac13ea9c9d"
+  integrity sha1-SL7+xKgkf++70eIqHOLVrBPqnJ0=
   dependencies:
     NeteaseCloudMusicApi Binaryify/NeteaseCloudMusicApi
     he "^1.2.0"
