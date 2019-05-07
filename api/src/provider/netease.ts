@@ -93,7 +93,7 @@ export class Netease {
     if (!options) {
       this.request = neteaseRequest;
     } else {
-      this.request = (method: any, url: any, data: any, originOptions = {}) => {
+      this.request = (method: any, url: any, data: any, originOptions: any = {}) => {
         return neteaseRequest(method, url, data, { ...originOptions, ...options });
       };
     }
