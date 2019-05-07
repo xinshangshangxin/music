@@ -26,6 +26,8 @@ export class SrcAudio extends EventEmitter {
     this.layInDuration = layInDuration;
     this.layOutDuration = layOutDuration;
 
+    // @ts-ignore
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
     this.audioContext = new AudioContext();
 
     this.source = this.audioContext.createMediaElementSource(this.audio);
@@ -116,6 +118,23 @@ export class SrcAudio extends EventEmitter {
 
     this.playing = true;
     this.audio.play();
+
+    this.safariFix(startTime);
+  }
+
+  private safariFix(startTime: number) {
+    if (!/Safari/.test(navigator.userAgent)) {
+      return;
+    }
+
+    this.audio.pause();
+    let fn = () => {
+      this.audio.currentTime = startTime;
+      this.playing = true;
+      this.audio.play();
+      this.audio.removeEventListener('canplay', fn);
+    };
+    this.audio.addEventListener('canplay', fn);
   }
 
   private addEvents() {

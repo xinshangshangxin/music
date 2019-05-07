@@ -31,6 +31,8 @@ export class ArrayBufferAudio extends EventEmitter {
     this.layInDuration = layInDuration;
     this.layOutDuration = layOutDuration;
 
+    // @ts-ignore
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
     this.audioContext = new AudioContext();
     this.gainNode = this.audioContext.createGain();
     this.gainNode.connect(this.audioContext.destination);

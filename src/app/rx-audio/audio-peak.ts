@@ -1,6 +1,8 @@
 export class AudioPeak {
   private audioCtx: AudioContext;
   constructor() {
+    // @ts-ignore
+    const AudioContext = window.AudioContext || window.webkitAudioContext;
     this.audioCtx = new AudioContext();
   }
 
