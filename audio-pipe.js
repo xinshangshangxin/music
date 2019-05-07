@@ -15,7 +15,6 @@ function getRange(rangeHeader, fileSize) {
         range[0] = parseInt(ranges[0], 10);
         if (ranges[1] && ranges[1].length) {
           range[1] = parseInt(ranges[1], 10);
-          range[1] = range[1] < 16 ? 16 : range[1];
         }
       } catch (e) {}
     }
