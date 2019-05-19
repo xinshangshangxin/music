@@ -1,5 +1,5 @@
 import get from 'lodash/get';
-import { CoreOptions } from 'request';
+import request, { CoreOptions } from 'request';
 import rp from 'request-promise';
 
 import { Privilege } from '../common/privilege';
@@ -13,6 +13,13 @@ class Kugou {
   private defaultConfig = {
     json: true,
     timeout: 10000,
+    headers: {
+      // 从 Cookie中可知, kg_mid 可以使用到 2046年, 所以这里就直接写死
+      // 生成方法: 打开页面 http://www.kugou.com/,
+      // 找到 请求 https://staticssl.kugou.com/verify/static/js/registerDev.v1.min.js?appid=1014&20190408
+      // 搜索 mid: a, 顺藤摸瓜 a 的生成方式就能找到
+      cookie: request.cookie('kg_mid=e43cbe7efa05858cc526c3cba7b47c66'),
+    },
   };
 
   private request: typeof rp;
@@ -199,6 +206,11 @@ class Kugou {
       qs: {
         r: 'play/getdata',
         hash,
+      },
+      headers: {
+        Host: 'www.kugou.com',
+        'User-Agent':
+          'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.108 Safari/537.36',
       },
     });
 
