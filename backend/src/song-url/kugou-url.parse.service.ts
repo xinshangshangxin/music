@@ -19,6 +19,7 @@ export class KugouUrlParseService {
   supportedUrlReg = {
     rawShare: /^https?:\/\/\w+\.kugou\.com\/song\.html\?id=(\w+)$/,
     chainShare: /https?:\/\/m\.kugou\.com\/share\/\?chain=(\w+)/,
+    zlistShare: /https?:\/\/\w+\.kugou\.com\/share\/zlist.html/,
     userListShare: /https?:\/\/\w+\.kugou\.com\/\w+/,
   };
 
@@ -85,6 +86,38 @@ export class KugouUrlParseService {
     }
 
     return await this.getUserSongList(url);
+  }
+
+  async zlistShare(url: string) {
+    if (!this.supportedUrlReg.zlistShare.test(url)) {
+      throw new Error('not match zlistShare');
+    }
+
+    let html = await this.client(url);
+
+    if (/var\s+dataFromSmarty\s*=\s*(\[[^\]]+\])/.test(html.body)) {
+      let songs = JSON.parse(RegExp.$1);
+
+      return songs.map(item => {
+        return {
+          privilege: Privilege.unknown,
+          provider: Provider.kugou,
+          id: item.hash,
+          name: (item.song_name || '').trim(),
+          artists: `${item.author_name || ''}`
+            .trim()
+            .split('、')
+            .map(name => {
+              return {
+                name,
+              };
+            }),
+          duration: item.timelength,
+        };
+      });
+    }
+
+    return [];
   }
 
   private async getPlaylistId(url: string) {
