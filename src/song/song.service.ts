@@ -81,7 +81,7 @@ export class SongService {
     }
 
     const baseSong = await getSong(id, provider, br);
-    console.debug({ baseSong });
+    logger.debug({ baseSong });
 
     if (!baseSong.artists) {
       baseSong.artists = [];
