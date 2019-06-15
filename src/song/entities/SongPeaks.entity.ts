@@ -1,13 +1,22 @@
 import { Field, Float, Int, ObjectType } from 'type-graphql';
-import { PrimaryGeneratedColumn, Entity, Column } from 'typeorm';
+import { Column, Entity, Index, PrimaryGeneratedColumn } from 'typeorm';
 
-import { Base } from './Base';
+import { Provider } from '../register-type';
 
 @ObjectType()
 @Entity()
-export class SongPeaks extends Base {
+@Index(['id', 'provider', 'duration'], { unique: true })
+export class SongPeaks {
   @PrimaryGeneratedColumn()
   pkId: number;
+
+  @Field()
+  @Column()
+  id: string;
+
+  @Field(type => Provider)
+  @Column()
+  provider: string;
 
   @Field(type => Int)
   @Column({
