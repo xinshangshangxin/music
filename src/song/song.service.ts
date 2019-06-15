@@ -2,8 +2,9 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { BitRate, getSong, Provider } from '@s4p/music-api';
 import omit from 'lodash/omit';
-import { DeepPartial, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 
+import { createOrUpdate } from '../util/helper';
 import { Album } from './entities/Album.entity';
 import { Artist } from './entities/Artist.entity';
 import { Song } from './entities/Song.entity';
@@ -30,37 +31,7 @@ export class SongService {
     id: string;
     provider: Provider;
   }): Promise<Song> {
-    return await this.getSongFromProvider({ id, provider });
-  }
-
-  private async getSongFromDb({
-    id,
-    provider,
-  }: {
-    id: string;
-    provider: Provider;
-  }): Promise<Song | undefined> {
-    return await this.songRepository.findOne({
-      where: { id, provider },
-      relations: ['artists', 'album'],
-    });
-  }
-
-  private async createOrUpdate<T>(
-    registory: Repository<T>,
-    where: object,
-    entityLike: DeepPartial<T>,
-  ): Promise<T> {
-    let item = await registory.findOne({
-      where,
-    });
-
-    if (item) {
-      return registory.save({ ...item, ...entityLike });
-    }
-
-    item = registory.create(entityLike);
-    return registory.save(item);
+    return await this.getSongWithSave({ id, provider });
   }
 
   private async saveArtist({
@@ -68,7 +39,7 @@ export class SongService {
     provider,
     name,
   }: Omit<Artist, 'pkId'>): Promise<Artist> {
-    return this.createOrUpdate(
+    return createOrUpdate(
       this.artistRepository,
       { id, provider },
       { id, provider, name },
@@ -76,7 +47,7 @@ export class SongService {
   }
 
   private async saveAlbum({ id, provider, name, img }: Omit<Album, 'pkId'>) {
-    return this.createOrUpdate(
+    return createOrUpdate(
       this.albumRepository,
       { id, provider },
       { id, provider, name, img },
@@ -84,14 +55,14 @@ export class SongService {
   }
 
   private async saveSong(song: Omit<Song, 'pkId'>) {
-    return this.createOrUpdate(
+    return createOrUpdate(
       this.songRepository,
       { id: song.id, provider: song.provider },
       song,
     );
   }
 
-  private async getSongFromProvider({
+  private async getSongWithSave({
     id,
     provider,
     br,
@@ -102,6 +73,7 @@ export class SongService {
   }): Promise<Song | undefined> {
     let song = await this.songRepository.findOne({
       where: { id, provider },
+      relations: ['artists', 'album'],
     });
 
     if (song) {

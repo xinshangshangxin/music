@@ -4,17 +4,22 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { SongModule } from './song/song.module';
+import { Album } from './song/entities/Album.entity';
+import { Artist } from './song/entities/Artist.entity';
+import { Song } from './song/entities/Song.entity';
+import { SongResolver } from './song/song.resolver';
+import { SongService } from './song/song.service';
 
 @Module({
   imports: [
-    SongModule,
     TypeOrmModule.forRoot({
       type: 'sqlite',
       database: '/Users/feng/Desktop/music/db',
       entities: [__dirname + '/**/*.entity{.ts,.js}'],
       synchronize: true,
     }),
+    TypeOrmModule.forFeature([Song, Artist, Album]),
+
     GraphQLModule.forRoot({
       debug: true,
       playground: true,
@@ -24,6 +29,6 @@ import { SongModule } from './song/song.module';
     }),
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, SongService, SongResolver],
 })
 export class AppModule {}
