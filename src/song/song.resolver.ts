@@ -1,8 +1,8 @@
 import { Args, Query, Resolver } from '@nestjs/graphql';
 
 import { Song } from './entities/Song.entity';
+import { Provider } from './register-type';
 import { SongService } from './song.service';
-import { Provider } from './type';
 
 @Resolver(of => Song)
 export class SongResolver {
@@ -36,6 +36,7 @@ export class SongResolver {
     @Args({ name: 'provider', type: () => Provider }) provider: Provider,
   ): Promise<Song> {
     console.info({ id, provider });
+    logger.info('asdf', { id, provider });
 
     let song = await this.songService.getSong({ id, provider });
     return song;

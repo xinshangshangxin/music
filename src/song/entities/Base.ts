@@ -1,7 +1,7 @@
 import { Field, ObjectType } from 'type-graphql';
 import { Column, Index, PrimaryGeneratedColumn } from 'typeorm';
 
-import { Provider } from '../type';
+import { Provider } from '../register-type';
 
 @ObjectType()
 @Index(['id', 'provider'], { unique: true })
