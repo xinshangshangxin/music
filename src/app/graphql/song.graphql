@@ -1,0 +1,28 @@
+query song($id: String!, $provider: Provider!, $duration: Int) {
+  song(id: $id, provider: $provider) {
+    provider
+    id
+    name
+
+    artists {
+      id
+      name
+    }
+
+    startTime(duration: $duration)
+
+    # album {
+    #   id
+    #   name
+    #   img
+    # }
+
+    # lrc
+    # klyric
+
+    # peaks {
+    #   duration
+    #   startTime
+    # }
+  }
+}

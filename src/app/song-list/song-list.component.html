@@ -1,0 +1,31 @@
+<div class="song-list">
+  <div
+    #perSong
+    class="song-box"
+    *ngFor="let song of list; index as i"
+    [ngClass]="{
+      playing: rxPlayerService.currentIndex === i,
+      disabled: song.privilege === denyPrivilege
+    }"
+    (click)="play(i)"
+  >
+    <span class="song-info">
+      <span
+        class="song-name"
+        matTooltip="{{ song.name }}"
+        matTooltipPosition="above"
+        matTooltipShowDelay="500"
+        >[{{ song.provider }}]-{{ song.name }}
+      </span>
+
+      <span
+        class="song-artists"
+        matTooltip="{{ formatArtists(song.artists) }}"
+        matTooltipPosition="above"
+        matTooltipShowDelay="500"
+      >
+        <span *ngFor="let artist of song.artists"> {{ artist.name }} </span>
+      </span>
+    </span>
+  </div>
+</div>

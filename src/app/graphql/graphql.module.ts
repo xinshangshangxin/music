@@ -5,7 +5,7 @@ import { InMemoryCache } from 'apollo-cache-inmemory';
 
 import { environment } from '../../environments/environment';
 
-const uri = `${environment}/graphql`; // <-- add the URL of the GraphQL server here
+const uri = `${environment.backendUrl}/graphql`; // <-- add the URL of the GraphQL server here
 export function createApollo(httpLink: HttpLink) {
   return {
     link: httpLink.create({ uri }),
