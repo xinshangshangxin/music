@@ -5,7 +5,7 @@ import { Provider, rank, RankType } from '../src';
 test('new rank kugou', async (t) => {
   try {
     let songs = await rank(Provider.kugou, RankType.new, 99);
-    t.true(songs.length === 99);
+    t.is(songs.length, 99);
   } catch (e) {
     t.regex(e.message, /Foreign IP/i);
   }
@@ -14,7 +14,7 @@ test('new rank kugou', async (t) => {
 test('hot rank kugou', async (t) => {
   try {
     let songs = await rank(Provider.kugou, RankType.hot, 11);
-    t.true(songs.length === 11);
+    t.is(songs.length, 11);
   } catch (e) {
     t.regex(e.message, /Foreign IP/i);
   }
