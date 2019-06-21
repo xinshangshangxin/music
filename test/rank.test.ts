@@ -2,23 +2,23 @@ import test from 'ava';
 
 import { Provider, rank, RankType } from '../src';
 
-// test('new rank kugou', async (t) => {
-//   try {
-//     let songs = await rank(Provider.kugou, RankType.new, 99);
-//     t.is(songs.length, 99);
-//   } catch (e) {
-//     t.regex(e.message, /Foreign IP/i);
-//   }
-// });
+test('new rank kugou', async (t) => {
+  try {
+    let songs = await rank(Provider.kugou, RankType.new, 99);
+    t.is(songs.length, 99);
+  } catch (e) {
+    t.regex(e.message, /Foreign IP/i);
+  }
+});
 
-// test('hot rank kugou', async (t) => {
-//   try {
-//     let songs = await rank(Provider.kugou, RankType.hot, 11);
-//     t.is(songs.length, 11);
-//   } catch (e) {
-//     t.regex(e.message, /Foreign IP/i);
-//   }
-// });
+test('hot rank kugou', async (t) => {
+  try {
+    let songs = await rank(Provider.kugou, RankType.hot, 11);
+    t.is(songs.length, 11);
+  } catch (e) {
+    t.regex(e.message, /Foreign IP/i);
+  }
+});
 
 test('hot rank netease', async (t) => {
   let songs = await rank(Provider.netease, RankType.hot, 3);

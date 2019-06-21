@@ -99,6 +99,7 @@ class Kugou {
     return this.getAlbum(id);
   }
 
+  // eslint-disable-next-line class-methods-use-this
   private async concatRankList(
     rankId: string,
     limit: number,
@@ -106,13 +107,14 @@ class Kugou {
   ): Promise<ISearchItem[]> {
     let page = parseInt(`${skip / limit}`, 10) + 1;
 
-    let result = await this.request({
+    let result = await rp({
       method: 'GET',
       url: 'http://mobilecdn.kugou.com/api/v3/rank/song',
       qs: { pagesize: limit, page, rankid: rankId },
       headers: {
         host: 'mobilecdn.kugou.com',
       },
+      json: true,
     });
 
     let songs = get(result, 'data.info', []);
