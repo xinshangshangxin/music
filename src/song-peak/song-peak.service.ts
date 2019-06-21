@@ -17,7 +17,11 @@ export class SongPeakService {
     private readonly audioService: AudioService,
   ) {}
 
-  async get(conditions: { id: string; provider: Provider; duration?: number }) {
+  async get(conditions: {
+    id: string;
+    provider: Provider;
+    duration: number;
+  }): Promise<SongPeaks | undefined> {
     return this.songRepository.findOne({ where: conditions });
   }
 

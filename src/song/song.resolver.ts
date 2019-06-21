@@ -6,7 +6,7 @@ import {
   ResolveProperty,
   Resolver,
 } from '@nestjs/graphql';
-import { Float } from 'type-graphql';
+import { Float, Int } from 'type-graphql';
 
 import { SongPeakService } from '../song-peak/song-peak.service';
 import { SongUrlParseService } from '../song-url/song-url-parse.service';
@@ -31,17 +31,36 @@ export class SongResolver {
   async song(
     @Args('id') id: string,
     @Args({ name: 'provider', type: () => Provider }) provider: Provider,
-  ): Promise<Song> {
+  ): Promise<Song | undefined> {
     logger.debug({ id, provider });
 
-    let song = await this.songService.getSong({ id, provider });
+    const song = await this.songService.getSong({ id, provider });
     return song;
   }
 
   @ResolveProperty('peaks', () => [SongPeaks])
-  async getPeaks(@Parent() song) {
+  async getPeaks(@Parent() song: Song) {
     const { id, provider } = song;
     return await this.songPeakService.query({ id, provider });
+  }
+
+  @ResolveProperty('startTime', () => Float)
+  async startTime(
+    @Parent() song: Song,
+    @Args({ name: 'duration', type: () => Int, nullable: true })
+    duration: number,
+  ) {
+    if (!duration) {
+      return;
+    }
+    const { id, provider } = song;
+    const peak = await this.songPeakService.get({ id, provider, duration });
+
+    if (!peak) {
+      return;
+    }
+
+    return peak.startTime;
   }
 
   @Query(returns => [SearchSong])
@@ -73,7 +92,7 @@ export class SongResolver {
     @Args('id') id: string,
     @Args({ name: 'provider', type: () => Provider }) provider: Provider,
     @Args({ name: 'duration', type: () => Float }) duration: number,
-  ): Promise<SongPeaks> {
+  ): Promise<SongPeaks | undefined> {
     return this.songPeakService.get({ id, provider, duration });
   }
 

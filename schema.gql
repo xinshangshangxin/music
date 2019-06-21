@@ -83,6 +83,7 @@ type Song {
   artists: [Artist!]
   album: Album
   peaks: [SongPeaks!]!
+  startTime(duration: Int): Float
 }
 
 type SongPeaks {

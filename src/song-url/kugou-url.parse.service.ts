@@ -157,7 +157,7 @@ export class KugouUrlParseService {
       headers: { location },
     } = await this.client(url, { followRedirect: false });
 
-    const query = querystringParse(urlParse(location).query);
+    const query = querystringParse(urlParse(location).query || '');
 
     const result = await this.client({
       uri: 'http://m.kugou.com/zlist/list',
