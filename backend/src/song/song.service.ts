@@ -123,6 +123,8 @@ export class SongService {
     br?: BitRate,
   ): Promise<ISong> {
     let baseSong = await getSong(id, provider, br);
+    console.debug({ baseSong });
+
     if (!baseSong.artists) {
       baseSong.artists = [];
     }
@@ -131,9 +133,11 @@ export class SongService {
       delete baseSong.album;
     }
 
-    console.info(baseSong);
-
     delete baseSong.url;
+
+    if (!baseSong.name) {
+      return baseSong;
+    }
 
     try {
       await this.SongModel.updateOne(
