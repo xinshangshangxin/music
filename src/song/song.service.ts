@@ -8,6 +8,7 @@ import { createOrUpdate } from '../util/helper';
 import { Album } from './entities/Album.entity';
 import { Artist } from './entities/Artist.entity';
 import { Song } from './entities/Song.entity';
+import { Privilege } from './register-type';
 
 @Injectable()
 export class SongService {
@@ -30,7 +31,7 @@ export class SongService {
   }: {
     id: string;
     provider: Provider;
-  }): Promise<Song> {
+  }): Promise<Song | undefined> {
     return await this.getSongWithSave({ id, provider });
   }
 
@@ -71,12 +72,12 @@ export class SongService {
     provider: Provider;
     br?: BitRate;
   }): Promise<Song | undefined> {
-    let song = await this.songRepository.findOne({
+    const song = await this.songRepository.findOne({
       where: { id, provider },
       relations: ['artists', 'album'],
     });
 
-    if (song) {
+    if (song && song.privilege !== Privilege.deny) {
       return song;
     }
 

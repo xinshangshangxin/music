@@ -15,5 +15,5 @@ export abstract class Base {
 
   @Field(type => Provider)
   @Column()
-  provider: string;
+  provider: Provider;
 }

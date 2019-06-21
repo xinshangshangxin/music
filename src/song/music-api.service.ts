@@ -23,7 +23,7 @@ export class MusicApiService {
     });
 
     if (!providers.length) {
-      providers = undefined;
+      providers = Object.values(Provider);
     }
 
     const data = await search(
@@ -39,7 +39,7 @@ export class MusicApiService {
   }
 
   async getUrl(id: string, provider: Provider, br?: BitRate): Promise<string> {
-    let baseSong = await getSong(id, provider, br);
+    const baseSong = await getSong(id, provider, br);
     return baseSong.url;
   }
 

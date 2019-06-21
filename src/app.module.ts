@@ -30,7 +30,7 @@ import { SongService } from './song/song.service';
       debug: true,
       playground: true,
 
-      installSubscriptionHandlers: true,
+      installSubscriptionHandlers: false,
       autoSchemaFile: 'schema.gql',
     }),
   ],

@@ -48,4 +48,7 @@ export class Song extends Base {
   @JoinTable()
   // '最hight部分'
   peaks?: SongPeaks[];
+
+  @Field(type => Float, { nullable: true })
+  startTime?: number;
 }
