@@ -14,11 +14,16 @@ export class SongUrlParseService {
       },
     );
 
-    logger.debug('match: ', item, url);
-
     if (!item) {
-      throw new Error('parse not match');
+      throw new Error(`parse not match, url: ${url}`);
     }
-    return this.kugouUrlParseService[item[0]](url);
+
+    const [funcName, regExp] = item;
+    logger.debug(
+      { funcName, reg: `/${regExp.source}/${regExp.flags}`, url },
+      'match parser: ',
+    );
+
+    return this.kugouUrlParseService[funcName](url);
   }
 }
