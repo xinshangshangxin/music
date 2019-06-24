@@ -1,3 +1,2 @@
-import './util/logger';
-import './util/exception';
+import './util/global/';
 import './main';

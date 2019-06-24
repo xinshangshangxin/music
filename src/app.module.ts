@@ -18,12 +18,7 @@ import { SongService } from './song/song.service';
 
 @Module({
   imports: [
-    TypeOrmModule.forRoot({
-      type: 'sqlite',
-      database: '/Users/feng/Desktop/music/db',
-      entities: [__dirname + '/**/*.entity{.ts,.js}'],
-      synchronize: true,
-    }),
+    TypeOrmModule.forRoot(environment.typeorm),
     TypeOrmModule.forFeature([Song, Artist, Album, SongPeaks]),
 
     GraphQLModule.forRoot({

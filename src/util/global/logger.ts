@@ -1,8 +1,6 @@
 import pino from 'pino';
 
-const myLogger = pino({
-  level: 'trace',
-});
+const myLogger = pino(environment.logger);
 
 // @ts-ignore
 global.logger = myLogger;
