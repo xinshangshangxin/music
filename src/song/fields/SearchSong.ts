@@ -15,10 +15,10 @@ export class SearchSong {
   @Field()
   name: string;
 
-  @Field(type => Privilege)
+  @Field(type => Privilege, { nullable: true })
   privilege: Privilege;
 
-  @Field(type => [SearchArtist])
+  @Field(type => [SearchArtist], { nullable: true })
   artists: SearchArtist[];
 
   @Field(type => SearchAlbum, { nullable: true })

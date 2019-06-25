@@ -38,13 +38,13 @@ export class SongResolver {
     return song;
   }
 
-  @ResolveProperty('peaks', () => [SongPeaks])
+  @ResolveProperty('peaks', () => [SongPeaks], { nullable: true })
   async getPeaks(@Parent() song: Song) {
     const { id, provider } = song;
     return await this.songPeakService.query({ id, provider });
   }
 
-  @ResolveProperty('startTime', () => Float)
+  @ResolveProperty('startTime', () => Float, { nullable: true })
   async startTime(
     @Parent() song: Song,
     @Args({ name: 'duration', type: () => Int, nullable: true })
