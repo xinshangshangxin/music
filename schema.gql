@@ -67,8 +67,8 @@ type SearchSong {
   id: String!
   provider: Provider!
   name: String!
-  privilege: Privilege!
-  artists: [SearchArtist!]!
+  privilege: Privilege
+  artists: [SearchArtist!]
   album: SearchAlbum
 }
 
@@ -82,7 +82,7 @@ type Song {
   privilege: String
   artists: [Artist!]
   album: Album
-  peaks: [SongPeaks!]!
+  peaks: [SongPeaks!]
   startTime(duration: Int): Float
 }
 

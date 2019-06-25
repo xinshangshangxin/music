@@ -44,7 +44,7 @@ export class Song extends Base {
   album?: Album;
 
   @Field(type => [SongPeaks], { nullable: true })
-  @ManyToMany(type => SongPeaks)
+  @ManyToMany(type => SongPeaks, { nullable: true })
   @JoinTable()
   // '最hight部分'
   peaks?: SongPeaks[];
