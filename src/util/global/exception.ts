@@ -6,7 +6,9 @@ process.on('uncaughtException', err => {
 });
 
 process.on('unhandledRejection', (err, p) => {
-  logger.error(err, 'unhandledRejection at: ');
+  if (err) {
+    logger.error(err, 'unhandledRejection at: ');
+  }
   logger.error(p);
   process.exit(1);
 });
