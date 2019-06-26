@@ -11,4 +11,5 @@ module.exports = {
   logger: {
     level: 'trace',
   },
+  port: process.env.PORT || 3000,
 };
