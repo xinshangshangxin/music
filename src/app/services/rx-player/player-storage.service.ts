@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 
 import { Meta, PeakConfig, PlayerSong, Playlist } from './interface';
+import { debounceTime, map, tap } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root',
@@ -43,10 +44,16 @@ export class PlayerStorageService {
     return this.meta.peakConfig;
   }
 
-  getPlaylist(playlistId = this.meta.currentPlaylistId): Playlist | undefined {
-    return this.meta.playlists.find(({ id }) => {
+  getPlaylist(playlistId = this.meta.currentPlaylistId): Playlist {
+    const playlist = this.meta.playlists.find(({ id }) => {
       return id === playlistId;
     });
+
+    if (!playlist) {
+      throw new Error(`no playlist with id: ${playlistId}`);
+    }
+
+    return playlist;
   }
 
   persistMeta() {
@@ -54,6 +61,16 @@ export class PlayerStorageService {
       return { id, name };
     });
     this.setStorageItem(this.metaId, { ...this.meta, playlists: persistsPlaylists });
+  }
+
+  persistPlaylist(playlistId = this.meta.currentPlaylistId, currentPlaylistSongs: PlayerSong[]) {
+    const playlist = this.getPlaylist(playlistId);
+    if (playlistId === this.meta.currentPlaylistId) {
+      playlist.songs = currentPlaylistSongs;
+    }
+
+    console.info(`persist playlist ${playlistId}, ${playlist.songs.length}`);
+    this.setStorageItem(playlistId, playlist.songs);
   }
 
   private getStorageItem<T>(id: string, defaultValue?: T): T | undefined {

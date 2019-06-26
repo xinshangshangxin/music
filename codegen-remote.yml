@@ -1,8 +1,8 @@
 overwrite: true
-schema: "https://music.leanapp.cn/graphql"
-documents: "**/*.graphql"
+schema: "https://music-old.leanapp.cn/graphql"
+documents: "{,!(node_modules)/**/}*.graphql"
 generates:
-  ./src/app/graphql/generated.ts:
+  ./src/app/graphql/generated/index.ts:
     plugins:
       - "typescript"
       - "typescript-operations"

@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
 import { merge } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { debounceTime, tap } from 'rxjs/operators';
 
 import { RxAudio } from '../audio/rx-audio';
-import { Status } from './rx-player/interface';
+import { PlayerSong, Status } from './rx-player/interface';
 import { PlayerStorageService } from './rx-player/player-storage.service';
 import { RxPlayerService } from './rx-player/rx-player.service';
 
@@ -17,8 +17,16 @@ export class PlayerService {
     private readonly storageService: PlayerStorageService,
     private readonly rxPlayerService: RxPlayerService
   ) {
-    this.loadPlayerList();
+    this.loadSongs();
     this.statusChange();
+  }
+
+  get status() {
+    return this.rxPlayerService.status;
+  }
+
+  get isPaused() {
+    return this.status === Status.paused;
   }
 
   previous() {
@@ -31,6 +39,10 @@ export class PlayerService {
 
   playAt(index: number): void {
     this.rxPlayerService.playAt(index);
+  }
+
+  playLast(): void {
+    this.playAt(this.rxPlayerService.songList.length - 1);
   }
 
   pause() {
@@ -48,20 +60,45 @@ export class PlayerService {
       this.rxAudio.layIn().catch((e) => {
         this.rxPlayerService.error$.next(e);
       });
+    } else {
+      this.playAt(this.rxPlayerService.currentIndex);
     }
   }
 
-  private loadPlayerList() {
-    const playlist = this.storageService.getPlaylist();
+  add(song: PlayerSong, index?: number) {
+    const { songList } = this.rxPlayerService;
+    if (typeof index === 'undefined') {
+      songList.push(song);
+    } else if (index > songList.length + 1) {
+      songList.push(song);
+    } else {
+      songList.splice(index, 0, song);
+    }
 
-    if (playlist) {
-      this.rxPlayerService.loadSongList(playlist.songs, this.rxPlayerService.currentIndex);
+    this.rxPlayerService.persistTask$.next();
+  }
+
+  remove(index: number) {
+    const { songList } = this.rxPlayerService;
+    songList.splice(index, 1);
+
+    this.rxPlayerService.persistTask$.next();
+  }
+
+  loadSongs(songs?: PlayerSong[]) {
+    if (!songs) {
+      ({ songs } = this.storageService.getPlaylist());
+    }
+
+    if (songs) {
+      this.rxPlayerService.loadSongList(songs, this.rxPlayerService.currentIndex);
     }
   }
 
   private statusChange() {
     merge(this.rxPlayerService.lastDestroy$, this.rxPlayerService.play$)
       .pipe(
+        debounceTime(200),
         tap((item) => {
           if (item instanceof RxAudio) {
             this.rxAudio = item;
@@ -73,8 +110,6 @@ export class PlayerService {
           }
         })
       )
-      .subscribe(() => {
-        // TODO: page destory
-      });
+      .subscribe(() => {});
   }
 }

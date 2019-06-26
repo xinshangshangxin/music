@@ -1,0 +1,7 @@
+<div class="controls">
+  <mat-icon (click)="previous()">skip_previous</mat-icon>
+  <mat-icon (click)="togglePlay()" *ngIf="isPaused">play_arrow</mat-icon>
+  <mat-icon (click)="togglePlay()" *ngIf="!isPaused">pause</mat-icon>
+  <mat-icon (click)="next()">skip_next</mat-icon>
+  <mat-icon (click)="locate()">find_in_page</mat-icon>
+</div>

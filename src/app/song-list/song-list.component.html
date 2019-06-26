@@ -26,6 +26,21 @@
       >
         <span *ngFor="let artist of song.artists"> {{ artist.name }} </span>
       </span>
+
+      <span class="song-control" (click)="$event.stopPropagation()">
+        <i class="material-icons" mat-button [matMenuTriggerFor]="menu">more_vert</i>
+      </span>
+      <mat-menu #menu="matMenu">
+        <!-- <button *ngIf="song.privilege === 'deny'" mat-menu-item (click)="searchSame(song, i)">
+          <mat-icon>loop</mat-icon>
+          <span>replace</span>
+        </button> -->
+
+        <button mat-menu-item (click)="remove(i)">
+          <mat-icon>delete</mat-icon>
+          <span>delete</span>
+        </button>
+      </mat-menu>
     </span>
   </div>
 </div>

@@ -56,6 +56,7 @@ export interface PlayerPeakSong extends Song {
 export interface QueueData {
   rxAudio: RxAudio;
   song: PlayerPeakSong;
+  changed: boolean;
 }
 
 export enum Status {

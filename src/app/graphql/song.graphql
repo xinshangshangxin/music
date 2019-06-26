@@ -11,6 +11,8 @@ query song($id: String!, $provider: Provider!, $duration: Int) {
 
     startTime(duration: $duration)
 
+    privilege
+
     # album {
     #   id
     #   name

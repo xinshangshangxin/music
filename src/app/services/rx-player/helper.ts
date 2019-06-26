@@ -19,11 +19,11 @@ function loadAudio(promise: Promise<QueueData | Error>): Observable<QueueData> {
           throw item;
         }
 
-        const { song, rxAudio } = item;
+        const { song, rxAudio, changed } = item;
 
         playingAudio = rxAudio;
 
-        observer.next({ rxAudio, song });
+        observer.next({ rxAudio, song, changed });
       })
       .catch((e) => {
         observer.error(e);

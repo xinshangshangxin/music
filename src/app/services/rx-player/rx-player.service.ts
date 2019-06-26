@@ -1,6 +1,15 @@
 import { Injectable } from '@angular/core';
 import { EMPTY, merge, Observable, of, Subject } from 'rxjs';
-import { catchError, delay, map, mapTo, switchMap, tap, throttleTime } from 'rxjs/operators';
+import {
+  catchError,
+  debounceTime,
+  delay,
+  map,
+  mapTo,
+  switchMap,
+  tap,
+  throttleTime,
+} from 'rxjs/operators';
 
 import { RxAudio } from '../../audio/rx-audio';
 import { loadAudio } from './helper';
@@ -18,6 +27,7 @@ export class RxPlayerService {
   public error$ = new Subject<Event>();
   public play$ = new Subject<RxAudio>();
   public lastDestroy$ = new Subject<void>();
+  public persistTask$ = new Subject<string | undefined>();
 
   public status = Status.paused;
 
@@ -38,6 +48,29 @@ export class RxPlayerService {
 
     // 监听播放列表
     this.playerWatch();
+
+    this.persistTask$
+      .pipe(
+        tap((playlistId) => {
+          console.info('get persist task', playlistId);
+        }),
+        map((playlistId) => {
+          if (!playlistId) {
+            return this.storageService.meta.currentPlaylistId;
+          }
+          return playlistId;
+        }),
+        map((playlistId) => {
+          return {
+            playlistId,
+            songs: this.songList,
+          };
+        }),
+        debounceTime(1000)
+      )
+      .subscribe(({ playlistId, songs }) => {
+        return this.storageService.persistPlaylist(playlistId, songs);
+      });
   }
 
   public previous(): void {
@@ -67,8 +100,13 @@ export class RxPlayerService {
     this.songList.length = 0;
     this.songList.push(...list);
 
-    // 触发歌曲载入
-    this.error$.next();
+    // 保存到storage
+    this.persistTask$.next();
+
+    if (this.songList.length) {
+      // 触发歌曲载入
+      this.error$.next();
+    }
   }
 
   public changePeak(peakConfig?: Partial<PeakConfig>): void {
@@ -135,7 +173,12 @@ export class RxPlayerService {
             this.setIndexStep(1);
           }
 
-          console.info({ errorNu: this.errorNu, continuousErrorNu: this.continuousErrorNu });
+          console.info({
+            errorNu: this.errorNu,
+            songRetries: this.storageService.meta.errorRetry.songRetries,
+            continuousErrorNu: this.continuousErrorNu,
+            playerRetries: this.storageService.meta.errorRetry.playerRetries,
+          });
         }),
         mapTo('error')
       )
@@ -174,7 +217,11 @@ export class RxPlayerService {
 
   private playSong(promise: Promise<QueueData | Error>): Observable<RxAudio> {
     return loadAudio(promise).pipe(
-      tap(({ rxAudio, song }) => {
+      tap(({ rxAudio, song, changed }) => {
+        if (changed) {
+          this.persistTask$.next();
+        }
+
         console.info(`play ┣ ${song.name} ┫ ┣ ${song.provider} ┫`, {
           currentTime: rxAudio.audio.currentTime,
           currentIndex: this.currentIndex,
@@ -243,7 +290,10 @@ export class RxPlayerService {
       }),
       catchError((err) => {
         console.warn('load audio error', err);
-        this.error$.next(err);
+        if (this.status !== Status.paused) {
+          this.error$.next(err);
+        }
+
         return EMPTY;
       })
     );

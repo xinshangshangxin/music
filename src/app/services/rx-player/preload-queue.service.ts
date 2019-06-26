@@ -73,7 +73,7 @@ export class PreloadQueueService {
           song.peakStartTime &&
           song.peakDuration === peakDuration
         ) {
-          return song;
+          return { song, changed: false };
         }
 
         const serverSong = await this.getSong({
@@ -84,10 +84,13 @@ export class PreloadQueueService {
 
         console.info({ serverSong });
 
+        song.privilege = serverSong.privilege;
+
         if (serverSong.startTime) {
           song.peakStartTime = serverSong.startTime;
           song.peakDuration = peakDuration;
-          return song;
+
+          return { song, changed: true };
         }
 
         const startTime = await this.buildPeak({
@@ -98,11 +101,10 @@ export class PreloadQueueService {
 
         song.peakStartTime = startTime;
         song.peakDuration = peakDuration;
-        // TODO: 保存到 localstorage
 
-        return song;
+        return { song, changed: true };
       })
-      .then((peakSong: PlayerPeakSong) => {
+      .then(({ song: peakSong, changed }: { song: PlayerPeakSong; changed: boolean }) => {
         const rxAudio = new RxAudio(
           songUrl,
           peakSong.peakStartTime - peakConfig.before,
@@ -113,6 +115,7 @@ export class PreloadQueueService {
         return {
           rxAudio,
           song: peakSong,
+          changed,
         };
       })
       .catch((e) => {

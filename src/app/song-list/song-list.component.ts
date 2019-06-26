@@ -24,6 +24,10 @@ export class SongListComponent implements OnInit {
     this.playerService.playAt(index);
   }
 
+  remove(index: number) {
+    this.playerService.remove(index);
+  }
+
   formatArtists(artists: SearchArtist[]) {
     return artists
       .map(({ name }) => {
