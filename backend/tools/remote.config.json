@@ -2,7 +2,7 @@
   "dev": {
     "url": "git@gitlab.com:xinshangshangxin/music-backend.git",
     "remote": "gitlab",
-    "branch": "develop"
+    "branch": "4.x"
   },
   "prod": {
     "url": "git@gitlab.com:demoshang/server-projects.git",
