@@ -1,0 +1,101 @@
+{
+  "name": "@s4p/music-api",
+  "version": "1.14.2",
+  "description": "music api for kugou,netease,xiami",
+  "main": "index.js",
+  "scripts": {
+    "start": "TS_NODE_FILES=true ./node_modules/.bin/ts-node src/index.ts",
+    "lint": "gulp lint",
+    "lint-fix": "./node_modules/.bin/eslint src/**/*.ts --fix",
+    "watch": "gulp",
+    "build": "gulp build",
+    "test": "TS_NODE_FILES=true ava --fail-fast -v",
+    "coverage": "TS_NODE_FILES=true nyc ava --fail-fast -v"
+  },
+  "keywords": [
+    "music",
+    "api",
+    "kugou",
+    "netease",
+    "xiami"
+  ],
+  "author": "xinshangshangxin",
+  "license": "MIT",
+  "homepage": "https://github.com/xinshangshangxin/music/tree/develop/api#music-api",
+  "bugs": {
+    "url": "https://github.com/xinshangshangxin/music/issues"
+  },
+  "dependencies": {
+    "NeteaseCloudMusicApi": "Binaryify/NeteaseCloudMusicApi",
+    "he": "^1.2.0",
+    "lodash": "^4.17.11",
+    "request": "^2.88.0",
+    "request-promise": "^4.2.4",
+    "tslib": "^1.9.3",
+    "xml2js": "^0.4.19"
+  },
+  "devDependencies": {
+    "@s4p/eslint-config": "^2.0.1",
+    "@types/he": "^1.1.0",
+    "@types/joi": "^14.3.2",
+    "@types/lodash": "^4.14.121",
+    "@types/node": "^11.9.5",
+    "@types/request-promise": "^4.1.42",
+    "@types/xml2js": "^0.4.4",
+    "@typescript-eslint/eslint-plugin": "^1.4.2",
+    "ava": "^1.2.1",
+    "del": "^4.1.1",
+    "eslint": "^5.14.1",
+    "eslint-config-airbnb-base": "^13.1.0",
+    "eslint-plugin-import": "^2.14.0",
+    "gulp": "^4.0.1",
+    "gulp-cached": "^1.1.1",
+    "gulp-eslint": "^5.0.0",
+    "gulp-filter": "^5.1.0",
+    "gulp-load-plugins": "^1.5.0",
+    "gulp-remember": "^1.0.1",
+    "gulp-replace": "^1.0.0",
+    "gulp-sourcemaps": "^2.6.5",
+    "gulp-typescript": "^5.0.0-alpha.3",
+    "joi": "^14.3.1",
+    "node-notifier": "^5.2.1",
+    "nodemon": "^1.18.10",
+    "nyc": "^14.1.0",
+    "source-map-support": "^0.5.10",
+    "streamqueue": "^1.1.2",
+    "ts-node": "^8.0.2",
+    "typescript": "^3.4.5"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "ava": {
+    "compileEnhancements": false,
+    "extensions": [
+      "ts"
+    ],
+    "require": [
+      "ts-node/register"
+    ]
+  },
+  "nyc": {
+    "include": [
+      "src/**/*.ts"
+    ],
+    "exclude": [
+      "**/*.d.ts"
+    ],
+    "extension": [
+      ".ts"
+    ],
+    "require": [
+      "ts-node/register"
+    ],
+    "reporter": [
+      "html",
+      "text-summary"
+    ],
+    "sourceMap": true,
+    "instrument": true
+  }
+}
