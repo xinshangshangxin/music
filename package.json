@@ -25,7 +25,7 @@
     "@nestjs/graphql": "^6.2.4",
     "@nestjs/platform-express": "^6.0.0",
     "@nestjs/typeorm": "^6.1.2",
-    "@s4p/music-api": "^1.13.0",
+    "@s4p/music-api": "^1.14.2",
     "apollo-server-express": "^2.6.2",
     "graphql": "^14.3.1",
     "graphql-tools": "^4.0.4",
@@ -37,7 +37,6 @@
     "request-promise": "^4.2.4",
     "rimraf": "^2.6.2",
     "rxjs": "^6.3.3",
-    "sqlite3": "^4.0.8",
     "type-graphql": "^0.17.4",
     "typeorm": "^0.2.18"
   },
