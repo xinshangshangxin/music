@@ -231,13 +231,12 @@ class Xiami {
       id: `${song.song_id}`,
       name: get(song, 'song_name', ''),
       url: Xiami.handleProtocolRelativeUrl(Xiami.caesar(song.location)),
-      artists: get(song, 'artist_name', '')
-        .split(';')
-        .map((name: string) => {
-          return {
-            name: name.trim(),
-          };
-        }),
+      artists: [
+        {
+          id: get(song, 'artist_id'),
+          name: get(song, 'artist_name'),
+        },
+      ],
       album: {
         id: `${song.album_id}`,
         name: decode(song.album_name),
