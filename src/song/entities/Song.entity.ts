@@ -24,7 +24,7 @@ export class Song extends Base {
   klyric?: string;
 
   @Field({ nullable: true })
-  @Column({ comment: '歌词', nullable: true })
+  @Column({ type: 'text', comment: '歌词', nullable: true })
   lrc?: string;
 
   @Field({ nullable: true })
@@ -32,20 +32,22 @@ export class Song extends Base {
   privilege?: string;
 
   @Field(type => [Artist], { nullable: true })
-  @ManyToMany(type => Artist, { nullable: true })
-  @JoinTable()
+  // @ManyToMany(type => Artist, { nullable: true })
+  // @JoinTable()
   // '作者'
+  @Column({ comment: '作者', nullable: true })
   artists?: Artist[];
 
   @Field(type => Album, { nullable: true })
-  @ManyToOne(type => Album, { nullable: true })
-  @JoinTable()
+  // @ManyToOne(type => Album, { nullable: true })
+  // @JoinTable()
   // '专辑'
+  @Column({ comment: '专辑', nullable: true })
   album?: Album;
 
   @Field(type => [SongPeaks], { nullable: true })
-  @ManyToMany(type => SongPeaks, { nullable: true })
-  @JoinTable()
+  // @ManyToMany(type => SongPeaks, { nullable: true })
+  // @JoinTable()
   // '最hight部分'
   peaks?: SongPeaks[];
 
