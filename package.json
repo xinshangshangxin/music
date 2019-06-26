@@ -8,6 +8,7 @@
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e",
+    "build:docker": "ng build --configuration=docker --prod --output-path dist",
     "gql-gen": "graphql-codegen --config codegen.yml",
     "gql-gen-remote": "graphql-codegen --config codegen-remote.yml"
   },

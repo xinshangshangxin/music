@@ -1,0 +1,12 @@
+{
+  "dev": {
+    "url": "git@gitlab.com:shang-music/music-frontend.git",
+    "remote": "gitlab",
+    "branch": "5.x"
+  },
+  "prod": {
+    "url": "",
+    "remote": "prod",
+    "branch": ""
+  }
+}
