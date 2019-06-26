@@ -7,7 +7,7 @@
   "scripts": {
     "build": "tsc -p tsconfig.build.json && cp -r src/environment/ dist/environment/",
     "format": "prettier --write \"src/**/*.ts\"",
-    "start": "ts-node --files -r tsconfig-paths/register src/index.ts",
+    "start": "ts-node --files -r tsconfig-paths/register src/index.ts | pino-pretty -i hostname,pid -t 'SYS:HH:MM:ss.l'",
     "start:dev": "rimraf dist && concurrently --handle-input \"wait-on dist/index.js && nodemon | pino-pretty -i hostname,pid -t 'SYS:HH:MM:ss.l' \" \"mkdir dist && cp -r src/environment/ dist/environment/ && tsc -w -p tsconfig.build.json\" ",
     "start:debug": "nodemon --config nodemon-debug.json",
     "prestart:prod": "rimraf dist && npm run build",
@@ -30,6 +30,7 @@
     "graphql": "^14.3.1",
     "graphql-tools": "^4.0.4",
     "lodash": "^4.17.11",
+    "mongodb": "^3.2.7",
     "pino": "^5.12.6",
     "reflect-metadata": "^0.1.12",
     "request": "^2.88.0",

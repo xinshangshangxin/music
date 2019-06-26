@@ -1,5 +1,5 @@
 import { Field, Float, Int, ObjectType } from 'type-graphql';
-import { Column, Entity, Index, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, Index, ObjectID, ObjectIdColumn } from 'typeorm';
 
 import { Provider } from '../register-type';
 
@@ -7,8 +7,11 @@ import { Provider } from '../register-type';
 @Entity()
 @Index(['id', 'provider', 'duration'], { unique: true })
 export class SongPeaks {
-  @PrimaryGeneratedColumn()
-  pkId: number;
+  // @PrimaryGeneratedColumn()
+  // pkId: number;
+
+  @ObjectIdColumn()
+  pkId: ObjectID;
 
   @Field()
   @Column()
