@@ -1,6 +1,6 @@
 # Music Player
 
-[在线试用](https://music.xinshangshangxin.com/)
+[在线试用](https://music-v4.xinshangshangxin.com/)
 
 ## 目录说明
 
@@ -119,7 +119,7 @@ ports:
 
 ### `docker-compose` 中只用到了 `frontend` 和 `backend` 项目, 其它都没有用到
 
-- `proxy` 项目的相关功能在 `backend` 项目中已经存在了, 独立成 `proxy` 项目是因为 [在线试用 demo](https://music.xinshangshangxin.com/) 部署在 [leancloud](https://leancloud.cn/) 上, 由于 `leancloud` 有内存限制(256M), 所以独立了一个 `proxy` 项目来突破内存限制. 而 `docker-compose` 启动不存在内存限制问题,故不需要部署 `proxy` 项目
+- `proxy` 项目的相关功能在 `backend` 项目中已经存在了, 独立成 `proxy` 项目是因为 [在线试用 demo](https://music-v4.xinshangshangxin.com/) 部署在 [leancloud](https://leancloud.cn/) 上, 由于 `leancloud` 有内存限制(256M), 所以独立了一个 `proxy` 项目来突破内存限制. 而 `docker-compose` 启动不存在内存限制问题,故不需要部署 `proxy` 项目
 - `api` 项目是一个 `npm` 包, 独立发布到 [![npm](https://img.shields.io/npm/v/@s4p/music-api.svg?label=%40s4p%2Fmusic-api&style=flat-square)](https://www.npmjs.com/package/@s4p/music-api), 已经在 `backend` 项目的 `package.json` 的依赖中了
 - `nmdb` 项目是一个 `npm` 包, 独立发布到 [![npm](https://img.shields.io/npm/v/@s4p/nmdb.svg?label=%40s4p%2Fnmdb&style=flat-square)](https://www.npmjs.com/package/@s4p/nmdb)
   [![npm](https://img.shields.io/npm/v/@s4p/nest-nmdb.svg?label=%40s4p%2Fnest-nmdb&style=flat-square)](https://www.npmjs.com/package/@s4p/nest-nmdb), 已经在 `backend` 项目的 `package.json` 的依赖中了

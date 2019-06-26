@@ -1,7 +1,7 @@
 {
   "url": "git@gitlab.com:shang-music/index.git",
   "remote": "gitlab",
-  "branch": "develop",
+  "branch": "4.x",
   "subtree": [
     {
       "prefix": "api",
@@ -16,12 +16,12 @@
     {
       "prefix": "frontend",
       "url": "git@gitlab.com:shang-music/music-frontend.git",
-      "branch": "develop"
+      "branch": "4.x"
     },
     {
       "prefix": "backend",
       "url": "git@gitlab.com:shang-music/music-backend.git",
-      "branch": "develop"
+      "branch": "4.x"
     },
     {
       "prefix": "proxy",
