@@ -1,0 +1,21 @@
+version: "3"
+services:
+  music_backend:
+    restart: always
+    build: ../../backend
+    environment:
+      - NODE_ENV=docker
+      - PORT=80
+      - SAVE_DIR=/app/.music
+      - NMDB_URL=nedb://memory
+  music_frontend:
+    restart: always
+    build: ../../frontend
+    environment:
+      - NODE_ENV=docker
+      - PORT=80
+  music_nginx:
+    restart: always
+    build: ./
+    ports:
+      - 8000:80
