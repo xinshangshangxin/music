@@ -2,7 +2,7 @@
   "dev": {
     "url": "git@gitlab.com:shang-music/music-frontend.git",
     "remote": "gitlab",
-    "branch": "develop"
+    "branch": "4.x"
   },
   "prod": {
     "url": "git@git.dev.tencent.com:xinshangshangxin/music.git",
