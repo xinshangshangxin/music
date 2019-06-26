@@ -179,6 +179,9 @@ export class SearchComponent implements OnInit, OnDestroy {
       delay(200),
       switchMap(() => {
         return from(this.router.navigate(['']));
+      }),
+      tap(() => {
+        this.searchService.urlLoadSubject.next('');
       })
     );
   }
