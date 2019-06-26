@@ -1,0 +1,46 @@
+<div class="song-list">
+  <div
+    #perSong
+    class="song-box"
+    *ngFor="let song of list; index as i"
+    [ngClass]="{
+      playing: rxPlayerService.currentIndex === i,
+      disabled: song.privilege === denyPrivilege
+    }"
+    (click)="play(i)"
+  >
+    <span class="song-info">
+      <span
+        class="song-name"
+        matTooltip="{{ song.name }}"
+        matTooltipPosition="above"
+        matTooltipShowDelay="500"
+        >[{{ song.provider }}]-{{ song.name }}
+      </span>
+
+      <span
+        class="song-artists"
+        matTooltip="{{ formatArtists(song.artists) }}"
+        matTooltipPosition="above"
+        matTooltipShowDelay="500"
+      >
+        <span *ngFor="let artist of song.artists"> {{ artist.name }} </span>
+      </span>
+
+      <span class="song-control" (click)="$event.stopPropagation()">
+        <i class="material-icons" mat-button [matMenuTriggerFor]="menu">more_vert</i>
+      </span>
+      <mat-menu #menu="matMenu">
+        <!-- <button *ngIf="song.privilege === 'deny'" mat-menu-item (click)="searchSame(song, i)">
+          <mat-icon>loop</mat-icon>
+          <span>replace</span>
+        </button> -->
+
+        <button mat-menu-item (click)="remove(i)">
+          <mat-icon>delete</mat-icon>
+          <span>delete</span>
+        </button>
+      </mat-menu>
+    </span>
+  </div>
+</div>

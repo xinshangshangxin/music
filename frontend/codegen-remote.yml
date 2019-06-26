@@ -1,0 +1,9 @@
+overwrite: true
+schema: "https://music-old.leanapp.cn/graphql"
+documents: "{,!(node_modules)/**/}*.graphql"
+generates:
+  ./src/app/graphql/generated/index.ts:
+    plugins:
+      - "typescript"
+      - "typescript-operations"
+      - "typescript-apollo-angular"

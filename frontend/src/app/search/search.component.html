@@ -1,0 +1,18 @@
+<div class="song-list">
+  <div
+    class="song-box"
+    *ngFor="let song of searchList; index as i"
+    [ngClass]="{ disabled: song.privilege === 'deny' }"
+  >
+    <span class="song-info">
+      <span class="song-name">[{{ song.provider }}]{{ song.name }}</span>
+      <span class="song-artists">
+        <span *ngFor="let artist of song.artists"> {{ artist.name }} </span>
+      </span>
+    </span>
+    <ng-container>
+      <i class="material-icons" (click)="add(song)">playlist_add</i>
+      <i class="material-icons" (click)="add(song, undefined, true)">playlist_play</i>
+    </ng-container>
+  </div>
+</div>
