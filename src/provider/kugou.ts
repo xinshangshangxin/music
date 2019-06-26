@@ -237,13 +237,10 @@ class Kugou {
       name: get(idInfo, 'songName'),
       url: get(idInfo, 'url'),
       lrc: '',
-      artists: get(idInfo, 'choricSinger', '')
-        .split('、')
-        .map((name: any) => {
-          return {
-            name: (name || '').trim(),
-          };
-        }),
+      artists: [{
+        id: get(idInfo, 'singerId'),
+        name: get(idInfo, 'singerName'),
+      }],
       album: {
         id: `${get(idInfo, 'albumid', '')}`,
         name: get(idInfo, 'songName', ''),

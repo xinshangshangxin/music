@@ -31,13 +31,14 @@ test('getSong', async (t) => {
       let data = await getSong(id, provider, BitRate.mid);
 
       let {
-        id: resultId, name, url, album, extra: realExtra,
+        id: resultId, name, url, album, extra: realExtra, artists,
       } = data;
 
       t.is(resultId, id);
-      t.true(!!name);
-      t.true(!!url);
-      t.true(!!album);
+      t.truthy(name);
+      t.truthy(url);
+      t.truthy(album && album.id && album.name && album.img, `${id}-${provider}`);
+      t.truthy(artists && artists[0].name && artists[0].id, `${id}-${provider}`);
 
       if (extra) {
         t.deepEqual(realExtra, extra);
