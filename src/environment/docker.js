@@ -1,9 +1,7 @@
 module.exports = {
   typeorm: {
     type: 'mongodb',
-    host: 'localhost',
-    port: 27017,
-    database: 'noDbName',
+    url: process.env.MONGO_URL,
     useNewUrlParser: true,
     entities: [__dirname + '/../**/*.entity{.ts,.js}'],
     synchronize: true,
