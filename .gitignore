@@ -35,4 +35,4 @@ lerna-debug.log*
 
 
 src/environment/*.js
-!src/environment/example.js
+!src/environment/docker.js
