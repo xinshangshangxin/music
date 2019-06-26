@@ -1,6 +1,6 @@
 {
-  "url": "git@gitlab.com:shang-music/index.git",
-  "remote": "gitlab",
+  "url": "git@github.com:xinshangshangxin/music.git",
+  "remote": "github",
   "branch": "4.x",
   "subtree": [
     {
