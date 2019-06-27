@@ -1,4 +1,4 @@
 module.exports = {
-  songUrl: 'http://music.leanapp.cn/graphql'
+  songUrl: 'http://music.xinshangshangxin.com/graphql'
   // songUrl: 'http://localhost:3000/graphql'
 }

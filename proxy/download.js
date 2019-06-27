@@ -36,8 +36,11 @@ async function getUrl(id, provider, br) {
     method: 'POST',
     url: config.songUrl,
     body: {
-      query:
-        'query($id: ID!, $provider: Provider!, $br: BitRate) {\n  url(id: $id, provider: $provider, br: $br)\n}\n',
+      query: `
+        query url($id:String!, $provider: Provider!, $br: BitRate) {
+          url(id: $id, provider: $provider, br: $br)
+        }
+        `,
       variables: { id, provider, br },
     },
     json: true,
