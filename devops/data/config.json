@@ -21,7 +21,7 @@
     {
       "prefix": "proxy",
       "url": "git@gitlab.com:shang-music/music-proxy.git",
-      "branch": "develop"
+      "branch": "5.x"
     }
   ]
 }
