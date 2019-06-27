@@ -79,7 +79,7 @@ export class SongResolver {
     @Args({ name: 'br', type: () => BitRate, nullable: true }) br: BitRate,
   ): Promise<string> {
     const url = await this.musicApiService.getUrl(id, provider, br);
-    return url;
+    return url || '';
   }
 
   @Query(returns => [SearchSong])
