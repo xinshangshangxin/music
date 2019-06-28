@@ -18,11 +18,11 @@
 
 ### [backend](./backend)
 
-基于 `nestjs 6` 调用 `@s4p/music-api` 提供 `graphql` 接口的后台服务
+基于 `nestjs` 调用 `@s4p/music-api` 提供 `graphql` 接口的后台服务
 
 ### [frontend](./frontend)
 
-基于 `Angular 8` 提供简易的界面
+基于 `Angular` 提供简易的界面
 
 ### [proxy](./proxy)
 
@@ -68,9 +68,12 @@
 
 ### `4.x` 和 `5.x` 区别
 
-- 使用 `angular 8` 和 `nestjs 6` 实现
-- 后端使用 `typeorm` 代替 `nmdb`
-- 前端重写 `RxPlayer`, 以实现预先载入下一首歌曲
+| 区别                           | `5.x`                        | `4.x`                                       |
+| ------------------------------ | ---------------------------- | ------------------------------------------- |
+| [angular](https://angular.io/) | 8                            | 6                                           |
+| [nest](https://nestjs.com/)    | 6                            | 5                                           |
+| 数据库 orm                     | [typeorm](http://typeorm.io) | [nmdb](https://github.com/shang-music/nmdb) |
+| 预载入下一首歌                 | √                            | ×                                           |
 
 ## TODO
 
