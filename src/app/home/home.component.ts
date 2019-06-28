@@ -4,7 +4,7 @@ import { Router } from '@angular/router';
 import { untilDestroyed } from 'ngx-take-until-destroy';
 
 import { SearchSong } from '../graphql/generated';
-import { PlayerSong, PeakConfig } from '../services/rx-player/interface';
+import { PeakConfig } from '../services/rx-player/interface';
 import { PlayerStorageService } from '../services/rx-player/player-storage.service';
 import { SearchService } from '../services/search.service';
 
@@ -17,7 +17,6 @@ export class HomeComponent implements OnInit, OnDestroy {
   public searchValue = '';
 
   public searchList: SearchSong[];
-  public allPlaylist: PlayerSong[];
   public peakConfig: PeakConfig;
 
   public peaks = [

@@ -93,9 +93,9 @@ export class PlayerService {
     this.preloadQueueService.clean();
   }
 
-  loadSongs(songs?: PlayerSong[]) {
+  async loadSongs(songs?: PlayerSong[]) {
     if (!songs) {
-      ({ songs } = this.storageService.getPlaylist());
+      ({ songs } = await this.storageService.getPlaylist());
     }
 
     if (songs) {
