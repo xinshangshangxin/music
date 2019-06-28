@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 
 import { Meta, PeakConfig, PlayerSong, Playlist } from './interface';
-import { debounceTime, map, tap } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root',
