@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 
+import { Action, Defer, defer, Message, awaitWrap } from '../../workers/helper';
 import { Meta, PeakConfig, PlayerSong, Playlist } from './interface';
-import { debounceTime, map, tap } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root',
@@ -27,9 +27,26 @@ export class PlayerStorageService {
     songs: [],
   };
 
+  private readonly worker = new Worker('../../workers/store.worker.ts', { type: 'module' });
+  private deferredMap: {
+    [key: string]: Defer<Message>;
+  } = {};
+  private fillPlaylistPromise;
+
   constructor() {
     this.initMeta();
-    this.fillPlaylists();
+    this.fillPlaylistPromise = awaitWrap(this.fillPlaylists());
+
+    this.worker.onmessage = ({ data }) => {
+      if (data && data.uuid) {
+        let deferred = this.deferredMap[data.uuid];
+
+        if (deferred) {
+          deferred.resolve(data);
+          delete this.deferredMap[data.uuid];
+        }
+      }
+    };
   }
 
   persistPeakConfig(peakConfig?: Partial<PeakConfig>): PeakConfig {
@@ -44,7 +61,9 @@ export class PlayerStorageService {
     return this.meta.peakConfig;
   }
 
-  getPlaylist(playlistId = this.meta.currentPlaylistId): Playlist {
+  async getPlaylist(playlistId = this.meta.currentPlaylistId): Promise<Playlist> {
+    await this.fillPlaylistPromise;
+
     const playlist = this.meta.playlists.find(({ id }) => {
       return id === playlistId;
     });
@@ -60,41 +79,111 @@ export class PlayerStorageService {
     const persistsPlaylists = this.meta.playlists.map(({ id, name }) => {
       return { id, name };
     });
-    this.setStorageItem(this.metaId, { ...this.meta, playlists: persistsPlaylists });
+    this.localStorage({
+      action: Action.put,
+      id: this.metaId,
+      value: { ...this.meta, playlists: persistsPlaylists },
+    });
   }
 
-  persistPlaylist(playlistId = this.meta.currentPlaylistId, currentPlaylistSongs: PlayerSong[]) {
-    const playlist = this.getPlaylist(playlistId);
+  async persistPlaylist(
+    playlistId = this.meta.currentPlaylistId,
+    currentPlaylistSongs: PlayerSong[]
+  ) {
+    const playlist = await this.getPlaylist(playlistId);
     if (playlistId === this.meta.currentPlaylistId) {
       playlist.songs = currentPlaylistSongs;
     }
 
     console.info(`persist playlist ${playlistId}, ${playlist.songs.length}`);
-    this.setStorageItem(playlistId, playlist.songs);
+
+    await this.workerStorage({
+      action: Action.put,
+      id: playlistId,
+      value: playlist.songs,
+    });
   }
 
-  private getStorageItem<T>(id: string, defaultValue?: T): T | undefined {
-    const key = `${this.musicPrefix}-${id}`;
-    const str = localStorage.getItem(key);
+  private workAct(data: any, timeout = 10000) {
+    const uuid = new Date().toISOString();
 
-    try {
-      return JSON.parse(str || '');
-    } catch (e) {
-      return defaultValue;
+    let deferred = defer<Message>();
+    this.deferredMap[uuid] = deferred;
+    this.worker.postMessage({
+      ...data,
+      uuid,
+    });
+
+    setTimeout(() => {
+      delete this.deferredMap[uuid];
+    }, timeout);
+
+    return deferred.promise;
+  }
+
+  private localStorage<T>({
+    action,
+    id,
+    value,
+  }: {
+    action: Action;
+    id: string;
+    value?: T;
+  }): T | undefined {
+    const key = `${this.musicPrefix}-${id}`;
+
+    if (action === Action.get) {
+      try {
+        const str = localStorage.getItem(key);
+        return JSON.parse(str || '');
+      } catch (e) {
+        return value;
+      }
+    } else {
+      if (!value) {
+        localStorage.removeItem(key);
+      } else {
+        localStorage.setItem(key, JSON.stringify(value));
+      }
     }
   }
 
-  private setStorageItem(id: string, value: object) {
+  private async workerStorage<T>({
+    action,
+    id,
+    value,
+    timeout,
+  }: {
+    action: Action;
+    id: string;
+    value?: T;
+    timeout?: number;
+  }): Promise<T | undefined> {
     const key = `${this.musicPrefix}-${id}`;
 
-    let str = '';
-    try {
-      str = JSON.stringify(value);
-    } catch (e) {
-      str = '';
-    }
+    if (action === Action.get) {
+      try {
+        const { result } = await this.workAct(
+          {
+            action: Action.get,
+            key,
+          },
+          timeout
+        );
 
-    localStorage.setItem(key, str);
+        if (typeof result === 'object') {
+          return result;
+        }
+
+        console.info('result=====: ', result);
+
+        return JSON.parse(result || '');
+      } catch (e) {
+        return value;
+      }
+    } else {
+      this.worker.postMessage({ action: Action.put, key, value });
+    }
   }
 
   private initMeta() {
@@ -111,7 +200,11 @@ export class PlayerStorageService {
       playlists: [this.tempPlaylist],
     };
 
-    const meta = this.getStorageItem<Meta>(this.metaId, defaultMeta);
+    const meta = this.localStorage<Meta>({
+      action: Action.get,
+      id: this.metaId,
+      value: defaultMeta,
+    });
 
     this.meta = {
       ...defaultMeta,
@@ -119,17 +212,24 @@ export class PlayerStorageService {
     };
   }
 
-  private fillPlaylists() {
-    this.meta.playlists.forEach((item) => {
-      this.fillPlaylistSongs(item);
-    });
+  private async fillPlaylists() {
+    await Promise.all(
+      this.meta.playlists.map((item) => {
+        return this.fillPlaylistSongs(item);
+      })
+    );
 
-    // TODO: check data is valid
     console.info('init done with data: ', this.meta);
   }
 
-  private fillPlaylistSongs(playlist: Playlist) {
-    let arr = this.getStorageItem<PlayerSong[]>(playlist.id, []);
+  private async fillPlaylistSongs(playlist: Playlist) {
+    let arr = await this.workerStorage<PlayerSong[]>({
+      action: Action.get,
+      id: playlist.id,
+      value: [],
+    });
+
     playlist.songs = arr || [];
+    // TODO: check data is valid
   }
 }
