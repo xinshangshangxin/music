@@ -6,12 +6,12 @@ import { Action, awaitWrap, Defer, defer, Message } from './helper';
 interface MusicDBSchema extends DBSchema {
   'song-list': {
     key: string;
-    value: string;
+    value: object[];
   };
 }
 
 const version = 1;
-const dbName = 'music;';
+const dbName = 'music';
 
 function openDBWithSchema(): Promise<IDBPDatabase<MusicDBSchema>> {
   return openDB<MusicDBSchema>(dbName, version, {

@@ -3,7 +3,7 @@ import { merge } from 'rxjs';
 import { debounceTime, tap } from 'rxjs/operators';
 
 import { RxAudio } from '../audio/rx-audio';
-import { PlayerSong, Status } from './rx-player/interface';
+import { PlayerSong, Status, PeakConfig } from './rx-player/interface';
 import { PlayerStorageService } from './rx-player/player-storage.service';
 import { PreloadQueueService } from './rx-player/preload-queue.service';
 import { RxPlayerService } from './rx-player/rx-player.service';
@@ -29,6 +29,10 @@ export class PlayerService {
 
   get isPaused() {
     return this.status === Status.paused;
+  }
+
+  get peakConfig() {
+    return this.storageService.meta.peakConfig;
   }
 
   previous() {
@@ -90,6 +94,13 @@ export class PlayerService {
     this.rxPlayerService.persistTask$.next();
 
     // TODO: 判断情况决定是否清空队列
+    this.preloadQueueService.clean();
+  }
+
+  peakChange(peakConfig?: Partial<PeakConfig>) {
+    this.storageService.persistPeakConfig(peakConfig);
+
+    // 清空队列, 重新构建
     this.preloadQueueService.clean();
   }
 
