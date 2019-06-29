@@ -4,8 +4,8 @@ import { Router } from '@angular/router';
 import { untilDestroyed } from 'ngx-take-until-destroy';
 
 import { SearchSong } from '../graphql/generated';
+import { PlayerService } from '../services/player.service';
 import { PeakConfig } from '../services/rx-player/interface';
-import { PlayerStorageService } from '../services/rx-player/player-storage.service';
 import { SearchService } from '../services/search.service';
 
 @Component({
@@ -69,11 +69,11 @@ export class HomeComponent implements OnInit, OnDestroy {
   constructor(
     private readonly router: Router,
     private readonly searchService: SearchService,
-    private readonly playerStorageService: PlayerStorageService
+    private readonly playerService: PlayerService
   ) {}
 
   ngOnInit() {
-    this.peakConfig = this.playerStorageService.meta.peakConfig;
+    this.peakConfig = this.playerService.peakConfig;
 
     this.searchService.searchSubject.pipe(untilDestroyed(this)).subscribe(async (value) => {
       if (value && this.router.url === this.homeUrl) {
@@ -102,7 +102,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   selectionChange({ value }: MatSelectChange) {
-    this.playerStorageService.persistPeakConfig({ duration: value });
+    this.playerService.peakChange({ duration: value });
   }
 
   ngOnDestroy(): void {}
