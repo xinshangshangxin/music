@@ -6,12 +6,12 @@ import { Action, awaitWrap, Defer, defer, Message } from './helper';
 interface MusicDBSchema extends DBSchema {
   'song-list': {
     key: string;
-    value: string;
+    value: object[];
   };
 }
 
 const version = 1;
-const dbName = 'music;';
+const dbName = 'music';
 
 function openDBWithSchema(): Promise<IDBPDatabase<MusicDBSchema>> {
   return openDB<MusicDBSchema>(dbName, version, {
@@ -50,7 +50,7 @@ async function getSongStore() {
 
 addEventListener('message', async ({ data }: { data: Message }) => {
   const { action, key, value, uuid } = data;
-  console.info('workerReceived...', data);
+  console.info('worker request data: ', data);
   const store = await getSongStore();
   if (action === Action.get) {
     const [err, result] = await awaitWrap(store[action](key));
