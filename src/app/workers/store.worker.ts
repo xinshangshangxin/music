@@ -50,7 +50,7 @@ async function getSongStore() {
 
 addEventListener('message', async ({ data }: { data: Message }) => {
   const { action, key, value, uuid } = data;
-  console.info('workerReceived...', data);
+  console.info('worker request data: ', data);
   const store = await getSongStore();
   if (action === Action.get) {
     const [err, result] = await awaitWrap(store[action](key));

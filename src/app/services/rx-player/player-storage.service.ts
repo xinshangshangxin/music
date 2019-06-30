@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
+import { v4 as uuidV4 } from 'uuid';
 
-import { Action, Defer, defer, Message, awaitWrap } from '../../workers/helper';
+import { Action, awaitWrap, Defer, defer, Message } from '../../workers/helper';
 import { Meta, PeakConfig, PlayerSong, Playlist } from './interface';
 
 @Injectable({
@@ -34,10 +35,9 @@ export class PlayerStorageService {
   private fillPlaylistPromise;
 
   constructor() {
-    this.initMeta();
-    this.fillPlaylistPromise = awaitWrap(this.fillPlaylists());
-
     this.worker.onmessage = ({ data }) => {
+      console.info('worker response data: ', data);
+
       if (data && data.uuid) {
         let deferred = this.deferredMap[data.uuid];
 
@@ -47,6 +47,9 @@ export class PlayerStorageService {
         }
       }
     };
+
+    this.initMeta();
+    this.fillPlaylistPromise = awaitWrap(this.fillPlaylists());
   }
 
   persistPeakConfig(peakConfig?: Partial<PeakConfig>): PeakConfig {
@@ -105,7 +108,7 @@ export class PlayerStorageService {
   }
 
   private workAct(data: any, timeout = 10000) {
-    const uuid = new Date().toISOString();
+    const uuid = new Date().toISOString() + '|' + uuidV4();
 
     let deferred = defer<Message>();
     this.deferredMap[uuid] = deferred;
