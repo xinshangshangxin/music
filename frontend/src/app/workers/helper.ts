@@ -18,7 +18,7 @@ export interface Defer<T, U = Error> {
 
 async function awaitWrap<T, U = Error>(promise: T): Promise<[U, null] | [null, T]> {
   try {
-    let data = await promise;
+    const data = await promise;
     return [null, data];
   } catch (e) {
     return [e, null];
