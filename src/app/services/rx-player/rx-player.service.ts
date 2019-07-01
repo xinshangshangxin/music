@@ -216,7 +216,7 @@ export class RxPlayerService {
       });
   }
 
-  public playSong(promise: Promise<QueueData | Error>): Observable<RxAudio> {
+  private playSong(promise: Promise<QueueData | Error>): Observable<RxAudio> {
     return loadAudio(promise).pipe(
       tap(({ rxAudio, song, changed }) => {
         if (changed) {
