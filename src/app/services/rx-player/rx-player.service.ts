@@ -9,6 +9,7 @@ import {
   switchMap,
   tap,
   throttleTime,
+  takeUntil,
 } from 'rxjs/operators';
 
 import { RxAudio } from '../../audio/rx-audio';
@@ -215,7 +216,7 @@ export class RxPlayerService {
       });
   }
 
-  private playSong(promise: Promise<QueueData | Error>): Observable<RxAudio> {
+  public playSong(promise: Promise<QueueData | Error>): Observable<RxAudio> {
     return loadAudio(promise).pipe(
       tap(({ rxAudio, song, changed }) => {
         if (changed) {
@@ -296,7 +297,8 @@ export class RxPlayerService {
         }
 
         return EMPTY;
-      })
+      }),
+      takeUntil(this.lastDestroy$)
     );
   }
 

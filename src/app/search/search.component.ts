@@ -16,6 +16,7 @@ import {
 import { ParseUrlGQL, SearchGQL, SearchSong, SongGQL } from '../graphql/generated';
 import { PlayerService } from '../services/player.service';
 import { SearchService } from '../services/search.service';
+import { TempPlayerService } from '../services/temp-player.service';
 
 enum SearchType {
   redirect = 'redirect',
@@ -31,6 +32,7 @@ enum SearchType {
 })
 export class SearchComponent implements OnInit, OnDestroy {
   public searchList: SearchSong[];
+  public replaceIndex = -1;
 
   constructor(
     private readonly searchService: SearchService,
@@ -40,13 +42,19 @@ export class SearchComponent implements OnInit, OnDestroy {
     private searchGQL: SearchGQL,
     private location: Location,
     private songGQL: SongGQL,
-    private playerService: PlayerService
+    private playerService: PlayerService,
+    private tempPlayerService: TempPlayerService
   ) {}
 
   ngOnInit() {
     const params$ = this.activatedRoute.queryParams.pipe(
       tap((data) => {
         console.info('queryParams: ', JSON.stringify(data));
+      }),
+      tap(({ replaceIndex }) => {
+        if (replaceIndex !== undefined) {
+          this.replaceIndex = replaceIndex;
+        }
       }),
       map(({ search }) => {
         return (search || '').trim();
@@ -115,6 +123,14 @@ export class SearchComponent implements OnInit, OnDestroy {
         untilDestroyed(this)
       )
       .subscribe(() => {});
+  }
+
+  playTemp(song: SearchSong) {
+    this.tempPlayerService.playSong(song);
+  }
+
+  replace(song: SearchSong) {
+    this.tempPlayerService.replaceSong(song, this.replaceIndex);
   }
 
   private getSearchType(keyword: string) {
