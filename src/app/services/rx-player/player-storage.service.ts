@@ -107,7 +107,7 @@ export class PlayerStorageService {
     });
   }
 
-  private workAct(data: any, timeout = 10000) {
+  private workerAct(data: any, timeout = 10000) {
     const uuid = new Date().toISOString() + '|' + uuidV4();
 
     let deferred = defer<Message>();
@@ -166,7 +166,7 @@ export class PlayerStorageService {
 
     if (action === Action.get) {
       try {
-        const { result } = await this.workAct(
+        const { result } = await this.workerAct(
           {
             action: Action.get,
             key,
