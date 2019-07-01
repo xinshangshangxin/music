@@ -10,12 +10,13 @@
     (click)="play(i)"
   >
     <span class="song-info">
+      <img class="logo" src="assets/logos/{{ song.provider }}.png" [alt]="song.provider" />
       <span
         class="song-name"
         matTooltip="{{ song.name }}"
         matTooltipPosition="above"
         matTooltipShowDelay="500"
-        >[{{ song.provider }}]-{{ song.name }}
+        >{{ song.name }}
       </span>
 
       <span
