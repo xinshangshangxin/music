@@ -223,6 +223,7 @@ export class RxPlayerService {
         }
 
         console.info(`play ┣ ${song.name} ┫ ┣ ${song.provider} ┫`, {
+          duration: song.duration,
           currentTime: rxAudio.audio.currentTime,
           currentIndex: this.currentIndex,
           queueLen: this.preloadQueueService.getQueueLen(),
