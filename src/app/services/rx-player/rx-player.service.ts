@@ -224,11 +224,12 @@ export class RxPlayerService {
         }
 
         console.info(`play ┣ ${song.name} ┫ ┣ ${song.provider} ┫`, {
-          duration: song.duration,
           currentTime: rxAudio.audio.currentTime,
           currentIndex: this.currentIndex,
           queueLen: this.preloadQueueService.getQueueLen(),
           status: this.status,
+          peakConfig: this.peakConfig,
+          song,
         });
         // 监听错误事件
         getError({ rxAudio, song, lastDestroy$: this.lastDestroy$ }).subscribe((e) => {
