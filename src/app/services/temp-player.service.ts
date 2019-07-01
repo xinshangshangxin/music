@@ -5,7 +5,7 @@ import { catchError, map, takeUntil, tap, throttleTime } from 'rxjs/operators';
 import { SearchSong } from '../graphql/generated';
 import { PlayerService } from './player.service';
 import { loadAudio } from './rx-player/helper';
-import { Status } from './rx-player/interface';
+import { Omit, Status } from './rx-player/interface';
 import { getEnded, getError, getLayoutEnd, getLayoutTouch } from './rx-player/listener';
 import { PlayerStorageService } from './rx-player/player-storage.service';
 import { PreloadQueueService } from './rx-player/preload-queue.service';
@@ -22,9 +22,7 @@ export class TempPlayerService {
     private readonly rxPlayerService: RxPlayerService
   ) {}
 
-  playSong(searchSong: SearchSong) {
-    const { __typename, ...song } = searchSong;
-
+  playSong(song: Omit<SearchSong, '__typename'>) {
     const { peakConfig } = this.storageService.meta;
     console.info('temp player play: ', song);
     const promise = this.preloadQueueService.getQueueData({

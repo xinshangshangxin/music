@@ -119,6 +119,11 @@ export class SearchComponent implements OnInit, OnDestroy {
           if (isPlay) {
             this.playerService.playLast();
           }
+
+          this.searchService.urlLoadSubject.next('');
+        }),
+        switchMap(() => {
+          return from(this.router.navigate(['']));
         }),
         untilDestroyed(this)
       )

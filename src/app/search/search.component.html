@@ -12,12 +12,13 @@
     </span>
     <span class="song-control">
         <ng-container *ngIf="replaceIndex === -1">
-          <i class="material-icons" (click)="add(song, i)">playlist_add</i>
+          <i class="material-icons" (click)="playTemp(song)">audiotrack</i>
+          <i class="material-icons" (click)="add(song)">playlist_add</i>
           <i class="material-icons" (click)="add(song, undefined, true)">playlist_play</i>
         </ng-container>
   
         <ng-container *ngIf="replaceIndex >= 0">
-          <i class="material-icons" (click)="playTemp(song)">playlist_play</i>
+          <i class="material-icons" (click)="playTemp(song)">audiotrack</i>
           <i class="material-icons" (click)="replace(song)">loop</i>
         </ng-container>
       </span>
