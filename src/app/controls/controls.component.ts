@@ -35,5 +35,7 @@ export class ControlsComponent implements OnInit {
     this.playerService.previous();
   }
 
-  locate() {}
+  locate() {
+    this.playerService.locateCurrent$.next();
+  }
 }
