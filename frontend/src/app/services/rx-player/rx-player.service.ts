@@ -9,6 +9,7 @@ import {
   switchMap,
   tap,
   throttleTime,
+  takeUntil,
 } from 'rxjs/operators';
 
 import { RxAudio } from '../../audio/rx-audio';
@@ -227,6 +228,8 @@ export class RxPlayerService {
           currentIndex: this.currentIndex,
           queueLen: this.preloadQueueService.getQueueLen(),
           status: this.status,
+          peakConfig: this.peakConfig,
+          song,
         });
         // 监听错误事件
         getError({ rxAudio, song, lastDestroy$: this.lastDestroy$ }).subscribe((e) => {
@@ -295,7 +298,8 @@ export class RxPlayerService {
         }
 
         return EMPTY;
-      })
+      }),
+      takeUntil(this.lastDestroy$)
     );
   }
 

@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { merge } from 'rxjs';
+import { merge, Subject } from 'rxjs';
 import { debounceTime, tap } from 'rxjs/operators';
 
 import { RxAudio } from '../audio/rx-audio';
@@ -13,6 +13,8 @@ import { RxPlayerService } from './rx-player/rx-player.service';
 })
 export class PlayerService {
   rxAudio: RxAudio | undefined;
+
+  public locateCurrent$ = new Subject<void>();
 
   constructor(
     private readonly storageService: PlayerStorageService,

@@ -1,5 +1,5 @@
 import { RxAudio } from '../../audio/rx-audio';
-import { Song } from '../../graphql/generated';
+import { Song, SearchArtist } from '../../graphql/generated';
 
 export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
 
@@ -43,9 +43,19 @@ export interface Meta {
   playlists: Playlist[];
 }
 
-export interface PlayerSong extends Song {
+export interface PlayerSong extends Omit<Song, 'artists' | 'album' | '__typename'> {
+  artists?:
+    | {
+        id?: string | null;
+        name: string;
+      }[]
+    | null;
   peakStartTime?: number;
   peakDuration?: number;
+  album?: {
+    id?: string | null;
+    name: string;
+  } | null;
 }
 
 export interface PlayerPeakSong extends Song {
