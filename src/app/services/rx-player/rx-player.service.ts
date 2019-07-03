@@ -304,8 +304,10 @@ export class RxPlayerService {
   }
 
   private loadNextSongs(): void {
-    console.info('===== loadNextSongs ====');
     let len = this.preloadQueueService.getQueueLen();
+
+    console.info('===== loadNextSongs ====', { queueLen: len, currentIndex: this.currentIndex });
+
     if (len >= this.queueLen) {
       return;
     }
