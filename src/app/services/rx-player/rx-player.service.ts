@@ -7,9 +7,9 @@ import {
   map,
   mapTo,
   switchMap,
+  takeUntil,
   tap,
   throttleTime,
-  takeUntil,
 } from 'rxjs/operators';
 
 import { RxAudio } from '../../audio/rx-audio';
@@ -179,6 +179,7 @@ export class RxPlayerService {
             songRetries: this.storageService.meta.errorRetry.songRetries,
             continuousErrorNu: this.continuousErrorNu,
             playerRetries: this.storageService.meta.errorRetry.playerRetries,
+            queueLen: this.preloadQueueService.getQueueLen(),
           });
         }),
         mapTo('error')
