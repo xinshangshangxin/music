@@ -37,7 +37,7 @@ export interface PlayerSong extends Omit<Song, 'artists' | 'album' | '__typename
   } | null;
 }
 
-export interface Setting extends Partial<PeakConfig> {
+export interface Setting extends PeakConfig {
   song: PlayerSong & { url: string };
   currentTime: number;
 }

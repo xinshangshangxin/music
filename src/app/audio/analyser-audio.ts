@@ -7,6 +7,7 @@ import { Setting } from './interface';
 export class AnalyserAudio {
   public audio = new Audio();
   public audioListener = new AudioListener();
+
   public songUrl: string;
 
   private peakConfig = { ...defaultPeakConfig };
@@ -18,6 +19,7 @@ export class AnalyserAudio {
 
   constructor() {
     this.audio.crossOrigin = 'anonymous';
+    this.audio.preload = 'auto';
 
     this.source = this.audioContext.createMediaElementSource(this.audio);
     this.analyser = this.audioContext.createAnalyser();
@@ -29,14 +31,39 @@ export class AnalyserAudio {
 
     // 绑定 audio;
     this.audioListener.bindAudio(this.audio);
+
+    // DEBUG LOG
+    // this.audio.addEventListener('loadstart', () => {
+    //   console.info('Event:loadstart: ', {
+    //     name: decodeURIComponent(this.audio.src.replace(/.*name=/, '')),
+    //     currentTime: this.audio.currentTime,
+    //   });
+    // });
+
+    // this.audio.addEventListener('timeupdate', () => {
+    //   console.info('Event:timeupdate: ', {
+    //     name: decodeURIComponent(this.audio.src.replace(/.*name=/, '')),
+    //     currentTime: this.audio.currentTime,
+    //   });
+    // });
+
+    // this.audio.addEventListener('canplaythrough', () => {
+    //   console.info('Event:canplaythrough: ', {
+    //     name: decodeURIComponent(this.audio.src.replace(/.*name=/, '')),
+    //     currentTime: this.audio.currentTime,
+    //   });
+    // });
   }
 
   set(setting: Setting) {
     const { song, currentTime, ...peakConfig } = setting;
 
     this.songUrl = song.url;
-    this.audio.src = song.url;
-    this.audio.currentTime = currentTime;
+
+    // 标记播放范围
+    // https://developer.mozilla.org/zh-CN/docs/Web/Guide/HTML/Using_HTML5_audio_and_video#%E6%A0%87%E8%AE%B0%E6%92%AD%E6%94%BE%E8%8C%83%E5%9B%B4
+    this.audio.src = `${song.url}#t=${currentTime}`;
+    this.audio.load();
 
     merge(this.peakConfig, peakConfig);
 

@@ -166,6 +166,8 @@ export class PoolAudio {
 
     analyserAudio.tryPause();
 
+    analyserAudio.audio.removeAttribute('src');
+
     delete this.pool[songUrl];
     this.restList.push(analyserAudio);
   }
