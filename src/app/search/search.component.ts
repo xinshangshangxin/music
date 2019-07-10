@@ -14,9 +14,8 @@ import {
 } from 'rxjs/operators';
 
 import { ParseUrlGQL, SearchGQL, SearchSong, SongGQL } from '../graphql/generated';
-import { PlayerService } from '../services/player.service';
 import { SearchService } from '../services/search.service';
-import { TempPlayerService } from '../services/temp-player.service';
+import { PlayerListService } from '../services/player-list.service';
 
 enum SearchType {
   redirect = 'redirect',
@@ -42,8 +41,7 @@ export class SearchComponent implements OnInit, OnDestroy {
     private searchGQL: SearchGQL,
     private location: Location,
     private songGQL: SongGQL,
-    private playerService: PlayerService,
-    private tempPlayerService: TempPlayerService
+    private readonly playerListService: PlayerListService
   ) {}
 
   ngOnInit() {
@@ -115,10 +113,8 @@ export class SearchComponent implements OnInit, OnDestroy {
           return result.data.song;
         }),
         tap((song) => {
-          this.playerService.add(song, index);
-          if (isPlay) {
-            this.playerService.playLast();
-          }
+          console.info('song: ', song);
+          this.playerListService.add(song, index);
 
           this.searchService.urlLoadSubject.next('');
         }),
@@ -130,13 +126,9 @@ export class SearchComponent implements OnInit, OnDestroy {
       .subscribe(() => {});
   }
 
-  playTemp(song: SearchSong) {
-    this.tempPlayerService.playSong(song);
-  }
+  playTemp(song: SearchSong) {}
 
-  replace(song: SearchSong) {
-    this.tempPlayerService.replaceSong(song, this.replaceIndex);
-  }
+  replace(song: SearchSong) {}
 
   private getSearchType(keyword: string) {
     if (keyword === '') {
@@ -195,7 +187,7 @@ export class SearchComponent implements OnInit, OnDestroy {
         return result.data.parseUrl || [];
       }),
       map((songs) => {
-        this.playerService.loadSongs(songs);
+        this.playerListService.loadSongList(songs);
       }),
       delay(200),
       tap(() => {

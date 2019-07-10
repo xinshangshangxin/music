@@ -4,7 +4,7 @@
     class="song-box"
     *ngFor="let song of list; index as i"
     [ngClass]="{
-      playing: rxPlayerService.currentIndex === i,
+      playing: currentIndex === i,
       disabled: song.privilege === denyPrivilege
     }"
     (click)="play(i)"

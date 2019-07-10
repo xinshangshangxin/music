@@ -10,16 +10,24 @@ import { ControlsComponent } from './controls/controls.component';
 import { CoreModule } from './core/core.module';
 import { GraphQLModule } from './graphql/graphql.module';
 import { HomeComponent } from './home/home.component';
-import { PlayerService } from './services/player.service';
-import { PlayerStorageService } from './services/rx-player/player-storage.service';
-import { PreloadQueueService } from './services/rx-player/preload-queue.service';
-import { RxPlayerService } from './services/rx-player/rx-player.service';
-import { SearchService } from './services/search.service';
-import { SongListComponent } from './song-list/song-list.component';
 import { SearchComponent } from './search/search.component';
+import { ConfigService } from './services/config.service';
+import { LocateService } from './services/locate.service';
+import { PersistService } from './services/persist.service';
+import { PlayerListService } from './services/player-list.service';
+import { PreloadService } from './services/preload.service';
+import { SearchService } from './services/search.service';
+import { StorageService } from './services/storage.service';
+import { SongListComponent } from './song-list/song-list.component';
 
 @NgModule({
-  declarations: [AppComponent, SongListComponent, HomeComponent, ControlsComponent, SearchComponent],
+  declarations: [
+    AppComponent,
+    SongListComponent,
+    HomeComponent,
+    ControlsComponent,
+    SearchComponent,
+  ],
   imports: [
     BrowserModule,
     AppRoutingModule,
@@ -30,11 +38,13 @@ import { SearchComponent } from './search/search.component';
     FormsModule,
   ],
   providers: [
-    PlayerService,
-    PlayerStorageService,
-    PreloadQueueService,
-    RxPlayerService,
+    ConfigService,
+    LocateService,
+    PersistService,
+    PlayerListService,
+    PreloadService,
     SearchService,
+    StorageService,
   ],
   bootstrap: [AppComponent],
 })

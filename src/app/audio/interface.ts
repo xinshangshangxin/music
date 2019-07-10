@@ -1,21 +1,13 @@
-import { RxAudio } from '../../audio/rx-audio';
-import { Song, SearchArtist } from '../../graphql/generated';
+import { Song } from '../graphql/generated';
 
 export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
-
-export interface PlaylistBrief {
-  id: string;
-  name: string;
-}
-
-export interface Playlist extends PlaylistBrief {
-  songs: PlayerSong[];
-}
 
 export type SongDuration = 0 | 20 | 25 | 30 | 35 | 40 | 45 | 50 | 55 | 60;
 
 // 总共播放时长 = duration + before + end
 export interface PeakConfig {
+  minVolume: number;
+  maxVolume: number;
   // 高潮音乐时长
   duration: SongDuration;
   // 渐入时长
@@ -28,19 +20,6 @@ export interface PeakConfig {
   after: number;
   // peak 数组的精确度
   precision: number;
-}
-
-export interface ErrorRetry {
-  songRetries: number;
-  playerRetries: number;
-}
-
-export interface Meta {
-  errorRetry: ErrorRetry;
-  peakConfig: PeakConfig;
-  currentIndex: number;
-  currentPlaylistId: string;
-  playlists: Playlist[];
 }
 
 export interface PlayerSong extends Omit<Song, 'artists' | 'album' | '__typename'> {
@@ -58,18 +37,7 @@ export interface PlayerSong extends Omit<Song, 'artists' | 'album' | '__typename
   } | null;
 }
 
-export interface PlayerPeakSong extends Song {
-  peakStartTime: number;
-  peakDuration: number;
-}
-
-export interface QueueData {
-  rxAudio: RxAudio;
-  song: PlayerPeakSong;
-  changed: boolean;
-}
-
-export enum Status {
-  palying = 'playing',
-  paused = 'paused',
+export interface Setting extends Partial<PeakConfig> {
+  song: PlayerSong & { url: string };
+  currentTime: number;
 }

@@ -1,12 +1,12 @@
 /// <reference lib="webworker" />
-import { DBSchema, IDBPDatabase, openDB } from 'idb';
+import { DBSchema, IDBPDatabase, IDBPObjectStore, openDB } from 'idb';
 
-import { Action, awaitWrap, Defer, defer, Message } from './helper';
+import { Action, awaitWrap, Defer, defer, RequestMessage } from './helper';
 
 interface MusicDBSchema extends DBSchema {
-  'song-list': {
+  'music-structured': {
     key: string;
-    value: object[];
+    value: object;
   };
 }
 
@@ -16,7 +16,7 @@ const dbName = 'music';
 function openDBWithSchema(): Promise<IDBPDatabase<MusicDBSchema>> {
   return openDB<MusicDBSchema>(dbName, version, {
     upgrade(db) {
-      db.createObjectStore('song-list');
+      db.createObjectStore('music-structured');
     },
   });
 }
@@ -42,27 +42,65 @@ const getDb = (() => {
 
 async function getSongStore() {
   const db = await getDb();
-  const tx = db.transaction(['song-list'], 'readwrite');
-  const store = tx.objectStore('song-list');
+  const tx = db.transaction(['music-structured'], 'readwrite');
+  const store = tx.objectStore('music-structured');
 
   return store;
 }
 
-addEventListener('message', async ({ data }: { data: Message }) => {
-  const { action, key, value, uuid } = data;
-  console.info('worker request data: ', data);
-  const store = await getSongStore();
-  if (action === Action.get) {
-    const [err, result] = await awaitWrap(store[action](key));
-    if (err) {
-      console.warn(err, data);
+async function dealAction({
+  store,
+  action,
+  key,
+  value,
+}: {
+  store: IDBPObjectStore<MusicDBSchema, 'music-structured'[], 'music-structured'>;
+  action: Action;
+  key: string;
+  value?: object;
+}): Promise<any> {
+  if (action === Action.put) {
+    if (!value) {
+      throw new Error('store put not set value');
     }
-    postMessage({ action, key, result, uuid });
-  } else if (action === Action.put) {
-    const [err, result] = await awaitWrap(store.put(value, key));
-    if (err) {
-      console.warn(err, data);
-    }
-    postMessage({ action, key, result, uuid });
+    return store.put(value, key);
+  } else if (action === Action.get) {
+    return store.get(key);
+  } else if (action === Action.delete) {
+    return store.delete(key);
+  } else {
+    throw new Error(`action:${action} not support`);
   }
+}
+
+addEventListener('message', async ({ data }: { data: RequestMessage & { uuid: string } }) => {
+  console.info('worker request data: ', data);
+
+  const { uuid } = data;
+
+  if (!uuid) {
+    console.warn('no uuid, ignore action', data);
+    return;
+  }
+
+  const store = await getSongStore();
+
+  const [err, result] = await awaitWrap(
+    dealAction({
+      store,
+      ...data,
+    })
+  );
+
+  let errorMessage: string | undefined;
+  if (err) {
+    console.warn(err, `set store failed`);
+    errorMessage = err.message;
+  }
+
+  postMessage({
+    uuid,
+    result,
+    errMsg: errorMessage,
+  });
 });

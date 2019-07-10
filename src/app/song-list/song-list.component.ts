@@ -12,10 +12,10 @@ import { untilDestroyed } from 'ngx-take-until-destroy';
 import { combineLatest } from 'rxjs';
 import { debounceTime, map, startWith, tap } from 'rxjs/operators';
 
+import { PlayerSong } from '../audio/interface';
 import { Privilege } from '../graphql/generated';
-import { PlayerService } from '../services/player.service';
-import { PlayerSong } from '../services/rx-player/interface';
-import { RxPlayerService } from '../services/rx-player/rx-player.service';
+import { LocateService } from '../services/locate.service';
+import { PlayerListService } from '../services/player-list.service';
 
 @Component({
   selector: 'app-song-list',
@@ -30,13 +30,13 @@ export class SongListComponent implements OnInit, AfterViewInit, OnDestroy {
   songDivs: QueryList<ElementRef<HTMLDivElement>>;
 
   constructor(
-    private playerService: PlayerService,
-    private rxPlayerService: RxPlayerService,
+    private playerListService: PlayerListService,
+    private locateService: LocateService,
     private router: Router
   ) {}
 
   ngOnInit() {
-    this.list = this.rxPlayerService.songList;
+    this.list = this.playerListService.songList;
   }
 
   ngAfterViewInit() {
@@ -45,12 +45,16 @@ export class SongListComponent implements OnInit, AfterViewInit, OnDestroy {
 
   ngOnDestroy(): void {}
 
+  get currentIndex() {
+    return this.playerListService.currentIndex;
+  }
+
   play(index: number) {
-    this.playerService.playAt(index);
+    this.playerListService.playAt(index);
   }
 
   remove(index: number) {
-    this.playerService.remove(index);
+    this.playerListService.remove(index);
   }
 
   formatArtists(artists: { name: string }[]) {
@@ -73,13 +77,13 @@ export class SongListComponent implements OnInit, AfterViewInit, OnDestroy {
   private locateWatch() {
     combineLatest([
       this.songDivs.changes.pipe(startWith(this.songDivs)),
-      this.playerService.locateCurrent$.pipe(startWith(undefined)),
+      this.locateService.locateCurrent$.pipe(startWith(undefined)),
     ])
       .pipe(
         debounceTime(200),
         map(() => {
           const elementRef = this.songDivs.find((item, index) => {
-            return index === this.rxPlayerService.currentIndex;
+            return index === this.playerListService.currentIndex;
           });
 
           if (elementRef) {
