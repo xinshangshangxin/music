@@ -77,7 +77,11 @@ export class AnalyserAudio {
     } catch (e) {}
   }
 
-  layIn(): Promise<void> {
+  layIn(currentTime?: number): Promise<void> {
+    if (currentTime) {
+      this.audio.currentTime = currentTime;
+    }
+
     if (this.peakConfig.layIn <= 0) {
       return this.audio.play();
     }

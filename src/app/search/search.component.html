@@ -3,24 +3,48 @@
     class="song-box"
     *ngFor="let song of searchList; index as i"
     [ngClass]="{ disabled: song.privilege === 'deny' }"
+    (click)="playTemp(song)"
   >
     <span class="song-info">
-      <span class="song-name">[{{ song.provider }}]{{ song.name }}</span>
+      <span class="song-name">
+        <img class="logo" src="assets/logos/{{ song.provider }}.png" [alt]="song.provider" />
+
+        {{ song.name }}</span
+      >
       <span class="song-artists">
         <span *ngFor="let artist of song.artists"> {{ artist.name }} </span>
       </span>
     </span>
-    <span class="song-control">
-        <ng-container *ngIf="replaceIndex === -1">
-          <i class="material-icons" (click)="playTemp(song)">audiotrack</i>
-          <i class="material-icons" (click)="add(song)">playlist_add</i>
-          <i class="material-icons" (click)="add(song, undefined, true)">playlist_play</i>
-        </ng-container>
-  
-        <ng-container *ngIf="replaceIndex >= 0">
-          <i class="material-icons" (click)="playTemp(song)">audiotrack</i>
-          <i class="material-icons" (click)="replace(song)">loop</i>
-        </ng-container>
-      </span>
+    <ng-container class="song-control">
+      <ng-container *ngIf="replaceIndex === -1">
+        <button
+          mat-icon-button
+          [matMenuTriggerFor]="menu"
+          aria-label="more"
+          (click)="$event.stopPropagation()"
+        >
+          <mat-icon>more_vert</mat-icon>
+        </button>
+        <mat-menu #menu="matMenu">
+          <button mat-menu-item (click)="add(song, 'next')">
+            下一首播放
+          </button>
+          <button mat-menu-item (click)="add(song, 'end')">
+            添加到播放列表
+          </button>
+          <button mat-menu-item [matMenuTriggerFor]="addMenu">加入歌单</button>
+        </mat-menu>
+
+        <mat-menu #addMenu="matMenu">
+          <button mat-menu-item>歌单1</button>
+          <button mat-menu-item>歌单2</button>
+        </mat-menu>
+      </ng-container>
+
+      <ng-container *ngIf="replaceIndex >= 0">
+        <i class="material-icons" (click)="playTemp(song)">audiotrack</i>
+        <i class="material-icons" (click)="replace(song)">loop</i>
+      </ng-container>
+    </ng-container>
   </div>
 </div>

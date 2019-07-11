@@ -32,10 +32,10 @@
         <i class="material-icons" mat-button [matMenuTriggerFor]="menu">more_vert</i>
       </span>
       <mat-menu #menu="matMenu">
-        <button *ngIf="song.privilege === 'deny'" mat-menu-item (click)="searchSame(song, i)">
+        <!-- <button *ngIf="song.privilege === 'deny'" mat-menu-item (click)="searchSame(song, i)">
           <mat-icon>loop</mat-icon>
           <span>replace</span>
-        </button>
+        </button> -->
 
         <button mat-menu-item (click)="remove(i)">
           <mat-icon>delete</mat-icon>

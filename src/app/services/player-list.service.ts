@@ -112,7 +112,7 @@ export class PlayerListService {
     this.config = await this.configService.changeConfig(config);
   }
 
-  public loadSongList(list: PlayerSong[], currentIndex = 0) {
+  public loadSongList(list: PlayerSong[], currentIndex = 0, isPlay = false) {
     // 更正游标
     this.currentIndex = currentIndex;
     // 更新列表
@@ -123,8 +123,12 @@ export class PlayerListService {
     this.persistTask$.next();
 
     if (this.songList.length) {
-      // 触发歌曲播放
+      // 触发歌曲载入
       this.loadNextSongs();
+    }
+
+    if (isPlay && this.songList.length) {
+      this.playAt(this.currentIndex);
     }
   }
 
@@ -148,8 +152,29 @@ export class PlayerListService {
     this.click$.next(index);
   }
 
-  public add(song: PlayerSong, index = this.songList.length) {
-    this.songList.splice(index, 0, song);
+  /**
+   *
+   * @param song PlayerSong
+   * @param position next 插入到下一首, end 插入到末尾
+   */
+  public add(song: PlayerSong, position: number | 'next' | 'end' = 'end') {
+    let start: number;
+    if (position === 'next') {
+      start = this.getValidIndex(this.currentIndex + 1);
+    } else if (position === 'end') {
+      start = this.songList.length;
+    } else {
+      start = position;
+    }
+
+    // 先删除重复歌曲
+    const removeIndex = this.songList.findIndex(({ provider, id }) => {
+      return provider === song.provider && id === song.id;
+    });
+    this.songList.splice(removeIndex, 1);
+
+    // 再加入歌单
+    this.songList.splice(start, 0, song);
     this.persistTask$.next();
   }
 
@@ -324,18 +349,18 @@ export class PlayerListService {
             this.loadNextSongs();
           });
       }),
-      map(({ analyserAudio }) => {
-        return analyserAudio;
-      }),
-      tap((analyserAudio) => {
+      tap(({ analyserAudio, song }) => {
         if (!analyserAudio || this.status !== Status.playing) {
           return;
         }
 
-        analyserAudio.layIn().catch((e) => {
+        analyserAudio.layIn(song.peakStartTime).catch((e) => {
           console.warn(e);
           this.error$.next(e);
         });
+      }),
+      map(({ analyserAudio }) => {
+        return analyserAudio;
       }),
       catchError((err) => {
         console.warn('load audio error', err);
