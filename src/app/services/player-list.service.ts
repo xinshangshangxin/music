@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { EMPTY, merge, Observable, of, Subject } from 'rxjs';
+import { EMPTY, from, merge, Observable, of, Subject } from 'rxjs';
 import {
   catchError,
   debounceTime,
@@ -287,6 +287,59 @@ export class PlayerListService {
         if (analyserAudio) {
           this.play$.next(analyserAudio);
         }
+      })
+    );
+  }
+
+  public playTemp(song: PlayerSong) {
+    this.lastDestroy$.next();
+
+    return of(null).pipe(
+      tap(() => {
+        this.status = Status.playing;
+      }),
+      switchMap(() => {
+        return loadAudio(
+          this.preloadService.getQueueData({
+            song,
+            peakConfig: this.config.peakConfig,
+            lastDestroy$: this.lastDestroy$,
+          })
+        );
+      }),
+      tap(({ analyserAudio, song }) => {
+        console.info('play temp song: ', song);
+        // 监听结束
+        merge(
+          // 正常结束
+          analyserAudio.audioListener.getEnded(),
+          // layOut 结束
+          analyserAudio.audioListener.getLayoutEnded(song.peakStartTime)
+        )
+          .pipe(throttleTime(500))
+          .subscribe(() => {
+            analyserAudio.tryPause();
+            this.status = Status.paused;
+          });
+
+        // 监听 layOutTouch
+        analyserAudio.audioListener.getLayoutTouch(song.peakStartTime).subscribe(() => {
+          analyserAudio.layOutPause();
+        });
+      }),
+      tap(({ analyserAudio }) => {
+        if (analyserAudio) {
+          this.play$.next(analyserAudio);
+        }
+      }),
+      switchMap(({ analyserAudio }) => {
+        return from(analyserAudio.layIn(song.peakStartTime));
+      }),
+      takeUntil(this.lastDestroy$),
+      catchError((e) => {
+        console.warn(e);
+        this.status = Status.paused;
+        return EMPTY;
       })
     );
   }

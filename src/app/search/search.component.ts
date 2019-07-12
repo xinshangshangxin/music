@@ -13,7 +13,7 @@ import {
   tap,
 } from 'rxjs/operators';
 
-import { ParseUrlGQL, SearchGQL, SearchSong, SongGQL } from '../graphql/generated';
+import { ParseUrlGQL, SearchGQL, SearchSong } from '../graphql/generated';
 import { PlayerListService } from '../services/player-list.service';
 import { SearchService } from '../services/search.service';
 
@@ -116,7 +116,10 @@ export class SearchComponent implements OnInit, OnDestroy {
   }
 
   playTemp(song: SearchSong) {
-    this.playerListService.loadSongList([song], 0, true);
+    this.playerListService
+      .playTemp(song)
+      .pipe(untilDestroyed(this))
+      .subscribe(() => {});
   }
 
   replace(song: SearchSong) {}

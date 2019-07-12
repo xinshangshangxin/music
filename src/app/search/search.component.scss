@@ -54,11 +54,13 @@
     }
 
     .song-control {
-        flex: 0 0 80px;
-        height: 20px;
+        flex: 0 0 45px;
+        display: flex;
+        justify-content: space-around;
+        cursor: pointer;
 
         .material-icons {
-            cursor: pointer;
+            font-size: 20px;
         }
     }
 }
