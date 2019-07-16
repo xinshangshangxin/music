@@ -1,5 +1,5 @@
 import { fromEvent, merge, Observable, Subject } from 'rxjs';
-import { filter, map, mapTo, take, takeUntil, tap } from 'rxjs/operators';
+import { filter, map, mapTo, take, takeUntil, tap, delay } from 'rxjs/operators';
 
 import { RxAudio } from '../../audio/rx-audio';
 import { PeakConfig, PlayerSong } from './interface';
@@ -14,6 +14,7 @@ function getPlay({
   lastDestroy$: Subject<void>;
 }): Observable<Event> {
   return fromEvent(rxAudio.audio, 'play').pipe(
+    delay(1000),
     takeUntil(lastDestroy$),
     take(1),
     tap((e) => {

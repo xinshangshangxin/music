@@ -1,75 +1,47 @@
+import { MyAudio } from './my-audio';
+
+let index = 0;
+const len = 5;
+const pool = new Array(len).fill(null).map(() => {
+  return new MyAudio('');
+});
+
+function getIndex() {
+  index += 1;
+  return index % len;
+}
+
+function getRxAudio(i: number) {
+  return pool[i];
+}
+
 export class RxAudio {
-  public audio = new Audio();
-  private audioContext = new AudioContext();
+  public audio: HTMLAudioElement;
+  private rxAudio: MyAudio;
+  private index: number;
 
-  private source: MediaElementAudioSourceNode;
-  private analyser: AnalyserNode;
-  private gainNode: GainNode;
+  constructor(src: string, currentTime = 0, layInDuration = 0, layOutDuration = 0) {
+    this.index = getIndex();
+    this.rxAudio = getRxAudio(this.index);
+    this.audio = this.rxAudio.audio;
 
-  constructor(src: string, currentTime = 0, private layInDuration = 0, private layOutDuration = 0) {
-    this.audio.crossOrigin = 'anonymous';
+    this.rxAudio.audio.src = src;
+    this.rxAudio.audio.currentTime = currentTime;
+    this.rxAudio.tryPause();
 
-    this.source = this.audioContext.createMediaElementSource(this.audio);
-    this.analyser = this.audioContext.createAnalyser();
-    this.gainNode = this.audioContext.createGain();
-
-    this.source.connect(this.analyser);
-    this.analyser.connect(this.gainNode);
-    this.gainNode.connect(this.audioContext.destination);
-
-    this.audio.src = src;
-    this.audio.currentTime = currentTime;
-    this.tryPause();
+    this.rxAudio.layInDuration = layInDuration;
+    this.rxAudio.layOutDuration = layOutDuration;
   }
 
-  layIn(): Promise<void> {
-    if (this.layInDuration <= 0) {
-      return this.audio.play();
-    }
-
-    this.gainNode.gain.setValueAtTime(0, this.audioContext.currentTime);
-    this.gainNode.gain.linearRampToValueAtTime(
-      1,
-      this.audioContext.currentTime + this.layInDuration
-    );
-    return this.audio.play();
+  async layIn() {
+    return this.rxAudio.layIn();
   }
 
-  layOutPause(): void {
-    if (this.layOutDuration <= 0) {
-      return;
-    }
-
-    this.gainNode.gain.setValueAtTime(1, this.audioContext.currentTime);
-    this.gainNode.gain.linearRampToValueAtTime(
-      0.2,
-      this.audioContext.currentTime + this.layOutDuration
-    );
+  async layOutPause() {
+    return this.rxAudio.layOutPause();
   }
 
   destroy(): void {
-    this.tryPause();
-
-    this.source.disconnect();
-    this.analyser.disconnect();
-    this.gainNode.disconnect();
-    this.audioContext.close();
-
-    // @ts-ignore
-    this.source = null;
-    // @ts-ignore
-    this.analyser = null;
-    // @ts-ignore
-    this.gainNode = null;
-    // @ts-ignore
-    this.audioContext = null;
-    // @ts-ignore
-    this.audio = null;
-  }
-
-  private tryPause(): void {
-    try {
-      this.audio.pause();
-    } catch (e) {}
+    this.rxAudio.tryPause();
   }
 }

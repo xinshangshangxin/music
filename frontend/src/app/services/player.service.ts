@@ -95,8 +95,12 @@ export class PlayerService {
 
     this.rxPlayerService.persistTask$.next();
 
-    // TODO: 判断情况决定是否清空队列
-    this.preloadQueueService.clean();
+    if (index === this.rxPlayerService.currentIndex) {
+      this.playAt(index);
+    } else {
+      // TODO: 判断情况决定是否清空队列
+      this.preloadQueueService.clean();
+    }
   }
 
   peakChange(peakConfig?: Partial<PeakConfig>) {

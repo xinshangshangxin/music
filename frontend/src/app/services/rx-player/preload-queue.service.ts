@@ -122,16 +122,24 @@ export class PreloadQueueService {
         return e;
       });
 
-    // DEBUG
-    promise.then((data) => {
-      if (data instanceof Error) {
-        // console.warn(data);
-      } else {
-        console.info('queue data song', data.song);
+    return promise;
+  }
+
+  async logQueueData() {
+    this.queue.forEach(async (promise, index) => {
+      try {
+        await promise.then((item) => {
+          if (item instanceof Error) {
+            console.debug(`========== queue index:${index}`, item);
+          } else {
+            const { song } = item;
+            console.debug(`========== queue index:${index}`, song);
+          }
+        });
+      } catch (e) {
+        console.debug(`========== queue index:${index}`, e);
       }
     });
-
-    return promise;
   }
 
   private getSong({
