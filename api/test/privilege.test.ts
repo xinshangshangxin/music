@@ -70,7 +70,7 @@ let testCaseMap = {
 
     {
       provider: Provider.netease,
-      keyword: '告白气球 周杰伦的床边故事',
+      keyword: '周杰伦 霍元甲 (电影 霍元甲 主题曲)',
     },
     {
       provider: Provider.netease,
