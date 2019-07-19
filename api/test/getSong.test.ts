@@ -31,7 +31,7 @@ test('getSong', async (t) => {
       let data = await getSong(id, provider, BitRate.mid);
 
       let {
-        id: resultId, name, url, album, extra: realExtra, artists,
+        id: resultId, name, url, album, extra: realExtra, artists, duration,
       } = data;
 
       t.is(resultId, id);
@@ -42,6 +42,10 @@ test('getSong', async (t) => {
 
       if (extra) {
         t.deepEqual(realExtra, extra);
+      }
+
+      if (provider === Provider.kugou || provider === Provider.netease) {
+        t.truthy(duration);
       }
     })
   );

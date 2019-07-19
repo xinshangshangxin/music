@@ -173,7 +173,7 @@ class Kugou {
           id: song.album_id,
           name: song.album_name,
         },
-        duration: song.duration * 1000,
+        duration: song.duration,
         mvId: song.mvhash,
       };
     });
@@ -213,6 +213,7 @@ class Kugou {
       return {
         privilege: get(result, 'data.play_url') ? Privilege.allow : Privilege.deny,
         id,
+        duration: get(idInfo, 'data.timelength', 0) / 1000 || undefined,
         name: get(result, 'data.song_name'),
         url: get(result, 'data.play_url'),
         lrc: get(result, 'data.lyrics'),
@@ -234,13 +235,16 @@ class Kugou {
     return {
       privilege: get(idInfo, 'url') ? Privilege.allow : Privilege.deny,
       id,
+      duration: get(idInfo, 'timeLength'),
       name: get(idInfo, 'songName'),
       url: get(idInfo, 'url'),
       lrc: '',
-      artists: [{
-        id: get(idInfo, 'singerId'),
-        name: get(idInfo, 'singerName'),
-      }],
+      artists: [
+        {
+          id: get(idInfo, 'singerId'),
+          name: get(idInfo, 'singerName'),
+        },
+      ],
       album: {
         id: `${get(idInfo, 'albumid', '')}`,
         name: get(idInfo, 'songName', ''),

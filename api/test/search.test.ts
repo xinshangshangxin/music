@@ -22,10 +22,15 @@ const schema = {
       })
     ),
   album: Joi.object({
-    name: Joi.string().required().allow(''),
+    name: Joi.string()
+      .required()
+      .allow(''),
     img: Joi.string(),
   }),
-  duration: Joi.number(),
+  duration: Joi.number().when('provider', {
+    is: Provider.kugou,
+    then: Joi.required(),
+  }),
   mvId: Joi.string().allow(''),
 };
 
@@ -37,11 +42,10 @@ function shouldValid(searchResult: ISearchItem | ISearchItem[]) {
     arr = searchResult;
   }
 
-  return arr
-    .map((item) => {
-      let { error } = Joi.validate(item, schema, { convert: false, allowUnknown: true });
-      return error && error.toString();
-    });
+  return arr.map((item) => {
+    let { error } = Joi.validate(item, schema, { convert: false, allowUnknown: true });
+    return error && error.toString();
+  });
 }
 
 test('search "Aragaki Yui" limit 5', async (t) => {

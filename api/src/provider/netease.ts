@@ -182,7 +182,7 @@ export class Netease {
           id: `${get(song, 'album.id')}`,
           name: get(song, 'album.name'),
         },
-        duration: song.duration,
+        duration: song.duration / 1000,
         mvId: `${song.mvid}`,
       };
     });
@@ -208,7 +208,7 @@ export class Netease {
         name: get(song, 'al.name'),
         img: get(song, 'al.picUrl'),
       },
-      duration: song.dt,
+      duration: song.dt / 1000,
       mvId: `${song.mv}`,
     };
   }
