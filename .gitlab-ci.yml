@@ -1,0 +1,40 @@
+image: node:10-alpine
+
+variables:
+  PUBLISH_PATH: 'dist/'
+
+stages:
+  - test-build
+  - release
+
+test-build:
+  stage: test-build
+  coverage: '/Lines\s*:\s*(\d+(?:\.\d+)?)%/'
+  retry: 2
+  artifacts:
+    name: 'music-api-${CI_COMMIT_SHA}'
+    paths:
+      - ${PUBLISH_PATH}
+  script:
+    - apk add git
+    - npm install --verbose
+    - npm run coverage
+    - npm run build
+
+release:
+  stage: release
+  script:
+    - cd ${PUBLISH_PATH}
+    - echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > ~/.npmrc
+    - npm publish
+  only:
+    - /^v\d+\.\d+\.\d+$/
+
+prerelease:
+  stage: release
+  script:
+    - cd ${PUBLISH_PATH}
+    - echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > ~/.npmrc
+    - npm publish --tag beta
+  only:
+    - /^v\d+\.\d+\.\d+-.*$/
