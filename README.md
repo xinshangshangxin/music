@@ -24,6 +24,10 @@
 
 基于 `Angular` 提供简易的界面
 
+### [kugou-lrc](./kugou-lrc)
+
+酷狗歌词搜索/下载/解析
+
 ### [proxy](./proxy)
 
 提供跨域歌曲 URL
