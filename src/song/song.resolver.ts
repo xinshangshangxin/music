@@ -1,11 +1,5 @@
-import {
-  Args,
-  Mutation,
-  Parent,
-  Query,
-  ResolveProperty,
-  Resolver,
-} from '@nestjs/graphql';
+import { Args, Mutation, Parent, Query, ResolveProperty, Resolver } from '@nestjs/graphql';
+import { Format, get, KrcInfo, LrcInfo } from '@s4p/kugou-lrc';
 import { Float, Int } from 'type-graphql';
 
 import { SongPeakService } from '../song-peak/song-peak.service';
@@ -13,6 +7,8 @@ import { SongUrlParseService } from '../song-url/song-url-parse.service';
 import { Song } from './entities/Song.entity';
 import { SongPeaks } from './entities/SongPeaks.entity';
 import { SearchSong } from './fields/SearchSong';
+import { SongKrc } from './fields/SongKrc';
+import { SongLrc } from './fields/SongLrc';
 import { SongPeaksInput } from './inputs/song-peaks';
 import { MusicApiService } from './music-api.service';
 import { BitRate, Provider } from './register-type';
@@ -70,6 +66,22 @@ export class SongResolver {
     providers: Provider[],
   ): Promise<SearchSong[]> {
     return this.musicApiService.search({ keyword, providers });
+  }
+
+  @Query(returns => SongLrc)
+  async lrc(
+    @Args('keyword') keyword: string,
+    @Args({ name: 'milliseconds', type: () => Float }) milliseconds: number,
+  ): Promise<LrcInfo> {
+    return get({ keyword, milliseconds, fmt: Format.lrc }) as any;
+  }
+
+  @Query(returns => SongKrc)
+  async krc(
+    @Args('keyword') keyword: string,
+    @Args({ name: 'milliseconds', type: () => Float }) milliseconds: number,
+  ): Promise<KrcInfo> {
+    return get({ keyword, milliseconds, fmt: Format.krc }) as any;
   }
 
   @Query(returns => String)
