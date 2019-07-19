@@ -1,4 +1,11 @@
-import { Args, Mutation, Parent, Query, ResolveProperty, Resolver } from '@nestjs/graphql';
+import {
+  Args,
+  Mutation,
+  Parent,
+  Query,
+  ResolveProperty,
+  Resolver,
+} from '@nestjs/graphql';
 import { Format, get, KrcInfo, LrcInfo } from '@s4p/kugou-lrc';
 import { Float, Int } from 'type-graphql';
 
@@ -70,18 +77,38 @@ export class SongResolver {
 
   @Query(returns => SongLrc)
   async lrc(
-    @Args('keyword') keyword: string,
-    @Args({ name: 'milliseconds', type: () => Float }) milliseconds: number,
+    @Args({ name: 'keyword', type: () => String, nullable: true })
+    keyword?: string,
+    @Args({ name: 'milliseconds', type: () => Float, nullable: true })
+    milliseconds?: number,
+    @Args({ name: 'hash', type: () => String, nullable: true }) hash?: string,
   ): Promise<LrcInfo> {
-    return get({ keyword, milliseconds, fmt: Format.lrc }) as any;
+    if (hash) {
+      return get({ hash, fmt: Format.lrc });
+    }
+    if (keyword && milliseconds) {
+      return get({ keyword, milliseconds, fmt: Format.lrc });
+    }
+
+    throw new Error('required hash');
   }
 
   @Query(returns => SongKrc)
   async krc(
-    @Args('keyword') keyword: string,
-    @Args({ name: 'milliseconds', type: () => Float }) milliseconds: number,
+    @Args({ name: 'keyword', type: () => String, nullable: true })
+    keyword?: string,
+    @Args({ name: 'milliseconds', type: () => Float, nullable: true })
+    milliseconds?: number,
+    @Args({ name: 'hash', type: () => String, nullable: true }) hash?: string,
   ): Promise<KrcInfo> {
-    return get({ keyword, milliseconds, fmt: Format.krc }) as any;
+    if (hash) {
+      return get({ hash, fmt: Format.krc });
+    }
+    if (keyword && milliseconds) {
+      return get({ keyword, milliseconds, fmt: Format.krc });
+    }
+
+    throw new Error('required hash');
   }
 
   @Query(returns => String)

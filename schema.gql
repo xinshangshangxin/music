@@ -55,8 +55,8 @@ enum Provider {
 type Query {
   song(provider: Provider!, id: String!): Song!
   search(providers: [Provider!], keyword: String!): [SearchSong!]!
-  lrc(milliseconds: Float!, keyword: String!): SongLrc!
-  krc(milliseconds: Float!, keyword: String!): SongKrc!
+  lrc(hash: String, milliseconds: Float, keyword: String): SongLrc!
+  krc(hash: String, milliseconds: Float, keyword: String): SongKrc!
   url(br: BitRate, provider: Provider!, id: String!): String!
   parseUrl(url: String!): [SearchSong!]!
   getPeak(duration: Float!, provider: Provider!, id: String!): SongPeaks!
