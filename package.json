@@ -1,6 +1,6 @@
 {
   "name": "@s4p/kugou-lrc",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "kugou lrc search, download, parse",
   "main": "index.js",
   "scripts": {
