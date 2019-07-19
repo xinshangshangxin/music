@@ -74,3 +74,8 @@ const [krcResult, ...others] = await query({
   parse: [[0], [Format.lrc]],
 });
 ```
+
+## Thanks
+
+[kugou-lyric](https://github.com/kangkang520/kugou-lyric)
+[酷狗歌词 API](https://blog.csdn.net/u010752082/article/details/50810190)
