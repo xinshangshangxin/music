@@ -22,6 +22,7 @@ async function get(params: any): Promise<KrcInfo | LrcInfo> {
     throw new Error('no lrc');
   }
 
+  params.fmt = params.fmt || Format.krc;
   const { fmt } = params;
 
   const [{ id, accesskey }] = list;

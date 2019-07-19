@@ -60,6 +60,8 @@ LCJsYSIsImhpYmkiLCJrZSIsImtvaSIsIm5vIiwid3V0YSJdXSwidHlwZSI6MH1dLCJ2ZXJzaW9uIjox
 `;
 
 export const lrcStr = `
+[ti:小さな恋のうた (小小恋歌)]
+[ar:新垣結衣 (あらがき ゆい)]
 [00:00.70]小さな恋のうた (小小恋歌) - 新垣結衣 (あらがき ゆい)
 [00:05.25]词：上江洌清作
 [00:06.60]曲：MONGOL800
