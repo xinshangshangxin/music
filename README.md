@@ -8,7 +8,7 @@
 
 `npm install @s4p/kugou-lrc`
 
-**see [test folder](https://github.com/xinshangshangxin/music/tree/develop/kugou-lrc/test) to learn more**
+**see [test folder](https://github.com/xinshangshangxin/music/tree/5.x/kugou-lrc/test) to learn more**
 
 ### get
 
