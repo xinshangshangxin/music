@@ -13,15 +13,12 @@
 ### get
 
 ```ts
-function get({
-  keyword,
-  milliseconds,
-  fmt,
-}: {
-  keyword: string;
-  milliseconds: number;
-  fmt?: Format;
-}): Promise<KrcInfo | LrcInfo>;
+function get(params: { keyword: string; milliseconds: number; fmt: Format.krc }): Promise<KrcInfo>;
+function get(params: { keyword: string; milliseconds: number; fmt: Format.lrc }): Promise<LrcInfo>;
+function get(params: { hash: string; fmt: Format.krc }): Promise<KrcInfo>;
+function get(params: { hash: string; fmt: Format.lrc }): Promise<LrcInfo>;
+function get(params: { keyword: string; milliseconds: number }): Promise<KrcInfo>;
+function get(params: { hash: string }): Promise<KrcInfo>;
 
 const lrc = await get({
   keyword: '小さな恋のうた',
@@ -33,7 +30,8 @@ const lrc = await get({
 ### search
 
 ```ts
-function search({ keyword, milliseconds }: LrcSearchOption): Promise<KugouLrc[]>;
+function search(params: { keyword: string; milliseconds: number }): Promise<KugouLrc[]>;
+function search(params: { hash: string }): Promise<KugouLrc[]>;
 
 await search({ keyword: '小さな恋のうた', milliseconds: 325000 });
 ```
@@ -53,26 +51,6 @@ function parseKrc(content: string): KrcInfo;
 function parseLrc(content: string): LrcInfo;
 
 const krc = await parseKrc(krcStr);
-```
-
-### query
-
-```ts
-function query({
-  keyword,
-  milliseconds,
-  parse,
-}: {
-  keyword: string;
-  milliseconds: number;
-  parse?: [number[], Format[]];
-}): Promise<QueryItem[]>;
-
-const [krcResult, ...others] = await query({
-  keyword: '小さな恋のうた',
-  milliseconds: 325000,
-  parse: [[0], [Format.lrc]],
-});
 ```
 
 ## Thanks

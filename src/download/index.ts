@@ -20,35 +20,45 @@ export interface KugouLrc {
   singer: string;
 }
 
-export interface LrcSearchOption {
-  keyword: string;
-  milliseconds: number;
-}
-
 export interface LrcDownloadOption {
   id: string;
   accesskey: string;
-  fmt: Format;
+  fmt?: Format;
 }
 
-async function search({ keyword, milliseconds }: LrcSearchOption): Promise<KugouLrc[]> {
+async function search(params: { keyword: string; milliseconds: number }): Promise<KugouLrc[]>;
+async function search(params: { hash: string }): Promise<KugouLrc[]>;
+async function search(params: any): Promise<KugouLrc[]> {
+  const qs: any = {
+    ver: 1,
+    man: 'yes',
+    client: 'pc',
+    duration: undefined,
+    keyword: undefined,
+    hash: undefined,
+  };
+
+  if (params.milliseconds) {
+    qs.duration = params.milliseconds;
+    qs.keyword = params.keyword;
+  } else {
+    qs.hash = params.hash;
+  }
+
   const { candidates } = await kugouRp({
     method: 'GET',
     uri: '/search',
-    qs: {
-      ver: 1,
-      man: 'yes',
-      client: 'pc',
-      keyword,
-      duration: milliseconds,
-    },
+    qs,
     json: true,
   });
 
   return candidates;
 }
 
-async function download(option: LrcDownloadOption): Promise<string> {
+async function download({
+  fmt: inputFmt = Format.krc,
+  ...option
+}: LrcDownloadOption): Promise<string> {
   const { fmt, content } = await kugouRp({
     method: 'GET',
     uri: '/download',
@@ -57,6 +67,7 @@ async function download(option: LrcDownloadOption): Promise<string> {
       client: 'pc',
       charset: 'utf8',
       ...option,
+      fmt: inputFmt,
     },
     json: true,
   });
