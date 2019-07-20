@@ -22,6 +22,11 @@
       "prefix": "proxy",
       "url": "git@gitlab.com:shang-music/music-proxy.git",
       "branch": "5.x"
+    },
+    {
+      "prefix": "kugou-lrc",
+      "url": "git@gitlab.com:shang-music/kugou-lrc.git",
+      "branch": "develop"
     }
   ]
 }
