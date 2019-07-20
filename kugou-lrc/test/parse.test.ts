@@ -1,7 +1,7 @@
 import test from 'ava';
 import Joi from 'joi';
 
-import { parseLrc } from '../src';
+import { parseKrc, parseLrc } from '../src';
 import {
   krcSchema, krcStr, lrcSchema, lrcStr
 } from './constant';
@@ -14,7 +14,7 @@ test('parse lrc "小さな恋のうた"', async (t) => {
 });
 
 test('parse krc "小さな恋のうた"', async (t) => {
-  const krc = await parseLrc(krcStr);
+  const krc = await parseKrc(krcStr);
   let { error } = Joi.validate(krc, krcSchema, { convert: false, allowUnknown: true });
 
   t.falsy(error);

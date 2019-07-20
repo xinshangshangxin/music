@@ -1,6 +1,6 @@
 {
   "name": "@s4p/kugou-lrc",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "kugou lrc search, download, parse",
   "main": "index.js",
   "scripts": {
@@ -18,7 +18,7 @@
   ],
   "author": "xinshangshangxin",
   "license": "MIT",
-  "homepage": "https://github.com/xinshangshangxin/music/tree/develop/api#kugou-lrc",
+  "homepage": "https://github.com/xinshangshangxin/music/tree/5.x/kugou-lrc#kugou-lrc",
   "bugs": {
     "url": "https://github.com/xinshangshangxin/music/issues"
   },
