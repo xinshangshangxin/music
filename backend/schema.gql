@@ -28,6 +28,14 @@ enum BitRate {
   hq
 }
 
+scalar KrcArray
+
+type LrcItem {
+  duration: Float
+  offset: Float
+  line: String!
+}
+
 type Mutation {
   addPeakTime(peak: SongPeaksInput!, provider: Provider!, id: String!): Boolean!
 }
@@ -47,6 +55,8 @@ enum Provider {
 type Query {
   song(provider: Provider!, id: String!): Song!
   search(providers: [Provider!], keyword: String!): [SearchSong!]!
+  lrc(hash: String, milliseconds: Float, keyword: String): SongLrc!
+  krc(hash: String, milliseconds: Float, keyword: String): SongKrc!
   url(br: BitRate, provider: Provider!, id: String!): String!
   parseUrl(url: String!): [SearchSong!]!
   getPeak(duration: Float!, provider: Provider!, id: String!): SongPeaks!
@@ -70,6 +80,7 @@ type SearchSong {
   privilege: Privilege
   artists: [SearchArtist!]
   album: SearchAlbum
+  duration: Float
 }
 
 type Song {
@@ -84,6 +95,22 @@ type Song {
   album: Album
   peaks: [SongPeaks!]
   startTime(duration: Int): Float
+}
+
+type SongKrc {
+  ti: String
+  ar: String
+  al: String
+  by: String
+  items: [KrcArray!]!
+}
+
+type SongLrc {
+  ti: String
+  ar: String
+  al: String
+  by: String
+  items: [LrcItem!]!
 }
 
 type SongPeaks {

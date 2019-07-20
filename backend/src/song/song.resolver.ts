@@ -6,6 +6,7 @@ import {
   ResolveProperty,
   Resolver,
 } from '@nestjs/graphql';
+import { Format, get, KrcInfo, LrcInfo } from '@s4p/kugou-lrc';
 import { Float, Int } from 'type-graphql';
 
 import { SongPeakService } from '../song-peak/song-peak.service';
@@ -13,6 +14,8 @@ import { SongUrlParseService } from '../song-url/song-url-parse.service';
 import { Song } from './entities/Song.entity';
 import { SongPeaks } from './entities/SongPeaks.entity';
 import { SearchSong } from './fields/SearchSong';
+import { SongKrc } from './fields/SongKrc';
+import { SongLrc } from './fields/SongLrc';
 import { SongPeaksInput } from './inputs/song-peaks';
 import { MusicApiService } from './music-api.service';
 import { BitRate, Provider } from './register-type';
@@ -70,6 +73,42 @@ export class SongResolver {
     providers: Provider[],
   ): Promise<SearchSong[]> {
     return this.musicApiService.search({ keyword, providers });
+  }
+
+  @Query(returns => SongLrc)
+  async lrc(
+    @Args({ name: 'keyword', type: () => String, nullable: true })
+    keyword?: string,
+    @Args({ name: 'milliseconds', type: () => Float, nullable: true })
+    milliseconds?: number,
+    @Args({ name: 'hash', type: () => String, nullable: true }) hash?: string,
+  ): Promise<LrcInfo> {
+    if (hash) {
+      return get({ hash, fmt: Format.lrc });
+    }
+    if (keyword && milliseconds) {
+      return get({ keyword, milliseconds, fmt: Format.lrc });
+    }
+
+    throw new Error('required hash');
+  }
+
+  @Query(returns => SongKrc)
+  async krc(
+    @Args({ name: 'keyword', type: () => String, nullable: true })
+    keyword?: string,
+    @Args({ name: 'milliseconds', type: () => Float, nullable: true })
+    milliseconds?: number,
+    @Args({ name: 'hash', type: () => String, nullable: true }) hash?: string,
+  ): Promise<KrcInfo> {
+    if (hash) {
+      return get({ hash, fmt: Format.krc });
+    }
+    if (keyword && milliseconds) {
+      return get({ keyword, milliseconds, fmt: Format.krc });
+    }
+
+    throw new Error('required hash');
   }
 
   @Query(returns => String)

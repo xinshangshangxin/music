@@ -1,4 +1,4 @@
-import { Field, ObjectType } from 'type-graphql';
+import { Field, ObjectType, Float } from 'type-graphql';
 
 import { Privilege, Provider } from '../register-type';
 import { SearchAlbum } from './SearchAlbum';
@@ -24,6 +24,7 @@ export class SearchSong {
   @Field(type => SearchAlbum, { nullable: true })
   album?: SearchAlbum;
 
+  @Field(type => Float, { nullable: true })
   duration?: number;
   mvId?: string;
 }
