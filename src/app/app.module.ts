@@ -19,6 +19,7 @@ import { PreloadService } from './services/preload.service';
 import { SearchService } from './services/search.service';
 import { StorageService } from './services/storage.service';
 import { SongListComponent } from './song-list/song-list.component';
+import { LrcComponent } from './lrc/lrc.component';
 
 @NgModule({
   declarations: [
@@ -27,6 +28,7 @@ import { SongListComponent } from './song-list/song-list.component';
     HomeComponent,
     ControlsComponent,
     SearchComponent,
+    LrcComponent,
   ],
   imports: [
     BrowserModule,

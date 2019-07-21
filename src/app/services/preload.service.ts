@@ -109,6 +109,7 @@ export class PreloadService {
     console.info({ serverSong });
 
     song.privilege = serverSong.privilege;
+    song.duration = serverSong.duration;
 
     if (serverSong.startTime) {
       song.peakStartTime = serverSong.startTime;

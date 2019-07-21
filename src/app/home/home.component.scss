@@ -16,6 +16,17 @@ mat-sidenav-container {
 .body {
     overflow: auto;
     flex: 1;
+    display: flex;
+
+    .left {
+        overflow: auto;
+        flex: 70%;
+    }
+
+    .right {
+        overflow: hidden;
+        width: 30%;
+    }
 }
 
 .duration {
