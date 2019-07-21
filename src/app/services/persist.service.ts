@@ -118,7 +118,7 @@ export class PersistService {
       },
       errorRetry: {
         songRetries: 3,
-        playerRetries: 1,
+        playerRetries: 10,
       },
       currentIndex: 0,
     };
