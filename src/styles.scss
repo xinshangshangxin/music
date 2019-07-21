@@ -47,9 +47,12 @@ body {
     }
 
     .word {
-        background: url(assets/lrc/bg.svg) no-repeat top left;
-        background-size: 0% 100%;
+        background-image: url(assets/lrc/bg.svg);
         background-color: red;
+
+        background-size: 0% 100%;
+        background-repeat: no-repeat;
+        background-position: top left;
 
         background-clip: text;
         -webkit-background-clip: text;
