@@ -1,8 +1,14 @@
 import { Module } from '@nestjs/common';
 import { GraphQLModule } from '@nestjs/graphql';
 import { TypeOrmModule } from '@nestjs/typeorm';
+
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { Krc } from './lyric/entities/Krc.entity';
+import { Lrc } from './lyric/entities/Lrc.entity';
+import { LyricResolver } from './lyric/lyric.resolver';
+import { LyricService } from './lyric/lyric.service';
+import { RectSvgController } from './rect-svg/rect-svg.controller';
 import { AudioService } from './song-peak/audio.service';
 import { SongPeakService } from './song-peak/song-peak.service';
 import { KugouUrlParseService } from './song-url/kugou-url.parse.service';
@@ -14,13 +20,11 @@ import { SongPeaks } from './song/entities/SongPeaks.entity';
 import { MusicApiService } from './song/music-api.service';
 import { SongResolver } from './song/song.resolver';
 import { SongService } from './song/song.service';
-import { RectSvgController } from './rect-svg/rect-svg.controller';
-
 
 @Module({
   imports: [
     TypeOrmModule.forRoot(environment.typeorm),
-    TypeOrmModule.forFeature([Song, Artist, Album, SongPeaks]),
+    TypeOrmModule.forFeature([Song, Artist, Album, SongPeaks, Krc, Lrc]),
 
     GraphQLModule.forRoot({
       debug: true,
@@ -40,6 +44,8 @@ import { RectSvgController } from './rect-svg/rect-svg.controller';
     SongResolver,
     SongService,
     SongUrlParseService,
+    LyricService,
+    LyricResolver,
   ],
 })
 export class AppModule {}
