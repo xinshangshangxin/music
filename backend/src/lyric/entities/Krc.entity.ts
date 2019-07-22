@@ -1,9 +1,9 @@
-import { KrcInfo } from '@s4p/kugou-lrc';
-import { Field, ObjectType } from 'type-graphql';
-
-import { KrcItem } from './KrcItem';
-
 import { GraphQLScalarType } from 'graphql';
+import { Field, ObjectType } from 'type-graphql';
+import { Column, Entity } from 'typeorm';
+
+import { Base } from '../../song/entities/Base';
+import { KrcItem } from '../fields/KrcItem';
 
 export const KrcArrayScalar = new GraphQLScalarType({
   name: 'KrcArray',
@@ -20,17 +20,25 @@ export const KrcArrayScalar = new GraphQLScalarType({
 });
 
 @ObjectType()
-export class SongKrc implements KrcInfo {
+@Entity()
+export class Krc extends Base {
+  @Column({ type: 'text', nullable: true })
   @Field({ nullable: true })
-  ti: string;
+  ti?: string;
 
+  @Column({ type: 'text', nullable: true })
   @Field({ nullable: true })
-  ar: string;
-  @Field({ nullable: true })
-  al: string;
-  @Field({ nullable: true })
-  by: string;
+  ar?: string;
 
+  @Column({ type: 'text', nullable: true })
+  @Field({ nullable: true })
+  al?: string;
+
+  @Column({ type: 'text', nullable: true })
+  @Field({ nullable: true })
+  by?: string;
+
+  @Column({ nullable: true })
   @Field(type => [KrcArrayScalar])
   items: KrcItem[][];
 }
