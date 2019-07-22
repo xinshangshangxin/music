@@ -1,8 +1,8 @@
-query lrc($milliseconds: Float, $keyword: String, $hash: String) {
-  lrc(milliseconds: $milliseconds, keyword: $keyword, hash: $hash) {
+query lrc($id: String!, $provider: Provider!) {
+  lrc(id: $id, provider: $provider) {
     items {
-      offset
       duration
+      offset
       line
     }
   }

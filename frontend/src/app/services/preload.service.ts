@@ -147,6 +147,9 @@ export class PreloadService {
       })
       .toPromise()
       .then((result) => {
+        if (!result.data.song) {
+          throw new Error('no song found');
+        }
         return result.data.song;
       });
   }

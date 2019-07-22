@@ -3,7 +3,7 @@ import { Observable, of } from 'rxjs';
 import { catchError, map, switchMap } from 'rxjs/operators';
 
 import { PlayerSong } from '../audio/interface';
-import { KrcGQL, Provider } from '../graphql/generated';
+import { KrcGQL } from '../graphql/generated';
 import { Lrc } from '../lrc/lrc';
 
 @Injectable({
@@ -24,9 +24,8 @@ export class LrcService {
   ): Observable<Event> {
     return this.krcGQL
       .fetch({
-        hash: song.provider === Provider.Kugou ? song.id : undefined,
-        keyword: song.name,
-        milliseconds: parseInt(`${(song.duration || audio.duration) * 1000}`, 10),
+        id: song.id,
+        provider: song.provider,
       })
       .pipe(
         catchError((e) => {
@@ -34,6 +33,9 @@ export class LrcService {
           return of({ data: { krc: { items: [] } } });
         }),
         map((result) => {
+          if (!result.data.krc) {
+            return [[]];
+          }
           return result.data.krc.items;
         }),
         switchMap((inputLines) => {

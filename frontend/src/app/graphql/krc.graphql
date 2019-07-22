@@ -1,5 +1,5 @@
-query krc($milliseconds: Float, $keyword: String, $hash: String) {
-  krc(milliseconds: $milliseconds, keyword: $keyword, hash: $hash) {
+query krc($id: String!, $provider: Provider!) {
+  krc(id: $id, provider: $provider) {
     items
   }
 }

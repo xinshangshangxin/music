@@ -40,6 +40,28 @@ export enum BitRate {
   Hq = 'hq',
 }
 
+export type Krc = {
+  __typename?: 'Krc';
+  id: Scalars['String'];
+  provider: Provider;
+  ti?: Maybe<Scalars['String']>;
+  ar?: Maybe<Scalars['String']>;
+  al?: Maybe<Scalars['String']>;
+  by?: Maybe<Scalars['String']>;
+  items: Array<Scalars['KrcArray']>;
+};
+
+export type Lrc = {
+  __typename?: 'Lrc';
+  id: Scalars['String'];
+  provider: Provider;
+  ti?: Maybe<Scalars['String']>;
+  ar?: Maybe<Scalars['String']>;
+  al?: Maybe<Scalars['String']>;
+  by?: Maybe<Scalars['String']>;
+  items: Array<LrcItem>;
+};
+
 export type LrcItem = {
   __typename?: 'LrcItem';
   duration?: Maybe<Scalars['Float']>;
@@ -72,13 +94,27 @@ export enum Provider {
 
 export type Query = {
   __typename?: 'Query';
-  song: Song;
+  lrc?: Maybe<Lrc>;
+  krc?: Maybe<Krc>;
+  song?: Maybe<Song>;
   search: Array<SearchSong>;
-  lrc: SongLrc;
-  krc: SongKrc;
   url: Scalars['String'];
   parseUrl: Array<SearchSong>;
   getPeak: SongPeaks;
+};
+
+export type QueryLrcArgs = {
+  milliseconds?: Maybe<Scalars['Float']>;
+  keyword?: Maybe<Scalars['String']>;
+  provider: Provider;
+  id: Scalars['String'];
+};
+
+export type QueryKrcArgs = {
+  milliseconds?: Maybe<Scalars['Float']>;
+  keyword?: Maybe<Scalars['String']>;
+  provider: Provider;
+  id: Scalars['String'];
 };
 
 export type QuerySongArgs = {
@@ -89,18 +125,6 @@ export type QuerySongArgs = {
 export type QuerySearchArgs = {
   providers?: Maybe<Array<Provider>>;
   keyword: Scalars['String'];
-};
-
-export type QueryLrcArgs = {
-  hash?: Maybe<Scalars['String']>;
-  milliseconds?: Maybe<Scalars['Float']>;
-  keyword?: Maybe<Scalars['String']>;
-};
-
-export type QueryKrcArgs = {
-  hash?: Maybe<Scalars['String']>;
-  milliseconds?: Maybe<Scalars['Float']>;
-  keyword?: Maybe<Scalars['String']>;
 };
 
 export type QueryUrlArgs = {
@@ -162,24 +186,6 @@ export type SongStartTimeArgs = {
   duration?: Maybe<Scalars['Int']>;
 };
 
-export type SongKrc = {
-  __typename?: 'SongKrc';
-  ti?: Maybe<Scalars['String']>;
-  ar?: Maybe<Scalars['String']>;
-  al?: Maybe<Scalars['String']>;
-  by?: Maybe<Scalars['String']>;
-  items: Array<Scalars['KrcArray']>;
-};
-
-export type SongLrc = {
-  __typename?: 'SongLrc';
-  ti?: Maybe<Scalars['String']>;
-  ar?: Maybe<Scalars['String']>;
-  al?: Maybe<Scalars['String']>;
-  by?: Maybe<Scalars['String']>;
-  items: Array<LrcItem>;
-};
-
 export type SongPeaks = {
   __typename?: 'SongPeaks';
   id: Scalars['String'];
@@ -201,25 +207,25 @@ export type AddPeakTimeMutationVariables = {
 export type AddPeakTimeMutation = { __typename?: 'Mutation' } & Pick<Mutation, 'addPeakTime'>;
 
 export type KrcQueryVariables = {
-  milliseconds?: Maybe<Scalars['Float']>;
-  keyword?: Maybe<Scalars['String']>;
-  hash?: Maybe<Scalars['String']>;
+  id: Scalars['String'];
+  provider: Provider;
 };
 
 export type KrcQuery = { __typename?: 'Query' } & {
-  krc: { __typename?: 'SongKrc' } & Pick<SongKrc, 'items'>;
+  krc: Maybe<{ __typename?: 'Krc' } & Pick<Krc, 'items'>>;
 };
 
 export type LrcQueryVariables = {
-  milliseconds?: Maybe<Scalars['Float']>;
-  keyword?: Maybe<Scalars['String']>;
-  hash?: Maybe<Scalars['String']>;
+  id: Scalars['String'];
+  provider: Provider;
 };
 
 export type LrcQuery = { __typename?: 'Query' } & {
-  lrc: { __typename?: 'SongLrc' } & {
-    items: Array<{ __typename?: 'LrcItem' } & Pick<LrcItem, 'offset' | 'duration' | 'line'>>;
-  };
+  lrc: Maybe<
+    { __typename?: 'Lrc' } & {
+      items: Array<{ __typename?: 'LrcItem' } & Pick<LrcItem, 'duration' | 'offset' | 'line'>>;
+    }
+  >;
 };
 
 export type ParseUrlQueryVariables = {
@@ -255,10 +261,12 @@ export type SongQueryVariables = {
 };
 
 export type SongQuery = { __typename?: 'Query' } & {
-  song: { __typename?: 'Song' } & Pick<
-    Song,
-    'provider' | 'id' | 'name' | 'duration' | 'startTime' | 'privilege'
-  > & { artists: Maybe<Array<{ __typename?: 'Artist' } & Pick<Artist, 'id' | 'name'>>> };
+  song: Maybe<
+    { __typename?: 'Song' } & Pick<
+      Song,
+      'provider' | 'id' | 'name' | 'duration' | 'startTime' | 'privilege'
+    > & { artists: Maybe<Array<{ __typename?: 'Artist' } & Pick<Artist, 'id' | 'name'>>> }
+  >;
 };
 
 export const AddPeakTimeDocument = gql`
@@ -277,8 +285,8 @@ export class AddPeakTimeGQL extends Apollo.Mutation<
   document = AddPeakTimeDocument;
 }
 export const KrcDocument = gql`
-  query krc($milliseconds: Float, $keyword: String, $hash: String) {
-    krc(milliseconds: $milliseconds, keyword: $keyword, hash: $hash) {
+  query krc($id: String!, $provider: Provider!) {
+    krc(id: $id, provider: $provider) {
       items
     }
   }
@@ -291,11 +299,11 @@ export class KrcGQL extends Apollo.Query<KrcQuery, KrcQueryVariables> {
   document = KrcDocument;
 }
 export const LrcDocument = gql`
-  query lrc($milliseconds: Float, $keyword: String, $hash: String) {
-    lrc(milliseconds: $milliseconds, keyword: $keyword, hash: $hash) {
+  query lrc($id: String!, $provider: Provider!) {
+    lrc(id: $id, provider: $provider) {
       items {
-        offset
         duration
+        offset
         line
       }
     }
