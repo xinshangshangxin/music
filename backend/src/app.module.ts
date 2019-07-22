@@ -1,7 +1,6 @@
 import { Module } from '@nestjs/common';
 import { GraphQLModule } from '@nestjs/graphql';
 import { TypeOrmModule } from '@nestjs/typeorm';
-
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AudioService } from './song-peak/audio.service';
@@ -15,6 +14,8 @@ import { SongPeaks } from './song/entities/SongPeaks.entity';
 import { MusicApiService } from './song/music-api.service';
 import { SongResolver } from './song/song.resolver';
 import { SongService } from './song/song.service';
+import { RectSvgController } from './rect-svg/rect-svg.controller';
+
 
 @Module({
   imports: [
@@ -29,7 +30,7 @@ import { SongService } from './song/song.service';
       autoSchemaFile: 'schema.gql',
     }),
   ],
-  controllers: [AppController],
+  controllers: [AppController, RectSvgController],
   providers: [
     AppService,
     AudioService,
