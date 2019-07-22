@@ -1,0 +1,9 @@
+query lrc($milliseconds: Float, $keyword: String, $hash: String) {
+  lrc(milliseconds: $milliseconds, keyword: $keyword, hash: $hash) {
+    items {
+      offset
+      duration
+      line
+    }
+  }
+}

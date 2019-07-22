@@ -1,7 +1,21 @@
 export enum Action {
   put = 'put',
   get = 'get',
+  delete = 'delete',
 }
+
+export interface RequestMessage {
+  action: Action;
+  key: string;
+  value?: object;
+}
+
+export interface ResponseMessage {
+  uuid: string;
+  errMsg: string;
+  result: unknown;
+}
+
 export interface Message {
   action: Action;
   key: string;
@@ -16,12 +30,12 @@ export interface Defer<T, U = Error> {
   promise: Promise<T>;
 }
 
-async function awaitWrap<T, U = Error>(promise: T): Promise<[U, null] | [null, T]> {
+async function awaitWrap<T, U = Error>(promise: Promise<T>): Promise<[U] | [undefined, T]> {
   try {
     const data = await promise;
-    return [null, data];
+    return [, data];
   } catch (e) {
-    return [e, null];
+    return [e];
   }
 }
 

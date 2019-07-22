@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 
-import { PlayerService } from '../services/player.service';
+import { LocateService } from '../services/locate.service';
+import { PlayerListService } from '../services/player-list.service';
 
 @Component({
   selector: 'app-controls',
@@ -8,7 +9,10 @@ import { PlayerService } from '../services/player.service';
   styleUrls: ['./controls.component.scss'],
 })
 export class ControlsComponent implements OnInit {
-  constructor(private playerService: PlayerService) {}
+  constructor(
+    private readonly playerListService: PlayerListService,
+    private readonly locateService: LocateService
+  ) {}
 
   public bufferedPercent = 0;
   public currentPercent = 0;
@@ -16,26 +20,26 @@ export class ControlsComponent implements OnInit {
   ngOnInit() {}
 
   get isPaused() {
-    return this.playerService.isPaused;
+    return this.playerListService.isPaused;
   }
 
   togglePlay() {
     if (this.isPaused) {
-      this.playerService.play();
+      this.playerListService.play();
     } else {
-      this.playerService.pause();
+      this.playerListService.pause();
     }
   }
 
   next() {
-    this.playerService.next();
+    this.playerListService.next();
   }
 
   previous() {
-    this.playerService.previous();
+    this.playerListService.previous();
   }
 
   locate() {
-    this.playerService.locateCurrent$.next();
+    this.locateService.locateCurrent$.next();
   }
 }

@@ -1,0 +1,5 @@
+query krc($milliseconds: Float, $keyword: String, $hash: String) {
+  krc(milliseconds: $milliseconds, keyword: $keyword, hash: $hash) {
+    items
+  }
+}

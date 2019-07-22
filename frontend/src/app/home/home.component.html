@@ -22,8 +22,12 @@
       </button>
     </mat-form-field>
 
-    <mat-form-field class="duration">
-      <mat-select [(ngModel)]="peakConfig.duration" name="item" (selectionChange)="selectionChange($event)">
+    <mat-form-field class="duration" *ngIf="config">
+      <mat-select
+        [(ngModel)]="config.peakConfig.duration"
+        name="item"
+        (selectionChange)="selectionChange($event)"
+      >
         <mat-option *ngFor="let item of peaks" [value]="item.duration">
           {{ item.name }}
         </mat-option>
@@ -32,7 +36,12 @@
   </div>
 
   <div class="body">
-    <router-outlet></router-outlet>
+    <div class="left">
+      <router-outlet></router-outlet>
+    </div>
+    <div class="right">
+      <app-lrc></app-lrc>
+    </div>
   </div>
 
   <div class="footer"><app-controls></app-controls></div>

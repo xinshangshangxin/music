@@ -4,9 +4,10 @@ import { Router } from '@angular/router';
 import { untilDestroyed } from 'ngx-take-until-destroy';
 
 import { SearchSong } from '../graphql/generated';
-import { PlayerService } from '../services/player.service';
-import { PeakConfig } from '../services/rx-player/interface';
 import { SearchService } from '../services/search.service';
+import { PlayerListService } from '../services/player-list.service';
+import { Config } from '../services/persist.service';
+import { ConfigService } from '../services/config.service';
 
 @Component({
   selector: 'app-home',
@@ -17,13 +18,14 @@ export class HomeComponent implements OnInit, OnDestroy {
   public searchValue = '';
 
   public searchList: SearchSong[];
-  public peakConfig: PeakConfig;
+
+  public config: Config;
 
   public peaks = [
-    {
-      name: '完整播放',
-      duration: 0,
-    },
+    // {
+    //   name: '完整播放',
+    //   duration: 0,
+    // },
     {
       name: '30s',
       duration: 20,
@@ -69,12 +71,15 @@ export class HomeComponent implements OnInit, OnDestroy {
   constructor(
     private readonly router: Router,
     private readonly searchService: SearchService,
-    private readonly playerService: PlayerService
-  ) {}
+    private readonly playerListService: PlayerListService,
+    private readonly configService: ConfigService
+  ) {
+    this.configService.getConfig().subscribe((config) => {
+      this.config = config;
+    });
+  }
 
   ngOnInit() {
-    this.peakConfig = this.playerService.peakConfig;
-
     this.searchService.searchSubject.pipe(untilDestroyed(this)).subscribe(async (value) => {
       if (value && this.router.url === this.homeUrl) {
         console.info('navigate to search');
@@ -102,7 +107,11 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   selectionChange({ value }: MatSelectChange) {
-    this.playerService.peakChange({ duration: value });
+    this.playerListService.changeConfig({
+      peakConfig: {
+        duration: value,
+      },
+    });
   }
 
   ngOnDestroy(): void {}

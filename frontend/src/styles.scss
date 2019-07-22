@@ -1,4 +1,68 @@
 /* You can add global styles to this file, and also import other style files */
 
-html, body { height: 100%; }
-body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+html,
+body {
+    height: 100%;
+}
+body {
+    margin: 0;
+    font-family: Roboto, 'Helvetica Neue', sans-serif;
+}
+
+@keyframes cover {
+    0% {
+        background-size: 0% 100%;
+    }
+    100% {
+        background-size: 100% 100%;
+    }
+}
+
+.container {
+    height: 100%;
+    overflow-y: hidden;
+
+    p {
+        margin: 0;
+    }
+
+    .lrc {
+        transition: all 0.5s ease-out;
+        text-align: center;
+    }
+
+    .line {
+        font-size: 30px;
+        font-weight: bold;
+
+        line-height: 40px;
+        height: 40px;
+        overflow: hidden;
+        opacity: 0.4;
+
+        &.playing {
+            height: auto;
+            opacity: 1;
+        }
+    }
+
+    .word {
+        background-image: url(assets/lrc/bg.svg);
+        background-color: red;
+
+        background-size: 0% 100%;
+        background-repeat: no-repeat;
+        background-position: top left;
+
+        background-clip: text;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+
+        contain: strict;
+
+        &.purple {
+            background-image: url(http://music.xinshangshangxin.com/rect-svg?color=5100e0);
+            background-color: #9c9c9c;
+        }
+    }
+}

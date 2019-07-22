@@ -3,6 +3,7 @@ query song($id: String!, $provider: Provider!, $duration: Int) {
     provider
     id
     name
+    duration
 
     artists {
       id

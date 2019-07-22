@@ -13,10 +13,9 @@ import {
   tap,
 } from 'rxjs/operators';
 
-import { ParseUrlGQL, SearchGQL, SearchSong, SongGQL } from '../graphql/generated';
-import { PlayerService } from '../services/player.service';
+import { ParseUrlGQL, SearchGQL, SearchSong } from '../graphql/generated';
+import { PlayerListService } from '../services/player-list.service';
 import { SearchService } from '../services/search.service';
-import { TempPlayerService } from '../services/temp-player.service';
 
 enum SearchType {
   redirect = 'redirect',
@@ -33,6 +32,7 @@ enum SearchType {
 export class SearchComponent implements OnInit, OnDestroy {
   public searchList: SearchSong[];
   public replaceIndex = -1;
+  public replacePlaylistId: string;
 
   constructor(
     private readonly searchService: SearchService,
@@ -41,9 +41,7 @@ export class SearchComponent implements OnInit, OnDestroy {
     private parseUrlGQL: ParseUrlGQL,
     private searchGQL: SearchGQL,
     private location: Location,
-    private songGQL: SongGQL,
-    private playerService: PlayerService,
-    private tempPlayerService: TempPlayerService
+    private readonly playerListService: PlayerListService
   ) {}
 
   ngOnInit() {
@@ -51,9 +49,13 @@ export class SearchComponent implements OnInit, OnDestroy {
       tap((data) => {
         console.info('queryParams: ', JSON.stringify(data));
       }),
-      tap(({ replaceIndex }) => {
+      tap(({ replaceIndex, replacePlaylistId }) => {
         if (replaceIndex !== undefined) {
           this.replaceIndex = replaceIndex;
+          this.replacePlaylistId = replacePlaylistId;
+        } else {
+          this.replaceIndex = -1;
+          this.replacePlaylistId = 'undefined';
         }
       }),
       map(({ search }) => {
@@ -104,39 +106,23 @@ export class SearchComponent implements OnInit, OnDestroy {
 
   ngOnDestroy(): void {}
 
-  add(song: SearchSong, index?: number, isPlay = false) {
-    this.songGQL
-      .fetch({
-        id: song.id,
-        provider: song.provider,
-      })
-      .pipe(
-        map((result) => {
-          return result.data.song;
-        }),
-        tap((song) => {
-          this.playerService.add(song, index);
-          if (isPlay) {
-            this.playerService.playLast();
-          }
+  add(song: SearchSong, position: number | 'next' | 'end' = 'end', isPlay = false) {
+    this.playerListService.add(song, position);
 
-          this.searchService.urlLoadSubject.next('');
-        }),
-        switchMap(() => {
-          return from(this.router.navigate(['']));
-        }),
-        untilDestroyed(this)
-      )
-      .subscribe(() => {});
+    if (isPlay) {
+      this.searchService.urlLoadSubject.next('');
+      this.router.navigate(['']);
+    }
   }
 
   playTemp(song: SearchSong) {
-    this.tempPlayerService.playSong(song);
+    this.playerListService
+      .playTemp(song)
+      .pipe(untilDestroyed(this))
+      .subscribe(() => {});
   }
 
-  replace(song: SearchSong) {
-    this.tempPlayerService.replaceSong(song, this.replaceIndex);
-  }
+  replace(song: SearchSong) {}
 
   private getSearchType(keyword: string) {
     if (keyword === '') {
@@ -195,7 +181,7 @@ export class SearchComponent implements OnInit, OnDestroy {
         return result.data.parseUrl || [];
       }),
       map((songs) => {
-        this.playerService.loadSongs(songs);
+        this.playerListService.loadSongList(songs);
       }),
       delay(200),
       tap(() => {
