@@ -121,10 +121,12 @@ export class SongService {
       }),
     );
 
-    saveSong.album = await this.saveAlbum({
-      ...baseSong.album,
-      provider,
-    });
+    if (baseSong.album) {
+      saveSong.album = await this.saveAlbum({
+        ...baseSong.album,
+        provider,
+      });
+    }
 
     return await this.saveSong(saveSong);
   }
