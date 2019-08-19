@@ -1,6 +1,7 @@
 import get from 'lodash/get';
 import { CoreOptions } from 'request';
 import rp from 'request-promise';
+import { createHash } from 'crypto';
 
 import { Privilege } from '../common/privilege';
 import { Provider } from '../common/provider';
@@ -180,77 +181,37 @@ class Kugou {
   }
 
   private async getDetail(id: string, br: BitRate = BitRate.mid): Promise<ISong> {
-    let hash = id;
-
-    let idInfo = await this.request({
-      url: 'http://m.kugou.com/app/i/getSongInfo.php',
+    const result = await this.request({
+      method: 'GET',
+      url: 'http://trackercdnbj.kugou.com/i/v2/',
       qs: {
-        cmd: 'playInfo',
+        key: createHash('md5')
+          .update(`${id}kgcloudv2`)
+          .digest('hex'),
         hash: id,
+        cmd: '23',
+        pid: '1',
+        behavior: 'download',
+        br: this.bitRateMap[br],
       },
     });
 
-    let extra = get(idInfo, 'extra', {});
-    let brHash = get(extra, `${this.bitRateMap[br]}hash`);
-    if (brHash) {
-      hash = brHash;
-    }
-
-    let result = await this.request({
-      url: 'http://www.kugou.com/yy/index.php',
-      qs: {
-        r: 'play/getdata',
-        hash,
-      },
-      headers: {
-        Host: 'www.kugou.com',
-        'User-Agent':
-          'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.108 Safari/537.36',
-      },
-    });
-
-    if (get(result, 'data.lyrics')) {
-      return {
-        privilege: get(result, 'data.play_url') ? Privilege.allow : Privilege.deny,
-        id,
-        duration: get(idInfo, 'data.timelength', 0) / 1000 || undefined,
-        name: get(result, 'data.song_name'),
-        url: get(result, 'data.play_url'),
-        lrc: get(result, 'data.lyrics'),
-        artists: get(result, 'data.authors', []).map((item: any) => {
-          return {
-            id: `${item.author_id}`,
-            name: item.author_name,
-          };
-        }),
-        album: {
-          id: `${get(result, 'data.album_id')}`,
-          name: get(result, 'data.album_name'),
-          img: get(result, 'data.img'),
-        },
-        extra,
-      };
-    }
+    const url = get(result, 'url');
+    const [songName, singerName] = get(result, 'fileName', '').split('-');
 
     return {
-      privilege: get(idInfo, 'url') ? Privilege.allow : Privilege.deny,
+      privilege: url ? Privilege.allow : Privilege.deny,
       id,
-      duration: get(idInfo, 'timeLength'),
-      name: get(idInfo, 'songName'),
-      url: get(idInfo, 'url'),
+      duration: get(result, 'timeLength'),
+      name: (songName || '').trim(),
+      url,
       lrc: '',
       artists: [
         {
-          id: get(idInfo, 'singerId'),
-          name: get(idInfo, 'singerName'),
+          id: '000000000',
+          name: (singerName || '').trim(),
         },
       ],
-      album: {
-        id: `${get(idInfo, 'albumid', '')}`,
-        name: get(idInfo, 'songName', ''),
-        img: get(idInfo, 'album_img', '').replace('{size}', '72'),
-      },
-      extra,
     };
   }
 

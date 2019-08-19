@@ -26,7 +26,7 @@ export interface ISong {
   id: string;
   name: string;
   url: string;
-  album: IAlbum;
+  album?: IAlbum;
   lrc?: string;
   artists?: IArtist[];
   duration?: number;
