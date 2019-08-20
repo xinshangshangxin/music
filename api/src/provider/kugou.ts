@@ -183,21 +183,36 @@ class Kugou {
   private async getDetail(id: string, br: BitRate = BitRate.mid): Promise<ISong> {
     const result = await this.request({
       method: 'GET',
-      url: 'http://trackercdnbj.kugou.com/i/v2/',
+      url: 'http://trackercdn.kugou.com/i/v2/',
       qs: {
         key: createHash('md5')
           .update(`${id}kgcloudv2`)
           .digest('hex'),
         hash: id,
-        cmd: '23',
-        pid: '1',
-        behavior: 'download',
+        appid: '1005',
+        pid: '2',
+        cmd: '25',
+        behavior: 'play',
         br: this.bitRateMap[br],
       },
     });
 
-    const url = get(result, 'url');
-    const [songName, singerName] = get(result, 'fileName', '').split('-');
+    const url = get(result, 'url[0]');
+    const [songName] = get(result, 'fileName', '').split('-');
+
+    const imageInfo = await this.request({
+      method: 'GET',
+      url: 'http://kmrcdn.service.kugou.com/container/v1/image',
+      qs: {
+        appid: '0',
+        clientver: '0',
+        author_image_type: '5',
+        data: `[{"hash":"${id}"}]`,
+      },
+    });
+
+    const singerName = get(imageInfo, 'data[0].author[0].author_name');
+    const singerId = get(imageInfo, 'data[0].author[0].author_id');
 
     return {
       privilege: url ? Privilege.allow : Privilege.deny,
@@ -208,10 +223,15 @@ class Kugou {
       lrc: '',
       artists: [
         {
-          id: '000000000',
-          name: (singerName || '').trim(),
+          id: singerId,
+          name: singerName,
         },
       ],
+      album: {
+        id: get(imageInfo, 'data[0].album[0].album_id'),
+        name: get(imageInfo, 'data[0].album[0].album_name'),
+        img: get(imageInfo, 'data[0].album[0].sizable_cover', '').replace('{size}', '400'),
+      },
     };
   }
 

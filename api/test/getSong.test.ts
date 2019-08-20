@@ -29,9 +29,7 @@ test('getSong', async (t) => {
       t.is(resultId, id);
       t.truthy(name);
       t.truthy(url);
-      if (album) {
-        t.truthy(album.id && album.name && album.img, `${id}-${provider}`);
-      }
+      t.truthy(album.id && album.name && album.img, `${id}-${provider}`);
       t.truthy(artists && artists[0].name && artists[0].id, `${id}-${provider}`);
 
       if (provider === Provider.kugou || provider === Provider.netease) {
