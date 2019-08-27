@@ -171,7 +171,9 @@ export class PlayerListService {
     const removeIndex = this.songList.findIndex(({ provider, id }) => {
       return provider === song.provider && id === song.id;
     });
-    this.songList.splice(removeIndex, 1);
+    if (removeIndex >= 0) {
+      this.songList.splice(removeIndex, 1);
+    }
 
     // 再加入歌单
     this.songList.splice(start, 0, song);
