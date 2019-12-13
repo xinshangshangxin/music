@@ -1,0 +1,5 @@
+query krc($id: String!, $provider: Provider!) {
+  krc(id: $id, provider: $provider) {
+    items
+  }
+}

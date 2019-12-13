@@ -1,0 +1,10 @@
+query parseUrl($url: String!) {
+  parseUrl(url: $url) {
+    id
+    provider
+    name
+    artists {
+      name
+    }
+  }
+}
