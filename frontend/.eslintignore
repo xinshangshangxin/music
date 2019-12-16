@@ -1,2 +1,3 @@
 src/app/apollo/
 src/polyfills.ts
+src/app/core/apollo/graphql.ts

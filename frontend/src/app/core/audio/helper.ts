@@ -1,4 +1,4 @@
-import { environment } from '../../environments/environment';
+import { environment } from '../../../environments/environment';
 import { Provider } from '../apollo/graphql';
 import { PlayerSong } from './interface';
 

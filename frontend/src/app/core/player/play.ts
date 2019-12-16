@@ -88,7 +88,7 @@ export class PlayerPlay extends PlayerAction {
           this.rxAudio.pause();
         }
 
-        this.status = Status.loading
+        this.status = Status.loading;
       }),
       map(() => this.getSong(this.currentIndex)),
       share(),

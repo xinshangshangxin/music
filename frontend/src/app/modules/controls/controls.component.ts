@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 
-import { PlayerService } from '../services/player.service';
+import { PlayerService } from '../../core/services/player.service';
 
 @Component({
   selector: 'app-controls',

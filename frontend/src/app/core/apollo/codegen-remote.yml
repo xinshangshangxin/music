@@ -2,7 +2,7 @@ overwrite: true
 schema: "http://music.xinshangshangxin.com/graphql"
 documents: "{,!(node_modules)/**/}*.graphql"
 generates:
-  src/app/apollo/graphql.ts:
+  src/app/core/apollo/graphql.ts:
     plugins:
       - "typescript"
       - "typescript-operations"

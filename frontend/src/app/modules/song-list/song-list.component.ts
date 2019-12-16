@@ -1,8 +1,8 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 
-import { Privilege } from '../apollo/graphql';
-import { PlayerSong } from '../audio/interface';
-import { PlayerService } from '../services/player.service';
+import { Privilege } from '../../core/apollo/graphql';
+import { PlayerSong } from '../../core/audio/interface';
+import { PlayerService } from '../../core/services/player.service';
 
 @Component({
   selector: 'app-song-list',

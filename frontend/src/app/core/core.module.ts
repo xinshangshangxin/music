@@ -45,8 +45,15 @@ import {
 } from '@angular/material';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
+import { ConfigService } from './services/config.service';
+import { PersistService } from './services/persist.service';
+import { PlayerService } from './services/player.service';
+import { PreloadService } from './services/preload.service';
+import { StorageService } from './services/storage.service';
+
 @NgModule({
   declarations: [],
+  providers: [ConfigService, PersistService, PlayerService, PreloadService, StorageService],
   exports: [
     BrowserAnimationsModule,
     A11yModule,

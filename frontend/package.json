@@ -9,8 +9,8 @@
     "lint": "eslint --ext .ts ./",
     "lint-fix": "eslint --ext .ts ./ --fix",
     "e2e": "ng e2e",
-    "gql-gen": "graphql-codegen --config src/app/apollo/codegen.yml",
-    "gql-gen-remote": "graphql-codegen --config src/app/apollo/codegen-remote.yml"
+    "gql-gen": "graphql-codegen --config src/app/core/apollo/codegen.yml",
+    "gql-gen-remote": "graphql-codegen --config src/app/core/apollo/codegen-remote.yml"
   },
   "private": true,
   "dependencies": {

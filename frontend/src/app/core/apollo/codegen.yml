@@ -2,7 +2,7 @@ overwrite: true
 schema: "http://127.0.0.1:3000/graphql"
 documents: "{,!(node_modules)/**/}*.graphql"
 generates:
-  src/app/apollo/graphql.ts:
+  src/app/core/apollo/graphql.ts:
     plugins:
       - "typescript"
       - "typescript-operations"

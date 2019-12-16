@@ -3,7 +3,7 @@ import { APOLLO_OPTIONS, ApolloModule } from 'apollo-angular';
 import { HttpLink, HttpLinkModule } from 'apollo-angular-link-http';
 import { InMemoryCache } from 'apollo-cache-inmemory';
 
-import { environment } from '../../environments/environment';
+import { environment } from '../../../environments/environment';
 
 const uri = `${environment.backendUrl}/graphql`; // <-- add the URL of the GraphQL server here
 
