@@ -1,0 +1,77 @@
+:host(app-song-list) {
+    width: 100%;
+}
+
+.song-list {
+    width: 100%;
+
+    display: flex;
+    flex-direction: column;
+
+    min-height: 60px;
+    -webkit-overflow-scrolling: touch;
+
+    .playing {
+        background-color: #ededed;
+    }
+
+    .disabled {
+        background-color: #ededed;
+        opacity: 0.45;
+    }
+
+    .song-box {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+
+        width: 100%;
+        padding: 20px 10px 19px;
+        border-bottom: solid 1px #ccc;
+        color: rgba(0, 0, 0, 0.87);
+
+        box-sizing: border-box;
+        font-size: 14px;
+
+        .song-info {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+
+            .song-name,
+            .song-artists {
+                overflow: hidden;
+                white-space: nowrap;
+                text-overflow: ellipsis;
+            }
+
+            .song-name {
+                flex: 1 1 70%;
+            }
+
+            .song-artists {
+                flex: 1 1 30%;
+                padding-left: 5px;
+                padding-right: 20px;
+            }
+
+            .logo {
+                width: 16px;
+                height: 16px;
+                padding: 2px;
+                margin-right: 10px;
+            }
+        }
+
+        .song-control {
+            flex: 0 0 45px;
+            display: flex;
+            justify-content: space-around;
+            cursor: pointer;
+
+            .material-icons {
+                font-size: 20px;
+            }
+        }
+    }
+}

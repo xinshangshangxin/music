@@ -1,0 +1,19 @@
+<div class="top-nav">
+  <button mat-button>Music</button>
+
+  <mat-form-field class="search">
+    <input matInput type="text" placeholder="search" (keyup)="inputKeyup($event)" />
+    <button
+      mat-button
+      *ngIf="searchValue"
+      matSuffix
+      mat-icon-button
+      aria-label="Clear"
+      (click)="clear()"
+    >
+      <mat-icon>close</mat-icon>
+    </button>
+  </mat-form-field>
+
+  <mat-icon>grain</mat-icon>
+</div>

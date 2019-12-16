@@ -1,0 +1,15 @@
+<div class="billboard">
+  <div class="top">
+    <app-top-nav></app-top-nav>
+  </div>
+
+  <mat-drawer-container>
+    <mat-drawer #drawer mode="side" opened>
+      <app-left-nav></app-left-nav>
+    </mat-drawer>
+
+    <mat-drawer-content>
+      <app-song-list></app-song-list>
+    </mat-drawer-content>
+  </mat-drawer-container>
+</div>

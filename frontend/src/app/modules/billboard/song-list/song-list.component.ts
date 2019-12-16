@@ -1,6 +1,5 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 
-import { Privilege } from '../../core/apollo/graphql';
 import { PlayerSong } from '../../core/audio/interface';
 import { PlayerService } from '../../core/services/player.service';
 
@@ -9,18 +8,16 @@ import { PlayerService } from '../../core/services/player.service';
   templateUrl: './song-list.component.html',
   styleUrls: ['./song-list.component.scss'],
 })
-export class SongListComponent implements OnInit, OnDestroy {
+export class SongListComponent implements OnInit {
   public list: PlayerSong[];
-
-  public denyPrivilege = Privilege.Deny;
 
   constructor(private playerService: PlayerService) {}
 
   public ngOnInit() {
     this.list = this.playerService.songList;
-  }
 
-  public ngOnDestroy(): void {}
+    console.info('this.list: ', this.list);
+  }
 
   public get currentIndex() {
     return this.playerService.currentIndex;

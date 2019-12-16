@@ -1,0 +1,20 @@
+:host(app-billboard) {
+    width: 100%;
+    display: flex;
+}
+
+.billboard {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+
+    .top {
+        height: 70px;
+    }
+
+    mat-drawer-container {
+        flex: 1 1 auto;
+
+        background-color: inherit;
+    }
+}

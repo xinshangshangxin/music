@@ -1,8 +1,8 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 
+import { BillboardComponent } from './modules/billboard/billboard.component';
 import { HomeComponent } from './modules/home/home.component';
-import { SongListComponent } from './modules/song-list/song-list.component';
 
 const routes: Routes = [
   {
@@ -11,7 +11,17 @@ const routes: Routes = [
     children: [
       {
         path: '',
-        component: SongListComponent,
+        component: BillboardComponent,
+
+        // children: [
+        //   {
+        //     path: '',
+        //   }
+        // ]
+      },
+      {
+        path: 'lrc',
+        component: BillboardComponent,
       },
     ],
   },
