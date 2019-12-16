@@ -3,11 +3,11 @@ import { Component, OnInit } from '@angular/core';
 import { PlayerService } from '../../core/services/player.service';
 
 @Component({
-  selector: 'app-controls',
-  templateUrl: './controls.component.html',
-  styleUrls: ['./controls.component.scss'],
+  selector: 'app-play-bar',
+  templateUrl: './play-bar.component.html',
+  styleUrls: ['./play-bar.component.scss'],
 })
-export class ControlsComponent implements OnInit {
+export class PlayBarComponent implements OnInit {
   constructor(private readonly playerService: PlayerService) {}
 
   public bufferedPercent = 0;

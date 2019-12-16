@@ -2,17 +2,6 @@ mat-sidenav-container {
     height: 100%;
 }
 
-.main {
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-
-    .header {
-        display: flex;
-        justify-content: space-between;
-    }
-}
-
 .body {
     overflow: auto;
     flex: 1;
@@ -29,10 +18,6 @@ mat-sidenav-container {
     }
 }
 
-.duration {
-    width: 60px;
-
-    mat-select {
-        font-size: 10px;
-    }
+.play-bar {
+    height: 72px;
 }

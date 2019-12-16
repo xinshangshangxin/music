@@ -7,12 +7,12 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { GraphQLModule } from './core/apollo/graphql.module';
 import { CoreModule } from './core/core.module';
-import { ControlsComponent } from './modules/controls/controls.component';
 import { HomeComponent } from './modules/home/home.component';
 import { SongListComponent } from './modules/song-list/song-list.component';
+import { PlayBarComponent } from './modules/play-bar/play-bar.component';
 
 @NgModule({
-  declarations: [AppComponent, HomeComponent, ControlsComponent, SongListComponent],
+  declarations: [AppComponent, HomeComponent, PlayBarComponent, SongListComponent, PlayBarComponent],
   imports: [
     BrowserModule,
     AppRoutingModule,

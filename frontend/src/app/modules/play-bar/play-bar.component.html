@@ -1,0 +1,45 @@
+<div class="play-bar">
+  <div class="left">
+    <div class="cover">
+      <img src="http://static.xinshangshangxin.com/gakki/happy.jpg?imageView2/1/w/100/h/100" />
+    </div>
+
+    <div class="info">
+      <div class="song-name">
+        小幸运
+      </div>
+
+      <div class="singers">
+        田馥甄
+      </div>
+    </div>
+  </div>
+
+  <div class="controls">
+    <mat-icon class="previous" (click)="previous()">skip_previous</mat-icon>
+
+    <ng-container *ngIf="isPaused; else pauseTemplate">
+      <mat-icon (click)="togglePlay()">play_arrow</mat-icon>
+    </ng-container>
+    <ng-template #pauseTemplate>
+      <mat-icon (click)="togglePlay()">pause</mat-icon>
+    </ng-template>
+
+    <mat-icon class="next" (click)="next()">skip_next</mat-icon>
+  </div>
+
+  <div class="volume">
+    <mat-icon>volume_up</mat-icon>
+    <mat-slider thumbLabel class="range"></mat-slider>
+  </div>
+
+  <div class="tools">
+    <div class="play-list">
+      <mat-icon>list</mat-icon>
+    </div>
+
+    <div class="more">
+      <mat-icon>more_horiz</mat-icon>
+    </div>
+  </div>
+</div>
