@@ -25,7 +25,6 @@ export type SongDuration = 0 | 20 | 25 | 30 | 35 | 40 | 45 | 50 | 55 | 60;
 // 总共播放时长 = duration + before + end
 export interface PeakConfig {
   minVolume: number;
-  maxVolume: number;
   // 高潮音乐时长
   duration: SongDuration;
   // 渐入时长
@@ -61,7 +60,9 @@ export interface PeakSong extends PlayerSong {
   peakDuration: number;
 }
 
-export interface Setting extends PeakConfig {
+export interface Setting {
   song: PlayerSong;
-  currentTime: number;
+  peakConfig: PeakConfig;
+  currentTime?: number;
+  volume?: number;
 }

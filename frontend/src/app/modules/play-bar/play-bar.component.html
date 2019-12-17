@@ -6,11 +6,11 @@
 
     <div class="info">
       <div class="song-name">
-        小幸运
+        {{ (currentSong$ | async)?.name }}
       </div>
 
       <div class="singers">
-        田馥甄
+        {{ (currentSong$ | async)?.artists }}
       </div>
     </div>
   </div>
@@ -18,7 +18,7 @@
   <div class="controls">
     <mat-icon class="previous" (click)="previous()">skip_previous</mat-icon>
 
-    <ng-container *ngIf="isPaused; else pauseTemplate">
+    <ng-container *ngIf="playerService.status === Status.paused; else pauseTemplate">
       <mat-icon (click)="togglePlay()">play_arrow</mat-icon>
     </ng-container>
     <ng-template #pauseTemplate>
@@ -30,7 +30,7 @@
 
   <div class="volume">
     <mat-icon>volume_up</mat-icon>
-    <mat-slider thumbLabel class="range"></mat-slider>
+    <mat-slider class="range" thumbLabel [(ngModel)]="volume"></mat-slider>
   </div>
 
   <div class="tools">
@@ -40,6 +40,10 @@
 
     <div class="more">
       <mat-icon>more_horiz</mat-icon>
+    </div>
+
+    <div class="locate" (click)="locate()">
+      <mat-icon>find_in_page</mat-icon>
     </div>
   </div>
 </div>

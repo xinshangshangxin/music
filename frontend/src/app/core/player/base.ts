@@ -38,6 +38,9 @@ export class PlayerBase {
   // 当前音频对象
   public rxAudio: RxAudio | undefined;
 
+  // 当前音量
+  public volume: number;
+
   // 错误状态
   protected errorStatus = {
     nu: 0,

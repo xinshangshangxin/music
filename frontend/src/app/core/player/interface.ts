@@ -10,6 +10,7 @@ export interface Config {
   currentIndex: number;
   preloadLen: number;
   peakConfig: PeakConfig;
+  volume: number;
 }
 
 export enum Status {

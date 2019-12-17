@@ -1,7 +1,9 @@
 import { Observable, Subscription } from 'rxjs';
 import { map, tap } from 'rxjs/operators';
 
-import { PeakConfig, PeakSong, PlayerSong } from './interface';
+import {
+  PeakConfig, PeakSong, PlayerSong, Setting,
+} from './interface';
 import { RxAudio } from './rx-audio';
 
 export type AudioLoadSource = Observable<{
@@ -50,20 +52,26 @@ export class PoolAudio {
 
     // build现在需要的
     list.forEach(({ song, preload$ }) => {
-      this.getSong(song, peakConfig, preload$);
+      this.getSong(
+        {
+          song,
+          peakConfig,
+        },
+        preload$,
+      );
     });
   }
 
   public getSong(
-    song: PlayerSong,
-    peakConfig: PeakConfig,
+    setting: Setting,
     preload$: Observable<{
       song: PeakSong;
       changed: boolean;
     }>,
   ): PoolItem {
+    const { song, peakConfig } = setting;
     if (!this.checkInPool(song, peakConfig)) {
-      this.createPoolItem(song, peakConfig, preload$);
+      this.createPoolItem(setting, preload$);
     }
 
     return this.getPoolItem(song);
@@ -106,13 +114,14 @@ export class PoolAudio {
   }
 
   private createPoolItem(
-    song: PlayerSong,
-    peakConfig: PeakConfig,
+    setting: Setting,
     preload$: Observable<{
       song: PeakSong;
       changed: boolean;
     }>,
   ): void {
+    const { song, peakConfig } = setting;
+
     let rxAudio: RxAudio;
     if (this.restList.length) {
       rxAudio = this.restList.pop();
@@ -125,7 +134,7 @@ export class PoolAudio {
         rxAudio.set({
           song: peakSong,
           currentTime: peakSong.peakStartTime,
-          ...peakConfig,
+          peakConfig,
         });
       }),
       map((data) => ({ ...data, rxAudio })),

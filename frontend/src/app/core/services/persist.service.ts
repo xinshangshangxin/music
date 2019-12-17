@@ -103,6 +103,7 @@ export class PersistService {
         playerRetries: 10,
       },
       currentIndex: 0,
+      volume: 1,
     };
 
     return from(this.storageService.get<Config>(this.configKey)).pipe(

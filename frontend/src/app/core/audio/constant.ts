@@ -1,7 +1,6 @@
 import { PeakConfig } from './interface';
 
 export const defaultPeakConfig: PeakConfig = {
-  maxVolume: 1,
   minVolume: 0.2,
   duration: 20,
   layIn: 2,

@@ -95,6 +95,10 @@ export class PlayerPlay extends PlayerAction {
     );
   }
 
+  public get currentSong() {
+    return this.getSong(this.currentIndex);
+  }
+
   public play() {
     this.status = Status.playing;
 
@@ -103,54 +107,6 @@ export class PlayerPlay extends PlayerAction {
     } else {
       this.playAt(this.currentIndex);
     }
-  }
-
-  private getSong(index: number): PlayerSong {
-    // eslint-disable-next-line no-param-reassign
-    index = this.getValidIndex(index);
-
-    if (index < 0) {
-      throw new Error('index lower than zero');
-    }
-
-    return this.songList[index];
-  }
-
-  private songStatus$({ song, rxAudio }: { song: PeakSong; rxAudio: RxAudio }) {
-    return merge(
-      // 错误
-      rxAudio.event(AudioEvent.error).pipe(
-        tap(() => {
-          console.debug(AudioEvent.error, song);
-          this.error$.next();
-        }),
-      ),
-      // 结束
-      merge(
-        // 正常结束
-        rxAudio.event(AudioEvent.ended),
-        // layOut 结束
-        rxAudio.event(AudioEvent.layoutEnded),
-      ).pipe(
-        throttleTime(500),
-        tap(() => {
-          console.debug('ended', song);
-          this.end$.next(song);
-        }),
-      ),
-      // 渐出
-      rxAudio.event(AudioEvent.layoutTouch).pipe(
-        tap(() => {
-          rxAudio.layOut();
-        }),
-      ),
-      // 预载入
-      rxAudio.event(AudioEvent.played).pipe(
-        tap(() => {
-          this.loadNextSongs();
-        }),
-      ),
-    );
   }
 
   protected playSong(
@@ -198,6 +154,10 @@ export class PlayerPlay extends PlayerAction {
 
         console.debug('播放新歌', song);
         this.status = Status.playing;
+
+        // 设置音量
+        this.setAudioVolume(this.volume);
+
         return rxAudio.layIn(song.peakStartTime).pipe(map(() => ({ song, rxAudio })));
       }),
       catchError((err) => {
@@ -209,6 +169,54 @@ export class PlayerPlay extends PlayerAction {
         return EMPTY;
       }),
       takeUntil(this.songChange$),
+    );
+  }
+
+  private getSong(index: number): PlayerSong {
+    // eslint-disable-next-line no-param-reassign
+    index = this.getValidIndex(index);
+
+    if (index < 0) {
+      throw new Error('index lower than zero');
+    }
+
+    return this.songList[index];
+  }
+
+  private songStatus$({ song, rxAudio }: { song: PeakSong; rxAudio: RxAudio }) {
+    return merge(
+      // 错误
+      rxAudio.event(AudioEvent.error).pipe(
+        tap(() => {
+          console.debug(AudioEvent.error, song);
+          this.error$.next();
+        }),
+      ),
+      // 结束
+      merge(
+        // 正常结束
+        rxAudio.event(AudioEvent.ended),
+        // layOut 结束
+        rxAudio.event(AudioEvent.layoutEnded),
+      ).pipe(
+        throttleTime(500),
+        tap(() => {
+          console.debug('ended', song);
+          this.end$.next(song);
+        }),
+      ),
+      // 渐出
+      rxAudio.event(AudioEvent.layoutTouch).pipe(
+        tap(() => {
+          rxAudio.layOut();
+        }),
+      ),
+      // 预载入
+      rxAudio.event(AudioEvent.played).pipe(
+        tap(() => {
+          this.loadNextSongs();
+        }),
+      ),
     );
   }
 

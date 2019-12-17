@@ -14,6 +14,8 @@ export class RxAudio extends AudioListeners {
 
   private gainNode: GainNode;
 
+  private gainVolume = 1;
+
   constructor(peakConfig: PeakConfig) {
     super(peakConfig);
 
@@ -29,14 +31,8 @@ export class RxAudio extends AudioListeners {
     this.gainNode.connect(this.audioContext.destination);
   }
 
-  public release() {
-    this.pause();
-    this.audio.removeAttribute('src');
-    this.release$.next();
-  }
-
-  public set(setting: Setting) {
-    const { song, currentTime, ...peakConfig } = setting;
+  public set(setting: Setting & { currentTime: number }) {
+    const { song, currentTime, peakConfig } = setting;
 
     this.song = song;
 
@@ -49,6 +45,15 @@ export class RxAudio extends AudioListeners {
       peakStartTime: song.peakStartTime,
       peakConfig,
     });
+  }
+
+  public get volume() {
+    return this.gainVolume;
+  }
+
+  public set volume(value: number) {
+    this.gainVolume = value;
+    this.gainNode.gain.setValueAtTime(value, this.audioContext.currentTime);
   }
 
   public play() {
@@ -78,9 +83,10 @@ export class RxAudio extends AudioListeners {
 
     this.gainNode.gain.setValueAtTime(0, this.audioContext.currentTime);
     this.gainNode.gain.linearRampToValueAtTime(
-      this.peakConfig.maxVolume,
+      this.gainVolume,
       this.audioContext.currentTime + this.peakConfig.layIn,
     );
+
     return from(this.audio.play());
   }
 
@@ -89,11 +95,20 @@ export class RxAudio extends AudioListeners {
       return;
     }
 
-    this.gainNode.gain.setValueAtTime(1, this.audioContext.currentTime);
-    this.gainNode.gain.linearRampToValueAtTime(
-      this.peakConfig.minVolume,
-      this.audioContext.currentTime + this.peakConfig.layOut,
-    );
+    if (this.gainVolume > this.peakConfig.minVolume) {
+      this.gainNode.gain.setValueAtTime(this.gainVolume, this.audioContext.currentTime);
+
+      this.gainNode.gain.linearRampToValueAtTime(
+        this.peakConfig.minVolume,
+        this.audioContext.currentTime + this.peakConfig.layOut,
+      );
+    }
+  }
+
+  public release() {
+    this.pause();
+    this.audio.removeAttribute('src');
+    this.release$.next();
   }
 
   public destroy() {

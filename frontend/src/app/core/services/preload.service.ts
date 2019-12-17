@@ -12,7 +12,9 @@ import {
 } from '../apollo/graphql';
 import { AudioPeak } from '../audio/audio-peak';
 import { getSongUrl } from '../audio/helper';
-import { PeakConfig, PeakSong, PlayerSong } from '../audio/interface';
+import {
+  PeakConfig, PeakSong, PlayerSong, Setting,
+} from '../audio/interface';
 import { PoolAudio } from '../audio/pool-audio';
 
 @Injectable({
@@ -35,8 +37,8 @@ export class PreloadService {
     this.poolAudio.maintain({ list, peakConfig });
   }
 
-  public getQueueData({ song, peakConfig }: { song: PlayerSong; peakConfig: PeakConfig }) {
-    return this.poolAudio.getSong(song, peakConfig, this.buildPeakSong(song, peakConfig));
+  public getQueueData({ song, peakConfig }: Pick<Setting, 'song' | 'peakConfig'>) {
+    return this.poolAudio.getSong({ song, peakConfig }, this.buildPeakSong(song, peakConfig));
   }
 
   private buildPeakSong(

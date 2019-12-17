@@ -1,15 +1,21 @@
-import { Component, OnInit } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, QueryList, ViewChildren } from '@angular/core';
+import { untilDestroyed } from 'ngx-take-until-destroy';
+import { combineLatest } from 'rxjs';
+import { debounceTime, map, startWith, tap } from 'rxjs/operators';
 
-import { PlayerSong } from '../../core/audio/interface';
-import { PlayerService } from '../../core/services/player.service';
+import { PlayerSong } from '../../../core/audio/interface';
+import { PlayerService } from '../../../core/services/player.service';
 
 @Component({
   selector: 'app-song-list',
   templateUrl: './song-list.component.html',
   styleUrls: ['./song-list.component.scss'],
 })
-export class SongListComponent implements OnInit {
+export class SongListComponent implements OnInit, AfterViewInit, OnDestroy {
   public list: PlayerSong[];
+
+  @ViewChildren('perSong')
+  private songQueryList: QueryList<ElementRef<HTMLDivElement>>;
 
   constructor(private playerService: PlayerService) {}
 
@@ -17,6 +23,13 @@ export class SongListComponent implements OnInit {
     this.list = this.playerService.songList;
 
     console.info('this.list: ', this.list);
+  }
+
+  public ngOnDestroy() {
+  }
+
+  public ngAfterViewInit() {
+    this.getLocateSource().subscribe(() => {});
   }
 
   public get currentIndex() {
@@ -31,8 +44,42 @@ export class SongListComponent implements OnInit {
     this.playerService.remove(index);
   }
 
-  // eslint-disable-next-line class-methods-use-this
   public formatArtists(artists: { name: string }[]) {
-    return artists.map(({ name }) => name).join(' ');
+    return this.playerService.formatArtists(artists);
+  }
+
+  private getLocateSource() {
+    return combineLatest([
+      this.songQueryList.changes.pipe(startWith(this.songQueryList)),
+      this.playerService.locate$.pipe(startWith(undefined)),
+    ]).pipe(
+      tap((value) => {
+        console.info(value);
+      }),
+      debounceTime(200),
+      map(() => {
+        const elementRef = this.songQueryList.find(
+          (item, index) => index === this.playerService.currentIndex,
+        );
+
+        if (elementRef) {
+          return elementRef.nativeElement;
+        }
+
+        return null;
+      }),
+      tap((ele) => {
+        if (!ele) {
+          return;
+        }
+
+        ele.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start',
+          inline: 'center',
+        });
+      }),
+      untilDestroyed(this),
+    );
   }
 }

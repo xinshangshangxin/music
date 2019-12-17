@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { merge, Observable } from 'rxjs';
+import { merge, Observable, Subject } from 'rxjs';
 import { switchMap, tap } from 'rxjs/operators';
 
 import { Player } from '../player';
@@ -14,6 +14,8 @@ import { PreloadService } from './preload.service';
 export class PlayerService extends Player {
   public playlistId = 'playlist';
 
+  public locate$ = new Subject<void>();
+
   constructor(
     private readonly configService: ConfigService,
     private readonly preloadService: PreloadService,
@@ -25,8 +27,16 @@ export class PlayerService extends Player {
     this.init().subscribe(() => {});
   }
 
+  // eslint-disable-next-line class-methods-use-this
+  public formatArtists(artists: { name: string }[]) {
+    return artists.map(({ name }) => name).join(' ');
+  }
+
   private init() {
     return this.getConfig().pipe(
+      tap((config) => {
+        this.setVolume(config.volume);
+      }),
       switchMap(() => merge(
         this.whenSongChange$(),
         this.whenPersistTask$(),

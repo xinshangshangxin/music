@@ -3,6 +3,12 @@ import { Status } from './interface';
 import { PlayerStatus } from './status';
 
 export class PlayerAction extends PlayerStatus {
+  public setVolume(value: number) {
+    this.volume = value;
+
+    this.setAudioVolume(value);
+  }
+
   public pause() {
     this.status = Status.paused;
 
@@ -122,7 +128,11 @@ export class PlayerAction extends PlayerStatus {
 
       songs = this.songList.slice(start, end);
     } else {
-      console.info('loadNextSongs: preload song index: ', [start, end], [0, end - this.songList.length]);
+      console.info(
+        'loadNextSongs: preload song index: ',
+        [start, end],
+        [0, end - this.songList.length],
+      );
 
       songs = [
         ...this.songList.slice(start, end),
@@ -131,5 +141,11 @@ export class PlayerAction extends PlayerStatus {
     }
 
     this.preloadTask$.next(songs);
+  }
+
+  protected setAudioVolume(value: number) {
+    if (this.rxAudio) {
+      this.rxAudio.volume = value;
+    }
   }
 }
