@@ -88,7 +88,9 @@ export class PlayerPlay extends PlayerAction {
           this.rxAudio.pause();
         }
 
-        this.status = Status.loading;
+        if (this.status !== Status.paused) {
+          this.status = Status.loading;
+        }
       }),
       map(() => this.getSong(this.currentIndex)),
       share(),
@@ -100,7 +102,7 @@ export class PlayerPlay extends PlayerAction {
   }
 
   public play() {
-    this.status = Status.playing;
+    this.status = Status.loading;
 
     if (this.rxAudio) {
       this.rxAudio.layIn();
@@ -125,13 +127,14 @@ export class PlayerPlay extends PlayerAction {
           src: rxAudio.audio.src,
           currentIndex: this.currentIndex,
           status: this.status,
+          peakConfig: rxAudio.peakConfig,
           song,
         });
 
         if (changed) {
           console.debug('song changed, update song info', song);
           this.updateSongInfo(song);
-          this.persistTask$.next(song);
+          this.persistTask$.next();
         }
 
         // 状态变换, 需要做一些操作
@@ -162,8 +165,9 @@ export class PlayerPlay extends PlayerAction {
       }),
       catchError((err) => {
         console.warn('load audio error', err);
+
         if (this.status !== Status.paused) {
-          this.error$.next(err);
+          this.error$.next({ index: this.currentIndex, data: err });
         }
 
         return EMPTY;
@@ -172,7 +176,7 @@ export class PlayerPlay extends PlayerAction {
     );
   }
 
-  private getSong(index: number): PlayerSong {
+  protected getSong(index: number): PlayerSong {
     // eslint-disable-next-line no-param-reassign
     index = this.getValidIndex(index);
 
@@ -189,7 +193,7 @@ export class PlayerPlay extends PlayerAction {
       rxAudio.event(AudioEvent.error).pipe(
         tap(() => {
           console.debug(AudioEvent.error, song);
-          this.error$.next();
+          this.error$.next({ index: this.currentIndex, data: AudioEvent.error });
         }),
       ),
       // 结束
@@ -220,8 +224,7 @@ export class PlayerPlay extends PlayerAction {
     );
   }
 
-  private updateSongInfo(song: PeakSong) {
-    // eslint-disable-next-line max-len
+  protected updateSongInfo(song: PlayerSong | PeakSong) {
     const index = this.songList.findIndex(
       ({ id, provider }) => id === song.id && provider === song.provider,
     );

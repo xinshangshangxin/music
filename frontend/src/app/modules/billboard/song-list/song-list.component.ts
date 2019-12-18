@@ -1,10 +1,21 @@
-import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, QueryList, ViewChildren } from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  ElementRef,
+  OnDestroy,
+  OnInit,
+  QueryList,
+  ViewChildren,
+} from '@angular/core';
 import { untilDestroyed } from 'ngx-take-until-destroy';
 import { combineLatest } from 'rxjs';
-import { debounceTime, map, startWith, tap } from 'rxjs/operators';
+import {
+  debounceTime, map, startWith, tap,
+} from 'rxjs/operators';
 
 import { PlayerSong } from '../../../core/audio/interface';
 import { PlayerService } from '../../../core/services/player.service';
+import { Privilege } from '../../../core/apollo/graphql';
 
 @Component({
   selector: 'app-song-list',
@@ -13,6 +24,8 @@ import { PlayerService } from '../../../core/services/player.service';
 })
 export class SongListComponent implements OnInit, AfterViewInit, OnDestroy {
   public list: PlayerSong[];
+
+  public Privilege = Privilege;
 
   @ViewChildren('perSong')
   private songQueryList: QueryList<ElementRef<HTMLDivElement>>;
@@ -25,8 +38,7 @@ export class SongListComponent implements OnInit, AfterViewInit, OnDestroy {
     console.info('this.list: ', this.list);
   }
 
-  public ngOnDestroy() {
-  }
+  public ngOnDestroy() {}
 
   public ngAfterViewInit() {
     this.getLocateSource().subscribe(() => {});

@@ -21,6 +21,18 @@ interface Playlist {
   providedIn: 'root',
 })
 export class PersistService {
+  public static DEFAULT_CONFIG: Omit<Config, 'currentIndex'> = {
+    preloadLen: 2,
+    peakConfig: {
+      ...defaultPeakConfig,
+    },
+    errorRetry: {
+      songRetries: 3,
+      playerRetries: 10,
+    },
+    volume: 1,
+  };
+
   private promise: Promise<[Error] | [undefined, any]>;
 
   private readonly configKey = 'config';
@@ -93,22 +105,12 @@ export class PersistService {
   }
 
   private initConfig() {
-    const defaultConfig: Config = {
-      preloadLen: 2,
-      peakConfig: {
-        ...defaultPeakConfig,
-      },
-      errorRetry: {
-        songRetries: 3,
-        playerRetries: 10,
-      },
-      currentIndex: 0,
-      volume: 1,
-    };
-
     return from(this.storageService.get<Config>(this.configKey)).pipe(
       tap((storageConfig) => {
-        this.config = merge({}, defaultConfig, storageConfig);
+        this.config = merge({}, {
+          ...PersistService.DEFAULT_CONFIG,
+          currentIndex: 0,
+        }, storageConfig);
       }),
       switchMap(() => this.persistConfig(this.config)),
     );

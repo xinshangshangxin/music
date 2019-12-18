@@ -1,0 +1,95 @@
+<form class="full-width" [formGroup]="settingFormGroup" *ngIf="config">
+  <mat-accordion formGroupName="peakConfig">
+    <mat-expansion-panel hideToggle [expanded]="step === 0" (opened)="setStep(0)">
+      <mat-expansion-panel-header>
+        <mat-panel-title>
+          High歌设置
+        </mat-panel-title>
+      </mat-expansion-panel-header>
+
+      <p>
+        <mat-form-field class="duration">
+          <mat-label>High时长</mat-label>
+
+          <mat-select formControlName="duration" name="item">
+            <mat-option *ngFor="let item of peaks" [value]="item.duration">
+              {{ item.name }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </p>
+      <p>
+        <mat-form-field>
+          <input type="number" formControlName="before" matInput placeholder="High歌前置时间(秒)" />
+        </mat-form-field>
+      </p>
+
+      <p>
+        <mat-form-field>
+          <input type="number" formControlName="after" matInput placeholder="High歌后置时间(秒)" />
+        </mat-form-field>
+      </p>
+
+      <p>
+        <mat-form-field>
+          <input type="number" formControlName="layIn" matInput placeholder="渐入时间" />
+        </mat-form-field>
+      </p>
+      <p>
+        <mat-form-field>
+          <input type="number" formControlName="layOut" matInput placeholder="渐出时间" />
+        </mat-form-field>
+      </p>
+
+      <p>
+        <mat-form-field>
+          <input type="number" formControlName="minVolume" matInput placeholder="渐入渐出最低音量" />
+        </mat-form-field>
+      </p>
+    </mat-expansion-panel>
+  </mat-accordion>
+
+  <mat-accordion formGroupName="errorRetry">
+    <mat-expansion-panel hideToggle [expanded]="step === 1" (opened)="setStep(1)">
+      <mat-expansion-panel-header>
+        <mat-panel-title>
+          错误 设置
+        </mat-panel-title>
+      </mat-expansion-panel-header>
+
+      <p>
+        <mat-form-field>
+          <input type="number" formControlName="songRetries" matInput placeholder="单首歌错误重试次数" />
+          <mat-hint align="start"><strong>超出重试次数后, 播放下一首</strong> </mat-hint>
+        </mat-form-field>
+      </p>
+      <p>
+        <mat-form-field>
+          <input type="number" matInput formControlName="playerRetries" placeholder="播放列表错误重试次数" />
+          <mat-hint align="start"><strong>超出重试次数后, 暂停播放</strong> </mat-hint>
+        </mat-form-field>
+      </p>
+    </mat-expansion-panel>
+  </mat-accordion>
+
+  <mat-accordion>
+    <mat-expansion-panel hideToggle [expanded]="step === 2" (opened)="setStep(2)">
+      <mat-expansion-panel-header>
+        <mat-panel-title>
+          其它 设置
+        </mat-panel-title>
+      </mat-expansion-panel-header>
+
+      <p>
+        <mat-form-field>
+          <input type="number" matInput formControlName="preloadLen" placeholder="预载入长度" />
+          <mat-hint align="start"><strong>预载入越多, 内存消耗越大</strong> </mat-hint>
+        </mat-form-field>
+      </p>
+    </mat-expansion-panel>
+  </mat-accordion>
+</form>
+
+<mat-card style="margin-top: 20px;">
+  <button mat-button color="warn" (click)="setDefaultConfig()">重置</button>
+</mat-card>

@@ -7,6 +7,7 @@ import { Config } from '../player/interface';
 import { ConfigService } from './config.service';
 import { PersistService } from './persist.service';
 import { PreloadService } from './preload.service';
+import { Privilege } from '../apollo/graphql';
 
 @Injectable({
   providedIn: 'root',
@@ -41,6 +42,7 @@ export class PlayerService extends Player {
         this.whenSongChange$(),
         this.whenPersistTask$(),
         this.whenPreloadTask$(),
+        this.whenSongError$(),
         this.persistService.getPlaylist(this.playlistId).pipe(
           tap((playlist) => {
             if (!playlist) {
@@ -54,8 +56,26 @@ export class PlayerService extends Player {
     );
   }
 
+  private whenSongError$() {
+    return this.error$.pipe(
+      tap(({ index, data }) => {
+        if (data && data.message === 'GraphQL error: NO_SONG_FOUND') {
+          this.updateSongInfo({
+            ...this.getSong(index),
+            privilege: Privilege.Deny,
+          });
+
+          this.persistTask$.next();
+        }
+      }),
+    );
+  }
+
   private whenSongChange$() {
     return this.songChange$.pipe(
+      tap((song) => {
+        console.info('songChange$', song);
+      }),
       switchMap((song) => {
         const pooItem = this.preloadService.getQueueData({
           song,

@@ -11,11 +11,12 @@ import { AudioEvent, PeakConfig } from './interface';
 export class AudioListeners {
   public audio = new Audio();
 
+  public peakConfig: PeakConfig;
+
   protected release$ = new Subject<number>();
 
   protected peakStartTime: number;
 
-  protected peakConfig: PeakConfig;
 
   constructor(peakConfig: PeakConfig) {
     this.audio.crossOrigin = 'anonymous';

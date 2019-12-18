@@ -50,10 +50,18 @@ import { PersistService } from './services/persist.service';
 import { PlayerService } from './services/player.service';
 import { PreloadService } from './services/preload.service';
 import { StorageService } from './services/storage.service';
+import { SearchService } from './services/search.service';
 
 @NgModule({
   declarations: [],
-  providers: [ConfigService, PersistService, PlayerService, PreloadService, StorageService],
+  providers: [
+    ConfigService,
+    PersistService,
+    PlayerService,
+    PreloadService,
+    StorageService,
+    SearchService,
+  ],
   exports: [
     BrowserAnimationsModule,
     A11yModule,

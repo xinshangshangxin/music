@@ -73,6 +73,13 @@ export class RxAudio extends AudioListeners {
   }
 
   public layIn(currentTime?: number): Observable<void> {
+    console.debug('layIn play', {
+      currentTime,
+      peakConfig: this.peakConfig,
+      gainVolume: this.gainVolume,
+      src: this.audio.src,
+    });
+
     if (currentTime) {
       this.audio.currentTime = currentTime;
     }

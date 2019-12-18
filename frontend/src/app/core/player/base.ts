@@ -18,7 +18,7 @@ export class PlayerBase {
   public end$ = new Subject<any>();
 
   // 当前歌曲播放错误
-  public error$ = new Subject<Event>();
+  public error$ = new Subject<{ index: number; data: any }>();
 
   // 当前歌曲信息有变更
   public persistTask$ = new Subject<PlayerSong>();

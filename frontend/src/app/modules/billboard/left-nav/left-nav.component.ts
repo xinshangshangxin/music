@@ -6,8 +6,5 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./left-nav.component.scss'],
 })
 export class LeftNavComponent implements OnInit {
-  constructor() { }
-
-  ngOnInit() {
-  }
+  public ngOnInit() {}
 }

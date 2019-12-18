@@ -88,6 +88,11 @@ export class PoolAudio {
       return false;
     }
 
+    // 还在播放中
+    if (item.rxAudio && !item.rxAudio.audio.paused) {
+      return false;
+    }
+
     if (item.peakConfig.duration !== peakConfig.duration) {
       console.info('peakConfig change, rebuild');
       this.release(song.url);
@@ -142,11 +147,13 @@ export class PoolAudio {
 
     this.pool[song.url] = {
       // 先subscribe 执行起来
-      subscription: source$.subscribe(({ song: peakSong }) => {
+      subscription: source$.pipe(tap(({ song: peakSong }) => {
         console.debug(`预载入 ${peakSong.name} 成功`, peakSong);
-      }),
+      })).subscribe(() => {}, console.warn),
       source$,
-      peakConfig,
+      peakConfig: {
+        ...peakConfig,
+      },
       rxAudio,
     };
 

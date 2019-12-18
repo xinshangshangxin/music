@@ -3,6 +3,9 @@ import { RouterModule, Routes } from '@angular/router';
 
 import { BillboardComponent } from './modules/billboard/billboard.component';
 import { HomeComponent } from './modules/home/home.component';
+import { SongListComponent } from './modules/billboard/song-list/song-list.component';
+import { SearchComponent } from './modules/billboard/search/search.component';
+import { SettingComponent } from './modules/billboard/setting/setting.component';
 
 const routes: Routes = [
   {
@@ -13,11 +16,20 @@ const routes: Routes = [
         path: '',
         component: BillboardComponent,
 
-        // children: [
-        //   {
-        //     path: '',
-        //   }
-        // ]
+        children: [
+          {
+            path: '',
+            component: SongListComponent,
+          },
+          {
+            path: 'search',
+            component: SearchComponent,
+          },
+          {
+            path: 'setting',
+            component: SettingComponent,
+          },
+        ],
       },
       {
         path: 'lrc',

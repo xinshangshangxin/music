@@ -1,6 +1,9 @@
+import { getSongUrl } from '../audio/helper';
 import { PlayerSong } from '../audio/interface';
 import { Status } from './interface';
 import { PlayerStatus } from './status';
+
+type Position = number | 'next' | 'end';
 
 export class PlayerAction extends PlayerStatus {
   public setVolume(value: number) {
@@ -33,8 +36,8 @@ export class PlayerAction extends PlayerStatus {
     this.end$.next();
   }
 
-  public playAt(index: number): void {
-    this.click$.next(index);
+  public playAt(position: Position): void {
+    this.click$.next(this.position2index(position, true));
   }
 
   /**
@@ -42,15 +45,8 @@ export class PlayerAction extends PlayerStatus {
    * @param song PlayerSong
    * @param position next 插入到下一首, end 插入到末尾
    */
-  public add(song: PlayerSong, position: number | 'next' | 'end' = 'end') {
-    let start: number;
-    if (position === 'next') {
-      start = this.getValidIndex(this.currentIndex + 1);
-    } else if (position === 'end') {
-      start = this.songList.length;
-    } else {
-      start = position;
-    }
+  public add(song: Omit<PlayerSong, 'url'>, position: Position = 'end') {
+    const start = this.position2index(position);
 
     // 先删除重复歌曲
     const removeIndex = this.songList.findIndex(
@@ -61,7 +57,10 @@ export class PlayerAction extends PlayerStatus {
     }
 
     // 再加入歌单
-    this.songList.splice(start, 0, song);
+    this.songList.splice(start, 0, {
+      ...song,
+      url: getSongUrl(song),
+    });
     this.persistTask$.next();
   }
 
@@ -88,6 +87,35 @@ export class PlayerAction extends PlayerStatus {
     if (isPlay && this.songList.length) {
       this.playAt(this.currentIndex);
     }
+  }
+
+  public loadNextSongs(offset = 0): void {
+    const start = this.getValidIndex(this.currentIndex + offset);
+    let end = start + this.config.preloadLen + 1;
+
+    let songs: PlayerSong[] = [];
+
+    if (end <= this.songList.length) {
+      console.info('loadNextSongs: preload song index: ', [start, end]);
+
+      songs = this.songList.slice(start, end);
+    } else {
+      end = this.getValidIndex(end);
+      console.info(
+        'loadNextSongs: preload song index: ',
+        [start, 'end'],
+        [0, end],
+      );
+
+      songs = [
+        ...this.songList.slice(start),
+        ...this.songList.slice(0, end),
+      ];
+    }
+
+    console.info('load songs: ', songs.map(({ name }) => name));
+
+    this.preloadTask$.next(songs);
   }
 
   protected getValidIndex(nu: number): number {
@@ -117,35 +145,26 @@ export class PlayerAction extends PlayerStatus {
     return this.setIndex(this.currentIndex + step);
   }
 
-  protected loadNextSongs(): void {
-    const start = this.currentIndex;
-    const end = this.currentIndex + this.config.preloadLen + 1;
-
-    let songs: PlayerSong[] = [];
-
-    if (end <= this.songList.length) {
-      console.info('loadNextSongs: preload song index: ', [start, end]);
-
-      songs = this.songList.slice(start, end);
-    } else {
-      console.info(
-        'loadNextSongs: preload song index: ',
-        [start, end],
-        [0, end - this.songList.length],
-      );
-
-      songs = [
-        ...this.songList.slice(start, end),
-        ...this.songList.slice(0, end - this.songList.length),
-      ];
-    }
-
-    this.preloadTask$.next(songs);
-  }
-
   protected setAudioVolume(value: number) {
     if (this.rxAudio) {
       this.rxAudio.volume = value;
     }
+  }
+
+  private position2index(position: Position, isPlay = false) {
+    let index: number;
+    if (position === 'next') {
+      index = this.getValidIndex(this.currentIndex + 1);
+    } else if (position === 'end') {
+      index = this.songList.length;
+
+      if (isPlay) {
+        index -= 1;
+      }
+    } else {
+      index = position;
+    }
+
+    return index;
   }
 }

@@ -5,7 +5,7 @@
     *ngFor="let song of list; index as i"
     [ngClass]="{
       playing: currentIndex === i,
-      disabled: song.privilege === denyPrivilege
+      disabled: song.privilege === Privilege.Deny
     }"
     (click)="play(i)"
   >
