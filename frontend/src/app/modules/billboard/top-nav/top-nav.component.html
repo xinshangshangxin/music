@@ -2,7 +2,13 @@
   <button mat-button>Music</button>
 
   <mat-form-field class="search">
-    <input matInput type="text" placeholder="search" (keyup)="inputKeyup($event)" />
+    <input
+      matInput
+      type="text"
+      placeholder="search"
+      (keyup)="inputKeyup($event)"
+      [(ngModel)]="searchValue"
+    />
     <button
       mat-button
       *ngIf="searchValue"
@@ -15,5 +21,5 @@
     </button>
   </mat-form-field>
 
-  <mat-icon>grain</mat-icon>
+  <mat-icon (click)="toggleSetting()">grain</mat-icon>
 </div>

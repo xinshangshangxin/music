@@ -6,8 +6,5 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./billboard.component.scss'],
 })
 export class BillboardComponent implements OnInit {
-  constructor() { }
-
-  ngOnInit() {
-  }
+  public ngOnInit() {}
 }
