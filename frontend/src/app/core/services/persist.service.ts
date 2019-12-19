@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { merge } from 'lodash';
 import { from, Observable } from 'rxjs';
 import {
-  map, mapTo, switchMap, tap,
+  map, mapTo, switchMap, tap, shareReplay,
 } from 'rxjs/operators';
 
 import { defaultPeakConfig } from '../audio/constant';
@@ -33,8 +33,6 @@ export class PersistService {
     volume: 1,
   };
 
-  private promise: Promise<[Error] | [undefined, any]>;
-
   private readonly configKey = 'config';
 
   private readonly playlistsKey = 'playlistIds';
@@ -43,16 +41,18 @@ export class PersistService {
 
   private playlists: Playlist[] = [];
 
+  private init$: Observable<void>;
+
   constructor(private readonly storageService: StorageService) {
-    this.promise = awaitWrap(this.init().toPromise());
+    this.init();
   }
 
   public getConfig(): Observable<Config> {
-    return from(this.promise).pipe(map(() => this.config));
+    return this.init$.pipe(map(() => this.config));
   }
 
   public getPlaylist(playlistId: string): Observable<Playlist | undefined> {
-    return from(this.promise).pipe(map(() => this.playlists.find(({ id }) => id === playlistId)));
+    return this.init$.pipe(map(() => this.playlists.find(({ id }) => id === playlistId)));
   }
 
   public persistConfig(
@@ -101,7 +101,13 @@ export class PersistService {
   }
 
   private init() {
-    return this.initConfig().pipe(switchMap(() => from(this.initPlaylists())));
+    this.init$ = this.initConfig().pipe(
+      switchMap(() => from(this.initPlaylists())),
+      shareReplay(1),
+    );
+
+    // as soon as possible run
+    this.init$.subscribe(console.info, console.warn);
   }
 
   private initConfig() {
