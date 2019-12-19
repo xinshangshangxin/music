@@ -14,11 +14,11 @@ query song($id: String!, $provider: Provider!, $duration: Int) {
 
     privilege
 
-    # album {
-    #   id
-    #   name
-    #   img
-    # }
+    album {
+      id
+      name
+      img
+    }
 
     # lrc
     # klyric

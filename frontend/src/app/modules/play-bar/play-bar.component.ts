@@ -1,7 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { merge, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
+import { untilDestroyed } from 'ngx-take-until-destroy';
 import { Status } from '../../core/player/interface';
 import { PersistService } from '../../core/services/persist.service';
 import { PlayerService } from '../../core/services/player.service';
@@ -11,12 +12,15 @@ import { PlayerService } from '../../core/services/player.service';
   templateUrl: './play-bar.component.html',
   styleUrls: ['./play-bar.component.scss'],
 })
-export class PlayBarComponent implements OnInit {
+export class PlayBarComponent implements OnInit, OnDestroy {
   public Status = Status;
+
+  public defaultImg = 'assets/logos/kugou.png';
 
   public currentSong$: Observable<{
     name: string;
     artists: string;
+    img?: string;
   }>;
 
   constructor(
@@ -25,12 +29,23 @@ export class PlayBarComponent implements OnInit {
   ) {}
 
   public ngOnInit() {
-    this.currentSong$ = merge(this.playerService.preloadTask$, this.playerService.songChange$).pipe(
-      map(() => ({
-        name: this.playerService.currentSong.name,
-        artists: this.playerService.formatArtists(this.playerService.currentSong.artists),
-      })),
-    );
+    this.currentSong$ = merge(
+      this.playerService.preloadTask$,
+      this.playerService.songChange$,
+      this.playerService.played$,
+    )
+      .pipe(
+        map(() => ({
+          provider: this.playerService.currentSong.provider,
+          name: this.playerService.currentSong.name,
+          img: this.playerService.currentSong.album && this.playerService.currentSong.album.img,
+          artists: this.playerService.formatArtists(this.playerService.currentSong.artists),
+        })),
+        untilDestroyed(this),
+      );
+  }
+
+  public ngOnDestroy(): void {
   }
 
   public get volume() {

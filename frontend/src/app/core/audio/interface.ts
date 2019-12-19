@@ -52,6 +52,7 @@ export interface PlayerSong extends Omit<Song, 'artists' | 'album' | '__typename
   album?: {
     id?: string | null;
     name: string;
+    img?: string;
   } | null;
 }
 

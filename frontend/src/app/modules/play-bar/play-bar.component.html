@@ -1,7 +1,7 @@
 <div class="play-bar">
   <div class="left">
     <div class="cover">
-      <img src="http://static.xinshangshangxin.com/gakki/happy.jpg?imageView2/1/w/100/h/100" />
+      <img [src]="(currentSong$ | async)?.img || defaultImg" (error)="img.src = defaultImg" #img />
     </div>
 
     <div class="info">

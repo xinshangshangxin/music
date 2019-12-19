@@ -307,7 +307,10 @@ export type SongQuery = (
     & { artists: Maybe<Array<(
       { __typename?: 'Artist' }
       & Pick<Artist, 'id' | 'name'>
-    )>> }
+    )>>, album: Maybe<(
+      { __typename?: 'Album' }
+      & Pick<Album, 'id' | 'name' | 'img'>
+    )> }
   )> }
 );
 
@@ -415,6 +418,11 @@ export const SongDocument = gql`
     }
     startTime(duration: $duration)
     privilege
+    album {
+      id
+      name
+      img
+    }
   }
 }
     `;

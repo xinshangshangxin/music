@@ -13,7 +13,7 @@ import { Privilege } from '../apollo/graphql';
   providedIn: 'root',
 })
 export class PlayerService extends Player {
-  public playlistId = 'playlist';
+  private readonly playerPersistId = 'player_temp';
 
   public locate$ = new Subject<void>();
 
@@ -43,7 +43,7 @@ export class PlayerService extends Player {
         this.whenPersistTask$(),
         this.whenPreloadTask$(),
         this.whenSongError$(),
-        this.persistService.getPlaylist(this.playlistId).pipe(
+        this.persistService.getPlaylist(this.playerPersistId).pipe(
           tap((playlist) => {
             if (!playlist) {
               return;
@@ -92,7 +92,7 @@ export class PlayerService extends Player {
 
   private whenPersistTask$() {
     return this.persistTask$.pipe(
-      switchMap(() => this.persistService.persistPlaylist(this.playlistId, this.songList)),
+      switchMap(() => this.persistService.persistPlaylist(this.playerPersistId, this.songList)),
     );
   }
 

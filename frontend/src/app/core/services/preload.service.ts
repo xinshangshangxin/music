@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { isNil, omit } from 'lodash';
 import {
   from, Observable, of, throwError,
 } from 'rxjs';
@@ -6,7 +7,6 @@ import {
   map, shareReplay, switchMap, timeout,
 } from 'rxjs/operators';
 
-import { isNil } from 'lodash';
 import {
   AddPeakTimeGQL, Privilege, Provider, SongGQL,
 } from '../apollo/graphql';
@@ -91,13 +91,15 @@ export class PreloadService {
       provider: song.provider,
       duration: peakDuration,
     }).pipe(
-      map(({ privilege, duration, startTime: serverPeakStartTime }) => {
+      map(({
+        startTime: serverPeakStartTime,
+        ...rest
+      }) => {
         if (isNil(serverPeakStartTime)) {
           return {
             song: {
               ...song,
-              privilege,
-              duration,
+              ...omit(rest, ['url']),
               peakDuration,
             },
             changed: true,
@@ -107,8 +109,7 @@ export class PreloadService {
         return {
           song: {
             ...song,
-            privilege,
-            duration,
+            ...rest,
             peakDuration,
 
             peakStartTime: serverPeakStartTime,
