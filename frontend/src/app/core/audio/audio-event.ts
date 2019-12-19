@@ -44,6 +44,8 @@ export class AudioListeners {
         return this.layoutTouch$();
       case AudioEvent.layoutEnded:
         return this.layoutEnded$();
+      case AudioEvent.timeupdate:
+        return this.timeupdate$();
       default:
         return of({ event: AudioEvent.unknown });
     }
@@ -99,6 +101,18 @@ export class AudioListeners {
         console.debug('====> Event:ended', e);
       }),
       mapTo({ event: AudioEvent.ended }),
+    );
+  }
+
+  private timeupdate$() {
+    return fromEvent(this.audio, AudioEvent.timeupdate).pipe(
+      takeUntil(
+        merge(fromEvent(this.audio, 'ended'), fromEvent(this.audio, 'error'), this.release$),
+      ),
+      map(() => ({
+        event: AudioEvent.timeupdate,
+        data: { currentTime: this.audio.currentTime },
+      })),
     );
   }
 

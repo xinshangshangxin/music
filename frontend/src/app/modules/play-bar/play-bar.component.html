@@ -1,49 +1,68 @@
 <div class="play-bar">
-  <div class="left">
-    <div class="cover">
-      <img [src]="(currentSong$ | async)?.img || defaultImg" (error)="img.src = defaultImg" #img />
-    </div>
+  <div class="top">
+    <mat-slider
+      class="progress"
+      thumbLabel
+      step="0.1"
+      [min]="progress.min"
+      [max]="progress.max"
+      [value]="progress.current"
+      (input)="progressInput($event)"
+    >
+    </mat-slider>
+  </div>
 
-    <div class="info">
-      <div class="song-name">
-        {{ (currentSong$ | async)?.name }}
+  <div class="bottom">
+    <div class="left">
+      <div class="cover">
+        <img
+          [src]="(currentSong$ | async)?.img || defaultImg"
+          (error)="img.src = defaultImg"
+          #img
+        />
       </div>
 
-      <div class="singers">
-        {{ (currentSong$ | async)?.artists }}
+      <div class="info">
+        <div class="song-name">
+          {{ (currentSong$ | async)?.name }}
+        </div>
+
+        <div class="singers">
+          {{ (currentSong$ | async)?.artists }}
+        </div>
       </div>
     </div>
-  </div>
 
-  <div class="controls">
-    <mat-icon class="previous" (click)="previous()">skip_previous</mat-icon>
+    <div class="controls">
+      <mat-icon class="previous" (click)="previous()">skip_previous</mat-icon>
 
-    <ng-container *ngIf="playerService.status === Status.paused; else pauseTemplate">
-      <mat-icon (click)="togglePlay()">play_arrow</mat-icon>
-    </ng-container>
-    <ng-template #pauseTemplate>
-      <mat-icon (click)="togglePlay()">pause</mat-icon>
-    </ng-template>
+      <ng-container *ngIf="playerService.status === Status.paused; else pauseTemplate">
+        <mat-icon (click)="togglePlay()">play_arrow</mat-icon>
+      </ng-container>
+      <ng-template #pauseTemplate>
+        <mat-icon (click)="togglePlay()">pause</mat-icon>
+      </ng-template>
 
-    <mat-icon class="next" (click)="next()">skip_next</mat-icon>
-  </div>
-
-  <div class="volume">
-    <mat-icon>volume_up</mat-icon>
-    <mat-slider class="range" thumbLabel [(ngModel)]="volume"></mat-slider>
-  </div>
-
-  <div class="tools">
-    <div class="play-list">
-      <mat-icon>list</mat-icon>
+      <mat-icon class="next" (click)="next()">skip_next</mat-icon>
     </div>
 
-    <div class="more">
-      <mat-icon>more_horiz</mat-icon>
+    <div class="volume">
+      <mat-icon>volume_up</mat-icon>
+      <mat-slider class="range" thumbLabel [(ngModel)]="volume"></mat-slider>
     </div>
 
-    <div class="locate" (click)="locate()">
-      <mat-icon>find_in_page</mat-icon>
+    <div class="tools">
+      <div class="locate" (click)="locate()">
+        <mat-icon>location_searching</mat-icon>
+      </div>
+
+      <div class="play-list">
+        <mat-icon>list</mat-icon>
+      </div>
+
+      <div class="more">
+        <mat-icon>more_horiz</mat-icon>
+      </div>
     </div>
   </div>
 </div>

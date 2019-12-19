@@ -2,13 +2,12 @@ import { Injectable } from '@angular/core';
 import { merge } from 'lodash';
 import { from, Observable } from 'rxjs';
 import {
-  map, mapTo, switchMap, tap, shareReplay,
+  map, mapTo, shareReplay, switchMap, tap,
 } from 'rxjs/operators';
 
 import { defaultPeakConfig } from '../audio/constant';
 import { PlayerSong } from '../audio/interface';
 import { Config } from '../player/interface';
-import { awaitWrap } from '../workers/helper';
 import { StorageService } from './storage.service';
 
 interface Playlist {

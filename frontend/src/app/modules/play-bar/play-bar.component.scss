@@ -1,91 +1,105 @@
 .play-bar {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
+    flex-direction: column;
 
     height: 100%;
     color: #e7e7e7;
     background-color: #303030;
 
-    .left {
+    .top {
         display: flex;
-        align-items: center;
+
+        height: 2px;
+
+        .progress {
+            top: -20px;
+            width: 100%;
+        }
+    }
+
+    .bottom {
+        display: flex;
         height: 100%;
 
-        .cover {
+        justify-content: space-between;
+        align-items: center;
+
+        .left {
+            display: flex;
+            align-items: center;
             height: 100%;
 
-            img {
+            .cover {
                 height: 100%;
+
+                img {
+                    height: 100%;
+                }
+            }
+
+            .info {
+                margin-left: 8px;
+
+                display: flex;
+                flex-direction: column;
+                flex-wrap: nowrap;
+
+                width: 130px;
+                overflow: hidden;
+
+                .song-name {
+                    font-size: 14px;
+                    line-height: 18px;
+                }
+
+                .singers {
+                    font-size: 12px;
+                }
             }
         }
 
-        .info {
-            margin-left: 8px;
-
+        .controls {
             display: flex;
-            flex-direction: column;
-            flex-wrap: nowrap;
+            align-items: center;
 
-            width: 130px;
-            overflow: hidden;
-
-            .song-name {
-                font-size: 14px;
-                line-height: 18px;
+            mat-icon {
+                font-size: 32px;
+                height: auto;
+                width: auto;
             }
 
-            .singers {
-                font-size: 12px;
+            .previous {
+                margin-right: 10px;
+            }
+
+            .next {
+                margin-left: 10px;
             }
         }
-    }
 
-    .controls {
-        display: flex;
-        align-items: center;
+        .volume {
+            display: flex;
+            align-items: center;
 
-        mat-icon {
-            font-size: 32px;
-            height: auto;
-            width: auto;
-        }
+            .range {
+                width: 80px;
 
-        .previous {
-            margin-right: 10px;
-        }
-
-        .next {
-            margin-left: 10px;
-        }
-    }
-
-    .volume {
-        display: flex;
-        align-items: center;
-
-        .range {
-            width: 80px;
-
-            ::ng-deep .mat-slider-track-wrapper,
-            .mat-slider-track-background,
-            .mat-slider-ticks,
-            .mat-slider-ticks-container {
-                background-color: #e7e7e7;
+                ::ng-deep .mat-slider-track-wrapper,
+                .mat-slider-track-background,
+                .mat-slider-ticks,
+                .mat-slider-ticks-container {
+                    background-color: #e7e7e7;
+                }
             }
         }
-    }
 
-    .tools {
-        display: flex;
-        align-items: center;
+        .tools {
+            display: flex;
+            align-items: center;
 
-        .more {
-            margin-left: 10px;
-        }
-
-        .locate {
-            margin-left: 10px;
+            > div {
+                margin-left: 10px;
+            }
         }
     }
 }

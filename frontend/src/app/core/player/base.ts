@@ -29,6 +29,9 @@ export class PlayerBase {
   // 切换其它歌曲
   public songChange$: Observable<PlayerSong>;
 
+  // 歌曲触发播放了
+  public play$ = new Subject<void>();
+
   // 当前歌曲正常播放了
   public played$ = new Subject<void>();
 

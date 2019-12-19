@@ -106,6 +106,7 @@ export class PlayerPlay extends PlayerAction {
 
     if (this.rxAudio) {
       this.rxAudio.layIn();
+      this.play$.next();
     } else {
       this.playAt(this.currentIndex);
     }
@@ -161,7 +162,13 @@ export class PlayerPlay extends PlayerAction {
         // 设置音量
         this.setAudioVolume(this.volume);
 
-        return rxAudio.layIn(song.peakStartTime).pipe(map(() => ({ song, rxAudio })));
+        return rxAudio.layIn(song.peakStartTime)
+          .pipe(
+            tap(() => {
+              this.play$.next();
+            }),
+            map(() => ({ song, rxAudio })),
+          );
       }),
       catchError((err) => {
         console.warn('load audio error', err);
@@ -215,9 +222,14 @@ export class PlayerPlay extends PlayerAction {
           rxAudio.layOut();
         }),
       ),
-      // 预载入
+      // 当前歌曲播放成功
       rxAudio.event(AudioEvent.played).pipe(
         tap(() => {
+          // 事件触发
+          this.played$.next();
+          // 清空列表错误次数
+          this.errorStatus.continuous = 0;
+          // 载入下面歌曲
           this.loadNextSongs();
         }),
       ),
