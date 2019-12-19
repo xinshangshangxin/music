@@ -103,3 +103,13 @@
         }
     }
 }
+
+@media (max-width: 700px) {
+    .volume {
+        display: none !important;
+    }
+
+    .info {
+        width: 60px !important;
+    }
+}

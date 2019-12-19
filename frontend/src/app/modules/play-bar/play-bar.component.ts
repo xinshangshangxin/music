@@ -51,6 +51,9 @@ export class PlayBarComponent implements OnInit, OnDestroy {
           img: this.playerService.currentSong.album && this.playerService.currentSong.album.img,
           artists: this.playerService.formatArtists(this.playerService.currentSong.artists),
         })),
+        tap((data) => {
+          console.info(JSON.stringify(data));
+        }),
         untilDestroyed(this),
       );
 
