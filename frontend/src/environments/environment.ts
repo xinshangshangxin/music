@@ -5,7 +5,7 @@
 export const environment = {
   production: false,
   // backendUrl: 'http://127.0.0.1:3000',
-  backendUrl: 'http://music.xinshangshangxin.com',
+  backendUrl: '//music.xinshangshangxin.com',
   proxyUrl: '//musicproxy.leanapp.cn',
 };
 

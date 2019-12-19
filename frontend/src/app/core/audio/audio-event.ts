@@ -13,10 +13,11 @@ export class AudioListeners {
 
   public peakConfig: PeakConfig;
 
+  protected layInFailed$ = new Subject<any>();
+
   protected release$ = new Subject<number>();
 
   protected peakStartTime: number;
-
 
   constructor(peakConfig: PeakConfig) {
     this.audio.crossOrigin = 'anonymous';
@@ -82,7 +83,10 @@ export class AudioListeners {
 
   private error$() {
     // 监听错误事件
-    return fromEvent(this.audio, AudioEvent.error).pipe(
+    return merge(
+      fromEvent(this.audio, AudioEvent.error),
+      this.layInFailed$,
+    ).pipe(
       takeUntil(this.release$),
       take(1),
       tap((e) => {

@@ -1,7 +1,12 @@
-import { from, Observable } from 'rxjs';
+import { EMPTY, from, Observable } from 'rxjs';
+import {
+  catchError, mapTo, switchMap, take, takeUntil, timeout, tap,
+} from 'rxjs/operators';
 
 import { AudioListeners } from './audio-event';
-import { PeakConfig, PlayerSong, Setting } from './interface';
+import {
+  AudioEvent, PeakConfig, PlayerSong, Setting,
+} from './interface';
 
 export class RxAudio extends AudioListeners {
   private audioContext = new AudioContext();
@@ -73,12 +78,34 @@ export class RxAudio extends AudioListeners {
   }
 
   public layIn(currentTime?: number): Observable<void> {
+    return this.tryLayIn(currentTime)
+      .pipe(
+        switchMap(() => this.event(AudioEvent.timeupdate).pipe(
+          take(1),
+        )),
+        timeout(1000),
+        takeUntil(this.release$),
+        tap(() => {
+          console.info('layIn success');
+        }),
+        catchError(() => {
+          console.warn('!!!!!!!!!!, 载入失败', this.audio.src);
+          this.layInFailed$.next();
+          return EMPTY;
+        }),
+        mapTo(undefined),
+      );
+  }
+
+  private tryLayIn(currentTime?: number): Observable<void> {
     console.debug('layIn play', {
       currentTime,
       peakConfig: this.peakConfig,
       gainVolume: this.gainVolume,
       src: this.audio.src,
     });
+
+    this.pause();
 
     if (currentTime) {
       this.audio.currentTime = currentTime;

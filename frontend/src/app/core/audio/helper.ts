@@ -3,7 +3,7 @@ import { Provider } from '../apollo/graphql';
 import { PlayerSong } from './interface';
 
 function getSongUrl(song: { id: string; provider: Provider; name?: string }) {
-  return `${environment.proxyUrl}?id=${song.id}&provider=${song.provider}&name=${song.name}`;
+  return `${environment.proxyUrl}?id=${song.id}&provider=${song.provider}`;
 }
 
 function getSongKey(song: Pick<PlayerSong, 'id' | 'provider'>) {
