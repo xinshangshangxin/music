@@ -1,5 +1,5 @@
 export const environment = {
   production: true,
-  backendUrl: 'http://music.xinshangshangxin.com',
+  backendUrl: '//music.xinshangshangxin.com',
   proxyUrl: '//musicproxy.leanapp.cn',
 };
