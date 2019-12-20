@@ -69,12 +69,15 @@ export class PlayerAction extends PlayerStatus {
     this.persistTask$.next();
   }
 
-  public loadSongList(list: PlayerSong[], currentIndex = 0, isPlay = false) {
+  public loadSongList(list: Omit<PlayerSong, 'url'>[], currentIndex = 0, isPlay = false) {
     // 更正游标
     this.currentIndex = currentIndex;
     // 更新列表
     this.songList.length = 0;
-    this.songList.push(...list);
+    this.songList.push(...list.map((song) => ({
+      ...song,
+      url: getSongUrl(song),
+    })));
 
     // 保存到storage
     this.persistTask$.next();

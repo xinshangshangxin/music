@@ -7,6 +7,7 @@ import {
 } from 'rxjs/operators';
 
 import { SearchSong } from '../../../core/apollo/graphql';
+import { getSongUrl } from '../../../core/audio/helper';
 import { PlayerService } from '../../../core/services/player.service';
 import { SearchService, SearchType } from '../../../core/services/search.service';
 
@@ -44,6 +45,13 @@ export class SearchComponent implements OnInit, OnDestroy {
 
       this.playerService.playAt(position);
     }
+  }
+
+  public tempPlay(index: number) {
+    this.playerService.loadSongList(this.searchList, index, true);
+
+    this.searchService.urlLoadSubject.next('');
+    this.router.navigate(['']);
   }
 
   private whenSearch$() {

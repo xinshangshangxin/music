@@ -16,6 +16,7 @@ import { SongListComponent } from './modules/billboard/song-list/song-list.compo
 import { TopNavComponent } from './modules/billboard/top-nav/top-nav.component';
 import { HomeComponent } from './modules/home/home.component';
 import { PlayBarComponent } from './modules/play-bar/play-bar.component';
+import { ShareModule } from './share/share/share.module';
 
 @NgModule({
   declarations: [
@@ -35,6 +36,7 @@ import { PlayBarComponent } from './modules/play-bar/play-bar.component';
     AppRoutingModule,
     BrowserAnimationsModule,
     CoreModule,
+    ShareModule,
     GraphQLModule,
     HttpClientModule,
     FormsModule,

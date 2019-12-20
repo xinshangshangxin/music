@@ -3,6 +3,7 @@
     class="song-box"
     *ngFor="let song of searchList; index as i"
     [ngClass]="{ disabled: song.privilege === 'deny' }"
+    (click)="tempPlay(i)"
   >
     <span class="song-info">
       <span class="song-name">

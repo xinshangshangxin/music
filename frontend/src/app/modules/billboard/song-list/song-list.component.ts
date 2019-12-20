@@ -1,21 +1,19 @@
 import {
-  AfterViewInit,
-  Component,
-  ElementRef,
-  OnDestroy,
-  OnInit,
-  QueryList,
-  ViewChildren,
+  AfterViewInit, Component, ElementRef, OnDestroy, OnInit, QueryList, ViewChildren,
 } from '@angular/core';
+import { MatDialog } from '@angular/material';
 import { untilDestroyed } from 'ngx-take-until-destroy';
-import { combineLatest } from 'rxjs';
+import { combineLatest, of } from 'rxjs';
 import {
-  debounceTime, map, startWith, tap,
+  debounceTime, map, startWith, switchMap, tap,
 } from 'rxjs/operators';
 
-import { PlayerSong } from '../../../core/audio/interface';
-import { PlayerService } from '../../../core/services/player.service';
 import { Privilege } from '../../../core/apollo/graphql';
+import { PlayerSong } from '../../../core/audio/interface';
+import { demoSongs } from '../../../core/player/demo';
+import { ConfigService } from '../../../core/services/config.service';
+import { PlayerService } from '../../../core/services/player.service';
+import { ConfirmDialogComponent } from '../../../share/confirm-dialog/confirm-dialog.component';
 
 @Component({
   selector: 'app-song-list',
@@ -30,12 +28,42 @@ export class SongListComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChildren('perSong')
   private songQueryList: QueryList<ElementRef<HTMLDivElement>>;
 
-  constructor(private playerService: PlayerService) {}
+  constructor(
+    private readonly playerService: PlayerService,
+    private readonly configService: ConfigService,
+    private readonly dialog: MatDialog,
+  ) {}
 
   public ngOnInit() {
-    this.list = this.playerService.songList;
+    this.configService.getConfig()
+      .pipe(
+        switchMap(() => {
+          if (this.playerService.songList.length) {
+            return of(undefined);
+          }
 
-    console.info('this.list: ', this.list);
+          return this.dialog
+            .open(ConfirmDialogComponent, {
+              minWidth: 300,
+              data: {
+                content: '是否添加默认歌曲?',
+                no: '否',
+                ok: '是',
+              },
+            })
+            .afterClosed()
+            .pipe(tap((confirm) => {
+              if (confirm) {
+                this.playerService.loadSongList(demoSongs, 0, true);
+              }
+            }));
+        }),
+        tap(() => {
+          this.list = this.playerService.songList;
+        }),
+      ).subscribe(() => {
+        console.info('this.list: ', this.list);
+      }, console.warn);
   }
 
   public ngOnDestroy() {}
