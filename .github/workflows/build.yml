@@ -26,13 +26,13 @@ jobs:
         run: |
           cd frontend
           npm ci
-          npm run build --if-present
+          npm run build
+          echo "m.xinshangshangxin.com" > dist/CNAME
+          ls -la dist
 
       - name: Deploy
-        uses: JamesIves/github-pages-deploy-action@releases/v3
-        with:
-          ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
-          BASE_BRANCH: develop
-          BRANCH: gh-pages
-          FOLDER: frontend/dist
-          CLEAN: true
+        uses: peaceiris/actions-gh-pages@v2
+        env:
+          PERSONAL_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+          PUBLISH_BRANCH: gh-pages
+          PUBLISH_DIR: ./frontend/dist

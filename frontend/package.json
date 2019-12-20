@@ -4,7 +4,7 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "build": "ng build --prod --build--optimizer --output-path dist",
+    "build": "ng build --prod --build--optimizer --aot --output-path dist",
     "test": "ng test",
     "lint": "eslint --ext .ts ./",
     "lint-fix": "eslint --ext .ts ./ --fix",
