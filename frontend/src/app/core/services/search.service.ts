@@ -106,12 +106,7 @@ export class SearchService {
     return this.parseUrlGQL.fetch({ url }).pipe(
       map((result) => result.data.parseUrl || []),
       map((songs) => {
-        this.playerService.loadSongList(
-          songs.map((data) => ({
-            ...data,
-            url: getSongUrl(data),
-          })),
-        );
+        this.playerService.loadSongList(songs, 0, true);
       }),
       delay(200),
       tap(() => {
