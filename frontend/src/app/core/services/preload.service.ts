@@ -4,7 +4,7 @@ import {
   from, Observable, of, throwError,
 } from 'rxjs';
 import {
-  map, shareReplay, switchMap, timeout,
+  map, shareReplay, switchMap, tap, timeout,
 } from 'rxjs/operators';
 
 import {
@@ -157,6 +157,18 @@ export class PreloadService {
     peakConfig: PeakConfig;
   }): Observable<number> {
     return from(this.audioPeak.get(song.url, peakConfig.duration, peakConfig.precision)).pipe(
+      tap(({ peaks, precision }) => {
+        this.addPeakTimeGQL
+          .mutate({
+            id: song.id,
+            provider: song.provider,
+            peak: {
+              peaks,
+              precision,
+            },
+          })
+          .subscribe(() => {}, console.warn);
+      }),
       map(({ startTime }) => startTime),
     );
   }
