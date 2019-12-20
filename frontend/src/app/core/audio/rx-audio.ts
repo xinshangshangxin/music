@@ -1,6 +1,6 @@
 import { EMPTY, from, Observable } from 'rxjs';
 import {
-  catchError, mapTo, switchMap, take, takeUntil, timeout, tap,
+  catchError, mapTo, switchMap, take, takeUntil, timeout, tap, skip,
 } from 'rxjs/operators';
 
 import { AudioListeners } from './audio-event';
@@ -84,17 +84,20 @@ export class RxAudio extends AudioListeners {
 
     return this.tryLayIn(currentTime)
       .pipe(
-        switchMap(() => this.event(AudioEvent.playing).pipe(
+        // 特殊情况下, audio 会触发 playing 事件, 但是 依然不播放
+        // 利用 timeupdate 来判断是否播放成功
+        switchMap(() => this.event(AudioEvent.timeupdate).pipe(
+          skip(2),
           take(1),
         )),
         timeout(this.errorDelaySeconds * 1000),
         takeUntil(this.release$),
         tap(() => {
-          console.info('!!!!!!!!!!, layIn success', this.song.name, this.audio.src, this.song);
+          console.info('======>, layIn success', this.song.name, this.audio.src, this.song);
         }),
         catchError(() => {
           this.errorDelaySeconds **= 2;
-          console.warn('!!!!!!!!!!, 载入失败', this.song.name, this.audio.src, this.song);
+          console.warn('======>, 载入失败', this.song.name, this.audio.src, this.song);
           this.layInFailed$.next();
           return EMPTY;
         }),

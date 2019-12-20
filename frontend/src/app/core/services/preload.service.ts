@@ -61,6 +61,7 @@ export class PreloadService {
             song: {
               ...song,
               peakStartTime: startTime,
+              peakDuration: peakConfig.duration,
             } as PeakSong,
             changed,
           })),
