@@ -94,11 +94,16 @@ export class PreloadService {
         startTime: serverPeakStartTime,
         ...rest
       }) => {
+        const omitAttrs = ['url'];
+        if (song.name) {
+          omitAttrs.push('name');
+        }
+
         if (isNil(serverPeakStartTime)) {
           return {
             song: {
               ...song,
-              ...omit(rest, ['url']),
+              ...omit(rest, omitAttrs),
               peakDuration,
             },
             changed: true,
@@ -108,7 +113,7 @@ export class PreloadService {
         return {
           song: {
             ...song,
-            ...rest,
+            ...omit(rest, omitAttrs),
             peakDuration,
 
             peakStartTime: serverPeakStartTime,

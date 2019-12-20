@@ -29,35 +29,37 @@
       </div>
     </div>
 
-    <div class="controls">
-      <mat-icon class="previous" (click)="previous()">skip_previous</mat-icon>
+    <div class="right">
+      <div class="controls">
+        <mat-icon class="previous" (click)="previous()">skip_previous</mat-icon>
 
-      <ng-container *ngIf="playerService.status === Status.paused; else pauseTemplate">
-        <mat-icon (click)="togglePlay()">play_arrow</mat-icon>
-      </ng-container>
-      <ng-template #pauseTemplate>
-        <mat-icon (click)="togglePlay()">pause</mat-icon>
-      </ng-template>
+        <ng-container *ngIf="playerService.status === Status.paused; else pauseTemplate">
+          <mat-icon class="play-btn" (click)="togglePlay()">play_arrow</mat-icon>
+        </ng-container>
+        <ng-template #pauseTemplate>
+          <mat-icon class="play-btn" (click)="togglePlay()">pause</mat-icon>
+        </ng-template>
 
-      <mat-icon class="next" (click)="next()">skip_next</mat-icon>
-    </div>
-
-    <div class="volume">
-      <mat-icon>volume_up</mat-icon>
-      <mat-slider class="range" thumbLabel [(ngModel)]="volume"></mat-slider>
-    </div>
-
-    <div class="tools">
-      <div class="locate" (click)="locate()">
-        <mat-icon>location_searching</mat-icon>
+        <mat-icon class="next" (click)="next()">skip_next</mat-icon>
       </div>
 
-      <div class="play-list">
-        <mat-icon>list</mat-icon>
-      </div>
+      <div class="tools">
+        <div class="volume">
+          <mat-icon>volume_up</mat-icon>
+          <mat-slider class="range" thumbLabel [(ngModel)]="volume"></mat-slider>
+        </div>
 
-      <div class="more">
-        <mat-icon>more_horiz</mat-icon>
+        <div class="locate" (click)="locate()">
+          <mat-icon>location_searching</mat-icon>
+        </div>
+
+        <div class="play-list">
+          <mat-icon>list</mat-icon>
+        </div>
+
+        <div class="more">
+          <mat-icon>more_horiz</mat-icon>
+        </div>
       </div>
     </div>
   </div>
