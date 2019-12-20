@@ -21,6 +21,8 @@ export class RxAudio extends AudioListeners {
 
   private gainVolume = 1;
 
+  private errorDelaySeconds = 2;
+
   constructor(peakConfig: PeakConfig) {
     super(peakConfig);
 
@@ -78,18 +80,21 @@ export class RxAudio extends AudioListeners {
   }
 
   public layIn(currentTime?: number): Observable<void> {
+    console.info('layIn error delay seconds: ', this.errorDelaySeconds);
+
     return this.tryLayIn(currentTime)
       .pipe(
-        switchMap(() => this.event(AudioEvent.timeupdate).pipe(
+        switchMap(() => this.event(AudioEvent.playing).pipe(
           take(1),
         )),
-        timeout(1000),
+        timeout(this.errorDelaySeconds * 1000),
         takeUntil(this.release$),
         tap(() => {
-          console.info('layIn success');
+          console.info('!!!!!!!!!!, layIn success', this.song.name, this.audio.src, this.song);
         }),
         catchError(() => {
-          console.warn('!!!!!!!!!!, 载入失败', this.audio.src);
+          this.errorDelaySeconds **= 2;
+          console.warn('!!!!!!!!!!, 载入失败', this.song.name, this.audio.src, this.song);
           this.layInFailed$.next();
           return EMPTY;
         }),
@@ -98,13 +103,6 @@ export class RxAudio extends AudioListeners {
   }
 
   private tryLayIn(currentTime?: number): Observable<void> {
-    console.debug('layIn play', {
-      currentTime,
-      peakConfig: this.peakConfig,
-      gainVolume: this.gainVolume,
-      src: this.audio.src,
-    });
-
     this.pause();
 
     if (currentTime) {

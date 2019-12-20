@@ -15,11 +15,7 @@
   <div class="bottom">
     <div class="left">
       <div class="cover">
-        <img
-          [src]="(currentSong$ | async)?.img || defaultImg"
-          (error)="img.src = defaultImg"
-          #img
-        />
+        <img [src]="(currentSong$ | async)?.img" (error)="img.src = defaultImg" #img />
       </div>
 
       <div class="info">

@@ -43,46 +43,22 @@ export class PlayBarComponent implements OnInit, OnDestroy {
       this.playerService.play$,
       this.playerService.songChange$,
       this.playerService.played$,
+      this.playerService.preloadTask$,
     )
       .pipe(
         map(() => ({
           provider: this.playerService.currentSong.provider,
           name: this.playerService.currentSong.name,
-          img: this.playerService.currentSong.album && this.playerService.currentSong.album.img,
+          img: (
+            this.playerService.currentSong.album
+            && this.playerService.currentSong.album.img
+          ) || this.defaultImg,
           artists: this.playerService.formatArtists(this.playerService.currentSong.artists),
         })),
-        tap((data) => {
-          console.info(JSON.stringify(data));
-        }),
         untilDestroyed(this),
       );
 
-
-    merge(
-      this.playerService.songChange$.pipe(
-        tap(() => {
-          this.progress.min = 0;
-          this.progress.current = 0;
-          this.progress.max = 100;
-
-          console.info('songChange$', JSON.stringify(this.progress));
-        }),
-      ),
-      merge(
-        this.playerService.played$,
-        this.playerService.play$,
-      ).pipe(
-        filter(() => !!this.playerService.rxAudio),
-        switchMap(
-          () => this.playerService.rxAudio.event(AudioEvent.timeupdate)
-            .pipe(takeUntil(this.playerService.played$)),
-        ),
-        map(() => {
-          this.progress = this.getProgress();
-        }),
-      ),
-    )
-      .pipe(untilDestroyed(this))
+    this.whenProgress$()
       .subscribe(() => {}, console.warn);
   }
 
@@ -123,6 +99,32 @@ export class PlayBarComponent implements OnInit, OnDestroy {
     if (this.playerService.rxAudio) {
       this.playerService.rxAudio.audio.currentTime = e.value;
     }
+  }
+
+  private whenProgress$() {
+    return merge(
+      this.playerService.songChange$.pipe(
+        tap(() => {
+          this.progress.min = 0;
+          this.progress.current = 0;
+          this.progress.max = 100;
+        }),
+      ),
+      merge(
+        this.playerService.played$,
+        this.playerService.play$,
+      ).pipe(
+        filter(() => !!this.playerService.rxAudio),
+        switchMap(
+          () => this.playerService.rxAudio.event(AudioEvent.timeupdate)
+            .pipe(takeUntil(this.playerService.played$)),
+        ),
+        map(() => {
+          this.progress = this.getProgress();
+        }),
+      ),
+    )
+      .pipe(untilDestroyed(this));
   }
 
   private getProgress() {

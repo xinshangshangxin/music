@@ -156,7 +156,6 @@ export class PlayerPlay extends PlayerAction {
           return of({ rxAudio, song });
         }
 
-        console.debug('播放新歌', song);
         this.status = Status.playing;
 
         // 设置音量
@@ -212,7 +211,7 @@ export class PlayerPlay extends PlayerAction {
       ).pipe(
         throttleTime(500),
         tap(() => {
-          console.debug('ended', song);
+          console.debug(AudioEvent.ended, song);
           this.end$.next(song);
         }),
       ),

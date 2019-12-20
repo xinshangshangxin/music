@@ -28,7 +28,6 @@ export class PreloadService {
   constructor(private readonly songGQL: SongGQL, private readonly addPeakTimeGQL: AddPeakTimeGQL) {}
 
   public load(songList: PlayerSong[], peakConfig: PeakConfig) {
-    console.debug('preload: ', songList);
     const list = songList.map((song) => ({
       song,
       preload$: this.buildPeakSong(song, peakConfig),

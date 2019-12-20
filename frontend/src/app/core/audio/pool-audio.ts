@@ -156,12 +156,5 @@ export class PoolAudio {
       },
       rxAudio,
     };
-
-    console.debug('预载入状态: ', {
-      pool: Object.keys(this.pool).length,
-      rest: this.restList.length,
-      songName: song.name,
-      song,
-    });
   }
 }

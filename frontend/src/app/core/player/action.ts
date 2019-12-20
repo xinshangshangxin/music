@@ -96,16 +96,9 @@ export class PlayerAction extends PlayerStatus {
     let songs: PlayerSong[] = [];
 
     if (end <= this.songList.length) {
-      console.info('loadNextSongs: preload song index: ', [start, end]);
-
       songs = this.songList.slice(start, end);
     } else {
       end = this.getValidIndex(end);
-      console.info(
-        'loadNextSongs: preload song index: ',
-        [start, 'end'],
-        [0, end],
-      );
 
       songs = [
         ...this.songList.slice(start),
@@ -113,7 +106,7 @@ export class PlayerAction extends PlayerStatus {
       ];
     }
 
-    console.info('load songs: ', songs.map(({ name }) => name));
+    console.info('load songs: ', [start, end], songs.map(({ name }) => name));
 
     this.preloadTask$.next(songs);
   }

@@ -101,9 +101,6 @@ export class AudioListeners {
     return fromEvent(this.audio, AudioEvent.ended).pipe(
       takeUntil(this.release$),
       take(1),
-      tap((e) => {
-        console.debug('====> Event:ended', e);
-      }),
       mapTo({ event: AudioEvent.ended }),
     );
   }

@@ -73,9 +73,6 @@ export class PlayerService extends Player {
 
   private whenSongChange$() {
     return this.songChange$.pipe(
-      tap((song) => {
-        console.info('songChange$', song);
-      }),
       switchMap((song) => {
         const pooItem = this.preloadService.getQueueData({
           song,
