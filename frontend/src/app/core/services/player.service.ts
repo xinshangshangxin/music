@@ -43,15 +43,16 @@ export class PlayerService extends Player {
         this.whenPersistTask$(),
         this.whenPreloadTask$(),
         this.whenSongError$(),
-        this.persistService.getPlaylist(this.playerPersistId).pipe(
-          tap((playlist) => {
-            if (!playlist) {
-              return;
-            }
+        this.persistService.getPlaylist(this.playerPersistId)
+          .pipe(
+            tap((playlist) => {
+              if (!playlist) {
+                return;
+              }
 
-            this.loadSongList(playlist.songs, this.config.currentIndex);
-          }),
-        ),
+              this.loadSongList(playlist.songs, this.config.currentIndex, false, false);
+            }),
+          ),
       )),
     );
   }

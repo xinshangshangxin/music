@@ -1,6 +1,8 @@
-import { EMPTY, from, Observable } from 'rxjs';
 import {
-  catchError, mapTo, switchMap, take, takeUntil, timeout, tap, skip,
+  EMPTY, from, merge, Observable,
+} from 'rxjs';
+import {
+  catchError, mapTo, switchMap, take, takeUntil, tap, timeout,
 } from 'rxjs/operators';
 
 import { AudioListeners } from './audio-event';
@@ -21,7 +23,7 @@ export class RxAudio extends AudioListeners {
 
   private gainVolume = 1;
 
-  private errorDelaySeconds = 2;
+  private errorDelaySeconds = 0.5;
 
   constructor(peakConfig: PeakConfig) {
     super(peakConfig);
@@ -45,7 +47,7 @@ export class RxAudio extends AudioListeners {
 
     // 标记播放范围
     // https://developer.mozilla.org/zh-CN/docs/Web/Guide/HTML/Using_HTML5_audio_and_video#%E6%A0%87%E8%AE%B0%E6%92%AD%E6%94%BE%E8%8C%83%E5%9B%B4
-    this.audio.src = `${this.song.url}#t=${currentTime}`;
+    this.audio.src = `${this.song.url}#t=${currentTime},${currentTime + peakConfig.duration + peakConfig.after + 1}`;
     this.audio.load();
 
     this.changePeak({
@@ -80,27 +82,38 @@ export class RxAudio extends AudioListeners {
   }
 
   public layIn(currentTime?: number): Observable<void> {
-    console.info('layIn error delay seconds: ', this.errorDelaySeconds);
-
-    return this.tryLayIn(currentTime)
+    // 处理特殊情况
+    // The AudioContext was not allowed to start. It must be resumed (or created) after a user gesture on the page. https://goo.gl/7K7WLu
+    const layInFailedSource$ = this.event(AudioEvent.playing)
       .pipe(
-        // 特殊情况下, audio 会触发 playing 事件, 但是 依然不播放
-        // 利用 timeupdate 来判断是否播放成功
-        switchMap(() => this.event(AudioEvent.timeupdate).pipe(
-          skip(2),
-          take(1),
-        )),
-        timeout(this.errorDelaySeconds * 1000),
-        takeUntil(this.release$),
         tap(() => {
-          console.info('======>, layIn success', this.song.name, this.audio.src, this.song);
+          console.info('======>, layIn checking', this.song.name, this.audio.src, this.song);
+        }),
+        take(1),
+        switchMap(() => this.event(AudioEvent.timeupdate).pipe(
+          take(1),
+          timeout(this.errorDelaySeconds * 1000),
+          takeUntil(this.release$),
+        )),
+        tap(() => {
+          console.info('======>, layIn success', this.song.name);
         }),
         catchError(() => {
-          this.errorDelaySeconds **= 2;
-          console.warn('======>, 载入失败', this.song.name, this.audio.src, this.song);
+          console.warn('======>, layIn failed', this.song.name, this.errorDelaySeconds);
+
+          this.pause();
+          this.errorDelaySeconds = (this.errorDelaySeconds + 1) ** 2;
           this.layInFailed$.next();
           return EMPTY;
         }),
+      );
+
+    return merge(
+      layInFailedSource$,
+      this.tryLayIn(currentTime),
+    )
+      .pipe(
+        takeUntil(this.release$),
         mapTo(undefined),
       );
   }

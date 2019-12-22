@@ -12,10 +12,11 @@ export enum AudioEvent {
   // 'loadedmetadata' = 'loadedmetadata',
   // 'loadstart' = 'loadstart',
 
+  'canplay' = 'canplay',
+  'stalled' = 'stalled',
   'layoutTouch' = 'layoutTouch',
   'layoutEnded' = 'layoutEnded',
   'played' = 'played',
-  'unknown' = 'unknown',
 }
 
 export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;

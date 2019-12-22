@@ -69,7 +69,7 @@ export class PlayerAction extends PlayerStatus {
     this.persistTask$.next();
   }
 
-  public loadSongList(list: Omit<PlayerSong, 'url'>[], currentIndex = 0, isPlay = false) {
+  public loadSongList(list: Omit<PlayerSong, 'url'>[], currentIndex = 0, isPlay = false, isLoadNext = true) {
     // 更正游标
     this.currentIndex = currentIndex;
     // 更新列表
@@ -82,7 +82,7 @@ export class PlayerAction extends PlayerStatus {
     // 保存到storage
     this.persistTask$.next();
 
-    if (this.songList.length) {
+    if (this.songList.length && isLoadNext) {
       // 触发歌曲载入
       this.loadNextSongs();
     }

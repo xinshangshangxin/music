@@ -1,6 +1,6 @@
 import { merge as lodashMerge } from 'lodash';
 import {
-  fromEvent, merge, Observable, of, Subject,
+  fromEvent, merge, Observable, Subject,
 } from 'rxjs';
 import {
   filter, map, mapTo, take, takeUntil, tap,
@@ -45,10 +45,16 @@ export class AudioListeners {
         return this.layoutTouch$();
       case AudioEvent.layoutEnded:
         return this.layoutEnded$();
-      case AudioEvent.timeupdate:
-        return this.timeupdate$();
       default:
-        return of({ event: AudioEvent.unknown });
+        return fromEvent(this.audio, eventName).pipe(
+          takeUntil(
+            merge(fromEvent(this.audio, 'ended'), fromEvent(this.audio, 'error'), this.release$),
+          ),
+          map((data) => ({
+            event: eventName,
+            data,
+          })),
+        );
     }
   }
 
@@ -102,18 +108,6 @@ export class AudioListeners {
       takeUntil(this.release$),
       take(1),
       mapTo({ event: AudioEvent.ended }),
-    );
-  }
-
-  private timeupdate$() {
-    return fromEvent(this.audio, AudioEvent.timeupdate).pipe(
-      takeUntil(
-        merge(fromEvent(this.audio, 'ended'), fromEvent(this.audio, 'error'), this.release$),
-      ),
-      map(() => ({
-        event: AudioEvent.timeupdate,
-        data: { currentTime: this.audio.currentTime },
-      })),
     );
   }
 
