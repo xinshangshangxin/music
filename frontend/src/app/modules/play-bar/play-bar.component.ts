@@ -8,6 +8,7 @@ import {
 
 import { AudioEvent } from '../../core/audio/interface';
 import { Status } from '../../core/player/interface';
+import { ConfigService } from '../../core/services/config.service';
 import { PersistService } from '../../core/services/persist.service';
 import { PlayerService } from '../../core/services/player.service';
 
@@ -36,6 +37,7 @@ export class PlayBarComponent implements OnInit, OnDestroy {
   constructor(
     public readonly playerService: PlayerService,
     private readonly persistService: PersistService,
+    private readonly configService: ConfigService,
   ) {}
 
   public ngOnInit() {
@@ -44,6 +46,7 @@ export class PlayBarComponent implements OnInit, OnDestroy {
       this.playerService.songChange$,
       this.playerService.played$,
       this.playerService.preloadTask$,
+      this.configService.getConfig(),
     )
       .pipe(
         map(() => ({
@@ -59,7 +62,7 @@ export class PlayBarComponent implements OnInit, OnDestroy {
       );
 
     this.whenProgress$()
-      .subscribe(() => {}, console.warn);
+      .subscribe(() => { }, console.warn);
   }
 
   public ngOnDestroy(): void {
@@ -105,19 +108,18 @@ export class PlayBarComponent implements OnInit, OnDestroy {
     return merge(
       this.playerService.songChange$.pipe(
         tap(() => {
-          this.progress.min = 0;
-          this.progress.current = 0;
-          this.progress.max = 100;
+          this.progress = {
+            min: 0,
+            max: 100,
+            current: 0,
+          };
         }),
       ),
-      merge(
-        this.playerService.played$,
-        this.playerService.play$,
-      ).pipe(
+      this.playerService.played$.pipe(
         filter(() => !!this.playerService.rxAudio),
         switchMap(
           () => this.playerService.rxAudio.event(AudioEvent.timeupdate)
-            .pipe(takeUntil(this.playerService.played$)),
+            .pipe(takeUntil(this.playerService.songChange$)),
         ),
         map(() => {
           this.progress = this.getProgress();
