@@ -1,5 +1,5 @@
 import { Observable, Subscription } from 'rxjs';
-import { map, tap } from 'rxjs/operators';
+import { map, shareReplay, tap } from 'rxjs/operators';
 
 import {
   PeakConfig, PeakSong, PlayerSong, Setting,
@@ -90,7 +90,7 @@ export class PoolAudio {
 
     // 还在播放中
     if (item.rxAudio && !item.rxAudio.audio.paused) {
-      return false;
+      return true;
     }
 
     if (item.peakConfig.duration !== peakConfig.duration) {
@@ -143,6 +143,7 @@ export class PoolAudio {
         });
       }),
       map((data) => ({ ...data, rxAudio })),
+      shareReplay(1),
     );
 
     this.pool[song.url] = {
