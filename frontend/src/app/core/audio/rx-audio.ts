@@ -87,7 +87,7 @@ export class RxAudio extends AudioListeners {
     const layInFailedSource$ = this.event(AudioEvent.playing)
       .pipe(
         tap(() => {
-          console.info('======>, layIn checking', this.song.name, this.audio.src, this.song);
+          console.info(`======>, layIn checking ┣ ${this.song.name} ┫`, this.audio.src, this.song);
         }),
         take(1),
         switchMap(() => this.event(AudioEvent.timeupdate).pipe(
@@ -96,10 +96,10 @@ export class RxAudio extends AudioListeners {
           takeUntil(this.release$),
         )),
         tap(() => {
-          console.info('======>, layIn success', this.song.name);
+          console.info(`======>, layIn success ┣ ${this.song.name} ┫`);
         }),
         catchError(() => {
-          console.warn('======>, layIn failed', this.song.name, this.errorDelaySeconds);
+          console.warn(`======>, layIn failed ┣ ${this.song.name} ┫`, this.errorDelaySeconds);
 
           this.pause();
           this.errorDelaySeconds = (this.errorDelaySeconds + 1) ** 2;

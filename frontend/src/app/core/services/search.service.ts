@@ -11,7 +11,6 @@ import {
 import {
   ParseUrlGQL, Provider, SearchGQL, SearchSong,
 } from '../apollo/graphql';
-import { getSongUrl } from '../audio/helper';
 import { PlayerService } from './player.service';
 
 export enum SearchType {

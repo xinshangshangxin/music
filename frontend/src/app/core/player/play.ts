@@ -27,7 +27,6 @@ export class PlayerPlay extends PlayerAction {
       this.click$.pipe(
         throttleTime(500),
         tap((nu) => {
-          console.debug('========> click$', nu);
           // 游标变更
           this.setIndex(nu);
 
@@ -38,8 +37,7 @@ export class PlayerPlay extends PlayerAction {
       ),
       this.end$.pipe(
         throttleTime(500),
-        tap((song) => {
-          console.debug('====>  this.end$, play next song', song);
+        tap(() => {
           // 游标变更
           this.setIndexStep(1);
         }),
@@ -47,7 +45,6 @@ export class PlayerPlay extends PlayerAction {
       ),
       this.error$.pipe(
         tap(() => {
-          console.debug('====> this.error$, replay current song');
           this.errorStatus.nu += 1;
           this.errorStatus.continuous += 1;
 
@@ -70,7 +67,11 @@ export class PlayerPlay extends PlayerAction {
       ),
     ).pipe(
       switchMap((eventName) => {
-        console.debug('歌曲变更触发', '触发类型', eventName, '触发歌曲下标', this.currentIndex);
+        console.debug('歌曲变更触发',
+          '触发类型', eventName,
+          '触发歌曲下标', this.currentIndex,
+          this.currentSong);
+
         if (eventName === 'click') {
           return of(null);
         }
@@ -84,7 +85,6 @@ export class PlayerPlay extends PlayerAction {
       }),
       tap(() => {
         if (this.rxAudio) {
-          console.debug('停止上一首播放');
           this.rxAudio.pause();
         }
 
@@ -198,7 +198,6 @@ export class PlayerPlay extends PlayerAction {
       // 错误
       rxAudio.event(AudioEvent.error).pipe(
         tap(() => {
-          console.debug(AudioEvent.error, song);
           this.error$.next({ index: this.currentIndex, data: AudioEvent.error });
         }),
       ),
@@ -211,7 +210,6 @@ export class PlayerPlay extends PlayerAction {
       ).pipe(
         throttleTime(500),
         tap(() => {
-          console.debug(AudioEvent.ended, song);
           this.end$.next(song);
         }),
       ),

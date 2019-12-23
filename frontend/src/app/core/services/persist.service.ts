@@ -106,7 +106,7 @@ export class PersistService {
     );
 
     // as soon as possible run
-    this.init$.subscribe(console.info, console.warn);
+    this.init$.subscribe(() => {}, console.warn);
   }
 
   private initConfig() {

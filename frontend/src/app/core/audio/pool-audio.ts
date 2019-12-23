@@ -148,7 +148,7 @@ export class PoolAudio {
     this.pool[song.url] = {
       // 先subscribe 执行起来
       subscription: source$.subscribe(({ song: peakSong }) => {
-        console.debug(`预载入 ${peakSong.name} 成功`, peakSong);
+        console.debug(`预载入 ┣ ${peakSong.name} ┫ 成功`, peakSong);
       }, console.warn),
       source$,
       peakConfig: {
