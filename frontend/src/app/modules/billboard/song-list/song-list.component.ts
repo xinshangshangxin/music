@@ -3,9 +3,9 @@ import {
 } from '@angular/core';
 import { MatDialog } from '@angular/material';
 import { untilDestroyed } from 'ngx-take-until-destroy';
-import { combineLatest, of } from 'rxjs';
+import { merge, of } from 'rxjs';
 import {
-  debounceTime, map, startWith, switchMap, tap,
+  debounceTime, filter, map, pairwise, startWith, switchMap, tap,
 } from 'rxjs/operators';
 
 import { Privilege } from '../../../core/apollo/graphql';
@@ -89,37 +89,38 @@ export class SongListComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private getLocateSource() {
-    return combineLatest([
-      this.songQueryList.changes.pipe(startWith(this.songQueryList)),
-      this.playerService.locate$.pipe(startWith(undefined)),
-    ]).pipe(
-      tap((value) => {
-        console.info(value);
-      }),
-      debounceTime(200),
-      map(() => {
-        const elementRef = this.songQueryList.find(
-          (item, index) => index === this.playerService.currentIndex,
-        );
+    return merge(
+      this.songQueryList.changes
+        .pipe(
+          startWith(this.songQueryList),
+          map((query: QueryList<ElementRef<HTMLDivElement>>) => query.length),
+          pairwise(),
+          filter(([len1, len2]) => len1 !== len2),
+        ),
+      this.playerService.locate$,
+    )
+      .pipe(
+        debounceTime(200),
+        map(() => {
+          const elementRef = this.songQueryList.find(
+            (item, index) => index === this.playerService.currentIndex,
+          );
 
-        if (elementRef) {
-          return elementRef.nativeElement;
-        }
+          if (elementRef) {
+            return elementRef.nativeElement;
+          }
 
-        return null;
-      }),
-      tap((ele) => {
-        if (!ele) {
-          return;
-        }
-
-        ele.scrollIntoView({
-          behavior: 'smooth',
-          block: 'start',
-          inline: 'center',
-        });
-      }),
-      untilDestroyed(this),
-    );
+          return null;
+        }),
+        filter((ele) => !!ele),
+        tap((ele) => {
+          ele.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start',
+            inline: 'center',
+          });
+        }),
+        untilDestroyed(this),
+      );
   }
 }
