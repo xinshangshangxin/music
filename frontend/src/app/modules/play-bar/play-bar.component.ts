@@ -1,9 +1,9 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { MatSliderChange } from '@angular/material';
 import { untilDestroyed } from 'ngx-take-until-destroy';
-import { merge, Observable } from 'rxjs';
+import { merge, Observable, EMPTY } from 'rxjs';
 import {
-  filter, map, switchMap, takeUntil, tap,
+  filter, map, switchMap, takeUntil, tap, catchError,
 } from 'rxjs/operators';
 
 import { AudioEvent } from '../../core/audio/interface';
@@ -49,6 +49,7 @@ export class PlayBarComponent implements OnInit, OnDestroy {
       this.configService.getConfig(),
     )
       .pipe(
+        filter(() => !!this.playerService.songList.length),
         map(() => ({
           provider: this.playerService.currentSong.provider,
           name: this.playerService.currentSong.name,

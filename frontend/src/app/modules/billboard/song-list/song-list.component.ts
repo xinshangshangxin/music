@@ -37,8 +37,12 @@ export class SongListComponent implements OnInit, AfterViewInit, OnDestroy {
   public ngOnInit() {
     this.configService.getConfig()
       .pipe(
-        switchMap(() => {
+        switchMap((config) => {
           if (this.playerService.songList.length) {
+            return of(undefined);
+          }
+
+          if (config.viewed) {
             return of(undefined);
           }
 
@@ -56,6 +60,8 @@ export class SongListComponent implements OnInit, AfterViewInit, OnDestroy {
               if (confirm) {
                 this.playerService.loadSongList(demoSongs, 0, true);
               }
+
+              this.configService.changeConfig({ viewed: true });
             }));
         }),
         tap(() => {

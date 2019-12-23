@@ -11,6 +11,7 @@ export interface Config {
   preloadLen: number;
   peakConfig: PeakConfig;
   volume: number;
+  viewed?: boolean;
 }
 
 export enum Status {
