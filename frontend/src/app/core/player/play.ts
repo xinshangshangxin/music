@@ -2,16 +2,7 @@ import {
   EMPTY, merge, Observable, of, throwError,
 } from 'rxjs';
 import {
-  catchError,
-  delay,
-  map,
-  mapTo,
-  share,
-  switchMap,
-  takeUntil,
-  tap,
-  throttleTime,
-  filter,
+  catchError, delay, map, mapTo, share, switchMap, takeUntil, tap, throttleTime,
 } from 'rxjs/operators';
 
 import { AudioEvent, PeakSong, PlayerSong } from '../audio/interface';
@@ -67,10 +58,6 @@ export class PlayerPlay extends PlayerAction {
         mapTo('error'),
       ),
     ).pipe(
-      tap((eventName) => {
-        console.debug('歌曲变更触发', '触发类型', eventName,
-          '触发歌曲下标', this.currentIndex);
-      }),
       switchMap((eventName) => {
         console.debug('歌曲变更触发',
           '触发类型', eventName,

@@ -4,7 +4,7 @@ import {
   from, Observable, of, throwError,
 } from 'rxjs';
 import {
-  map, shareReplay, switchMap, tap, timeout,
+  map, switchMap, tap, timeout,
 } from 'rxjs/operators';
 
 import {
