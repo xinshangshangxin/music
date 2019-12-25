@@ -7,6 +7,11 @@ export const environment = {
   // backendUrl: 'http://127.0.0.1:3000',
   backendUrl: 'https://music.xinshangshangxin.com',
   proxyUrl: '//musicproxy.leanapp.cn',
+
+  build: {
+    when: new Date().toISOString(),
+    sha: process.env.GITHUB_SHA || 'no-sha',
+  },
 };
 
 /*
