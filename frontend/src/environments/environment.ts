@@ -10,7 +10,7 @@ export const environment = {
 
   build: {
     when: new Date().toISOString(),
-    sha: process.env.GITHUB_SHA || 'no-sha',
+    sha: process.env.SHA || 'no-sha',
   },
 };
 
