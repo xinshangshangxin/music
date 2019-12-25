@@ -30,6 +30,8 @@ export class SearchComponent implements OnInit, OnDestroy {
       if (data.type === SearchType.search) {
         this.searchList = data.result;
       }
+    }, (e) => {
+      console.warn('SearchComponent whenSearch$ error', e);
     });
   }
 

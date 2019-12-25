@@ -25,7 +25,9 @@ export class PlayerService extends Player {
     super();
 
     // 初始化
-    this.init().subscribe(() => {});
+    this.init().subscribe(() => {}, (e) => {
+      console.warn('PlayerService init failed', e);
+    });
   }
 
   // eslint-disable-next-line class-methods-use-this

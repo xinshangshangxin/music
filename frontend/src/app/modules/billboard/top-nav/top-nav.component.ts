@@ -26,12 +26,16 @@ export class TopNavComponent implements OnInit, OnDestroy {
         console.info('navigate to home');
         this.router.navigate(['']);
       }
+    }, (e) => {
+      console.warn('TopNavComponent search check e: ', e);
     });
 
     this.searchService.urlLoadSubject.pipe(untilDestroyed(this)).subscribe(async (value) => {
       Promise.resolve().then(() => {
         this.searchValue = value;
       });
+    }, (e) => {
+      console.warn('TopNavComponent urlLoad check e: ', e);
     });
   }
 

@@ -113,8 +113,8 @@ export class RxAudio extends AudioListeners {
       this.tryLayIn(currentTime),
     )
       .pipe(
-        takeUntil(this.release$),
         mapTo(undefined),
+        takeUntil(this.release$),
       );
   }
 

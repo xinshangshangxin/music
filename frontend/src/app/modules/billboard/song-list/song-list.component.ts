@@ -75,7 +75,9 @@ export class SongListComponent implements OnInit, AfterViewInit, OnDestroy {
   public ngOnDestroy() {}
 
   public ngAfterViewInit() {
-    this.getLocateSource().subscribe(() => {});
+    this.getLocateSource().subscribe(() => {}, (e) => {
+      console.warn('ngAfterViewInit Locate e', e);
+    });
   }
 
   public get currentIndex() {

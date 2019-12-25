@@ -47,13 +47,13 @@ export class AudioListeners {
         return this.layoutEnded$();
       default:
         return fromEvent(this.audio, eventName).pipe(
-          takeUntil(
-            merge(fromEvent(this.audio, 'ended'), fromEvent(this.audio, 'error'), this.release$),
-          ),
           map((data) => ({
             event: eventName,
             data,
           })),
+          takeUntil(
+            merge(fromEvent(this.audio, 'ended'), fromEvent(this.audio, 'error'), this.release$),
+          ),
         );
     }
   }
@@ -78,12 +78,12 @@ export class AudioListeners {
 
   private play$() {
     return fromEvent(this.audio, AudioEvent.play).pipe(
-      takeUntil(this.release$),
       take(1),
       tap((e) => {
         console.debug('====> Event:play', e);
       }),
       mapTo({ event: AudioEvent.play }),
+      takeUntil(this.release$),
     );
   }
 
@@ -93,21 +93,21 @@ export class AudioListeners {
       fromEvent(this.audio, AudioEvent.error),
       this.layInFailed$,
     ).pipe(
-      takeUntil(this.release$),
       take(1),
       tap((e) => {
         console.debug('====> Event:error', e);
       }),
       mapTo({ event: AudioEvent.error }),
+      takeUntil(this.release$),
     );
   }
 
   private ended$() {
     // 监听结束事件
     return fromEvent(this.audio, AudioEvent.ended).pipe(
-      takeUntil(this.release$),
       take(1),
       mapTo({ event: AudioEvent.ended }),
+      takeUntil(this.release$),
     );
   }
 
@@ -130,14 +130,17 @@ export class AudioListeners {
         }
         return false;
       }),
-      takeUntil(
-        merge(fromEvent(this.audio, 'ended'), fromEvent(this.audio, 'error'), this.release$),
-      ),
       take(1),
       map(() => ({
         event: AudioEvent.layoutTouch,
         data: { endTime, currentTime: this.audio.currentTime },
       })),
+      takeUntil<{
+        event: AudioEvent.layoutTouch;
+        data: { endTime: number; currentTime: number };
+      }>(
+        merge(fromEvent(this.audio, 'ended'), fromEvent(this.audio, 'error'), this.release$),
+      ),
     );
   }
 
@@ -154,6 +157,8 @@ export class AudioListeners {
         }
         return false;
       }),
+      take(1),
+      mapTo({ event: AudioEvent.layoutEnded }),
       takeUntil(
         merge(
           fromEvent(this.audio, AudioEvent.ended),
@@ -161,16 +166,14 @@ export class AudioListeners {
           this.release$,
         ),
       ),
-      take(1),
-      mapTo({ event: AudioEvent.layoutEnded }),
     );
   }
 
   private played$() {
     return fromEvent(this.audio, AudioEvent.playing).pipe(
       take(1),
-      takeUntil(this.release$),
       mapTo({ event: AudioEvent.played }),
+      takeUntil(this.release$),
     );
   }
 }

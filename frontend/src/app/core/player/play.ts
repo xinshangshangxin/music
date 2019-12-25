@@ -139,7 +139,9 @@ export class PlayerPlay extends PlayerAction {
         // 状态变换, 需要做一些操作
         this.songStatus$({ song, rxAudio })
           .pipe(takeUntil(this.songChange$))
-          .subscribe(() => {});
+          .subscribe(() => {}, (error) => {
+            console.warn('songStatus$ handle error', error);
+          });
       }),
       switchMap(({ song, rxAudio }) => {
         if (!rxAudio) {
