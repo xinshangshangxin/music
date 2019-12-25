@@ -1,5 +1,7 @@
 import { Observable, Subscription } from 'rxjs';
-import { map, shareReplay, tap } from 'rxjs/operators';
+import {
+  map, shareReplay, tap, takeUntil,
+} from 'rxjs/operators';
 
 import {
   PeakConfig, PeakSong, PlayerSong, Setting,
@@ -143,7 +145,11 @@ export class PoolAudio {
         });
       }),
       map((data) => ({ ...data, rxAudio })),
-      shareReplay(1),
+      shareReplay({
+        bufferSize: 1,
+        refCount: true,
+      }),
+      takeUntil(rxAudio.release$),
     );
 
     this.pool[song.url] = {

@@ -68,7 +68,6 @@ export class PreloadService {
         );
       }),
       timeout(10000),
-      shareReplay(1),
     );
   }
 

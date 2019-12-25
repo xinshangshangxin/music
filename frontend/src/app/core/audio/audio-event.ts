@@ -13,9 +13,9 @@ export class AudioListeners {
 
   public peakConfig: PeakConfig;
 
-  protected layInFailed$ = new Subject<any>();
+  public release$ = new Subject<number>();
 
-  protected release$ = new Subject<number>();
+  protected layInFailed$ = new Subject<any>();
 
   protected peakStartTime: number;
 
