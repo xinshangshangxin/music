@@ -1,0 +1,30 @@
+<h1 mat-dialog-title>歌曲添加/创建到哪个歌单</h1>
+<div class="content" mat-dialog-content>
+  <ng-select
+    addTag="true"
+    notFoundText="未找到, 输入直接创建"
+    addTagText="创建歌单"
+    [items]="list$ | async"
+    bindLabel="name"
+    autofocus
+    [(ngModel)]="playlist"
+  >
+  </ng-select>
+
+  <ng-select
+    addTag="true"
+    dropdownPosition="top"
+    [items]="positions"
+    bindLabel="name"
+    bindValue="id"
+    autofocus
+    [(ngModel)]="position"
+  >
+  </ng-select>
+</div>
+<div mat-dialog-actions class="actions">
+  <button mat-raised-button (click)="close(false)">取消</button>
+  <button mat-raised-button color="primary" cdkFocusInitial (click)="close(true)">
+    确定
+  </button>
+</div>

@@ -1,5 +1,5 @@
 <div class="nav">
-  <p>这里是导航</p>
-  <p>目前未完成</p>
-  <p>当前播放歌单</p>
+  <p *ngFor="let item of persistService.getPlaylistList() | async" (click)="loadPlaylist(item.id)">
+    {{ item.name }}
+  </p>
 </div>

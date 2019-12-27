@@ -19,3 +19,7 @@ export enum Status {
   paused = 'paused',
   loading = 'loading',
 }
+
+export type Position = number | 'next' | 'end';
+
+export type PlaylistPosition = Position | 'append' | 'insert' | 'cover' | 'drop';

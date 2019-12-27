@@ -1,5 +1,6 @@
 import { Location } from '@angular/common';
 import { Injectable } from '@angular/core';
+import { MatDialog } from '@angular/material';
 import { Router } from '@angular/router';
 import {
   BehaviorSubject, from, Observable, of, Subject,
@@ -8,6 +9,7 @@ import {
   delay, map, switchMap, tap,
 } from 'rxjs/operators';
 
+import { PlaylistComponent, PlaylistDialogResult } from '../../modules/dialog/playlist/playlist.component';
 import {
   ParseUrlGQL, Provider, SearchGQL, SearchSong,
 } from '../apollo/graphql';
@@ -32,10 +34,11 @@ export class SearchService {
 
   constructor(
     private readonly router: Router,
-    private location: Location,
-    private parseUrlGQL: ParseUrlGQL,
-    private searchGQL: SearchGQL,
-    private playerService: PlayerService,
+    private readonly location: Location,
+    private readonly parseUrlGQL: ParseUrlGQL,
+    private readonly searchGQL: SearchGQL,
+    private readonly playerService: PlayerService,
+    private readonly dialog: MatDialog,
   ) {}
 
   public changeHref(search: string) {
@@ -104,10 +107,19 @@ export class SearchService {
   private parseUrl(url: string): Observable<boolean> {
     return this.parseUrlGQL.fetch({ url }).pipe(
       map((result) => result.data.parseUrl || []),
-      map((songs) => {
-        this.playerService.loadSongList(songs, 0, true);
-      }),
-      delay(200),
+      switchMap((songs) => this.dialog
+        .open<PlaylistComponent, any, PlaylistDialogResult>(PlaylistComponent, {
+        minWidth: 300,
+      })
+        .afterClosed()
+        .pipe(
+          map((item) => ({ ...item, songs })),
+        )),
+      switchMap(({
+        id, name, position, songs,
+      }) => this.playerService.add2playlist({
+        id, name, songs, position,
+      })),
       tap(() => {
         this.urlLoadSubject.next('');
       }),

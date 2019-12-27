@@ -2,8 +2,9 @@ import {
   AfterViewInit, Component, ElementRef, OnDestroy, OnInit, QueryList, ViewChildren,
 } from '@angular/core';
 import { MatDialog } from '@angular/material';
+import { ActivatedRoute } from '@angular/router';
 import { untilDestroyed } from 'ngx-take-until-destroy';
-import { merge, of } from 'rxjs';
+import { combineLatest, merge, of } from 'rxjs';
 import {
   debounceTime, filter, map, pairwise, startWith, switchMap, tap,
 } from 'rxjs/operators';
@@ -32,38 +33,35 @@ export class SongListComponent implements OnInit, AfterViewInit, OnDestroy {
     private readonly playerService: PlayerService,
     private readonly configService: ConfigService,
     private readonly dialog: MatDialog,
+    private readonly activatedRoute: ActivatedRoute,
   ) {}
 
   public ngOnInit() {
-    this.configService.getConfig()
+    combineLatest(
+      this.activatedRoute.queryParams,
+      this.configService.getConfig(),
+    )
       .pipe(
-        switchMap((config) => {
-          if (this.playerService.songList.length) {
-            return of(undefined);
+        switchMap(([qs, config]) => {
+          if (!config.viewed) {
+            return this.openDefaultSongsDialog().pipe(map(() => ({ qs, config })));
           }
-
-          if (config.viewed) {
-            return of(undefined);
-          }
-
-          return this.dialog
-            .open(ConfirmDialogComponent, {
-              minWidth: 300,
-              data: {
-                content: '是否添加默认歌曲?',
-                no: '否',
-                ok: '是',
-              },
-            })
-            .afterClosed()
-            .pipe(tap((confirm) => {
-              if (confirm) {
-                this.playerService.loadSongList(demoSongs, 0, true);
-              }
-
-              this.configService.changeConfig({ viewed: true });
-            }));
+          return of({ qs, config });
         }),
+        map(({ qs, config }) => {
+          if (qs.id && qs.id !== this.playerService.currentPlaylistId) {
+            return {
+              id: qs.id,
+              index: 0,
+            };
+          }
+
+          return {
+            id: this.playerService.currentPlaylistId,
+            index: config.currentIndex,
+          };
+        }),
+        switchMap(({ id, index }) => this.playerService.loadPlaylist(id, index, false, true)),
         tap(() => {
           this.list = this.playerService.songList;
         }),
@@ -130,5 +128,25 @@ export class SongListComponent implements OnInit, AfterViewInit, OnDestroy {
         }),
         untilDestroyed(this),
       );
+  }
+
+  private openDefaultSongsDialog() {
+    return this.dialog
+      .open(ConfirmDialogComponent, {
+        minWidth: 300,
+        data: {
+          content: '是否添加默认歌曲?',
+          no: '否',
+          ok: '是',
+        },
+      })
+      .afterClosed()
+      .pipe(tap((confirm) => {
+        if (confirm) {
+          this.playerService.loadTempPlaylist(demoSongs, 0, true);
+        }
+
+        this.configService.changeConfig({ viewed: true });
+      }));
   }
 }

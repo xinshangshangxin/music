@@ -1,9 +1,8 @@
 import { getSongUrl } from '../audio/helper';
 import { PlayerSong } from '../audio/interface';
-import { Status } from './interface';
+import { Position, Status } from './interface';
 import { PlayerStatus } from './status';
 
-type Position = number | 'next' | 'end';
 
 export class PlayerAction extends PlayerStatus {
   public setVolume(value: number) {
@@ -46,8 +45,6 @@ export class PlayerAction extends PlayerStatus {
    * @param position next 插入到下一首, end 插入到末尾
    */
   public add(song: Omit<PlayerSong, 'url'>, position: Position = 'end') {
-    const start = this.position2index(position);
-
     // 先删除重复歌曲
     const removeIndex = this.songList.findIndex(
       ({ provider, id }) => provider === song.provider && id === song.id,
@@ -55,6 +52,8 @@ export class PlayerAction extends PlayerStatus {
     if (removeIndex >= 0) {
       this.songList.splice(removeIndex, 1);
     }
+
+    const start = this.position2index(position);
 
     // 再加入歌单
     this.songList.splice(start, 0, {
@@ -69,15 +68,16 @@ export class PlayerAction extends PlayerStatus {
     this.persistTask$.next();
   }
 
-  public loadSongList(list: Omit<PlayerSong, 'url'>[], currentIndex = 0, isPlay = false, isLoadNext = true) {
+  protected loadSongList(list: Omit<PlayerSong, 'url'>[], currentIndex = 0, isPlay = false, isLoadNext = true) {
+    const wrapList = list.map((song) => ({
+      ...song,
+      url: getSongUrl(song),
+    }));
     // 更正游标
     this.currentIndex = currentIndex;
     // 更新列表
     this.songList.length = 0;
-    this.songList.push(...list.map((song) => ({
-      ...song,
-      url: getSongUrl(song),
-    })));
+    this.songList.push(...wrapList);
 
     // 保存到storage
     this.persistTask$.next();
@@ -114,6 +114,23 @@ export class PlayerAction extends PlayerStatus {
     this.preloadTask$.next(songs);
   }
 
+  public position2index(position: Position, endShiftLeft = false) {
+    let index: number;
+    if (position === 'next') {
+      index = this.getValidIndex(this.currentIndex + 1);
+    } else if (position === 'end') {
+      index = this.songList.length;
+
+      if (endShiftLeft) {
+        index -= 1;
+      }
+    } else {
+      index = position;
+    }
+
+    return index;
+  }
+
   protected getValidIndex(nu: number): number {
     if (!this.songList.length) {
       return -1;
@@ -145,22 +162,5 @@ export class PlayerAction extends PlayerStatus {
     if (this.rxAudio) {
       this.rxAudio.volume = value;
     }
-  }
-
-  private position2index(position: Position, isPlay = false) {
-    let index: number;
-    if (position === 'next') {
-      index = this.getValidIndex(this.currentIndex + 1);
-    } else if (position === 'end') {
-      index = this.songList.length;
-
-      if (isPlay) {
-        index -= 1;
-      }
-    } else {
-      index = position;
-    }
-
-    return index;
   }
 }

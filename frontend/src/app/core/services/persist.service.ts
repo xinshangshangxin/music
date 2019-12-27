@@ -10,7 +10,7 @@ import { PlayerSong } from '../audio/interface';
 import { Config } from '../player/interface';
 import { StorageService } from './storage.service';
 
-interface Playlist {
+export interface Playlist {
   id: string;
   songs: PlayerSong[];
   name?: string;
@@ -54,6 +54,10 @@ export class PersistService {
     return this.init$.pipe(map(() => this.playlists.find(({ id }) => id === playlistId)));
   }
 
+  public getPlaylistList(): Observable<Playlist[]> {
+    return this.init$.pipe(map(() => this.playlists));
+  }
+
   public persistConfig(
     config: { [key in keyof Config]?: Partial<Config[key]> } = {},
   ): Observable<Config> {
@@ -88,13 +92,15 @@ export class PersistService {
     } else if (!remove && index === -1) {
       this.playlists.push(playlist);
     } else if (!remove && index >= 0) {
+      // eslint-disable-next-line no-param-reassign
+      playlist.name = playlist.name || this.playlists[index].name;
       this.playlists.splice(index, 1, playlist);
     }
 
     return from(
       this.storageService.put(
         this.playlistsKey,
-        this.playlists.map(({ id, name }) => ({ id, name })),
+        this.playlists.map(({ id, name }) => ({ id, name: name || id })),
       ),
     );
   }
@@ -106,7 +112,7 @@ export class PersistService {
     );
 
     // as soon as possible run
-    this.init$.subscribe(() => {}, console.warn);
+    this.init$.subscribe(() => { }, console.warn);
   }
 
   private initConfig() {
@@ -138,7 +144,7 @@ export class PersistService {
 
         return {
           id,
-          name,
+          name: name || id,
           songs,
         };
       }),

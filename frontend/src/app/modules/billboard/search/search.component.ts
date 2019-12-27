@@ -7,6 +7,7 @@ import {
 } from 'rxjs/operators';
 
 import { SearchSong } from '../../../core/apollo/graphql';
+import { Position } from '../../../core/player/interface';
 import { PlayerService } from '../../../core/services/player.service';
 import { SearchService, SearchType } from '../../../core/services/search.service';
 
@@ -37,7 +38,7 @@ export class SearchComponent implements OnInit, OnDestroy {
 
   public ngOnDestroy(): void {}
 
-  public add(song: SearchSong, position: number | 'next' | 'end' = 'end', isPlay = false) {
+  public add(song: SearchSong, position: Position, isPlay = false) {
     this.playerService.add(song, position);
 
     if (isPlay) {
@@ -49,7 +50,7 @@ export class SearchComponent implements OnInit, OnDestroy {
   }
 
   public tempPlay(index: number) {
-    this.playerService.loadSongList(this.searchList, index, true);
+    this.playerService.loadTempPlaylist(this.searchList, index, true);
 
     this.searchService.urlLoadSubject.next('');
     this.router.navigate(['']);
