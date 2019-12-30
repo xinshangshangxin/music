@@ -9,6 +9,7 @@ import { PlayerSong } from '../audio/interface';
 import { Player } from '../player';
 import { Config, PlaylistPosition } from '../player/interface';
 import { ConfigService } from './config.service';
+import { playerPersistId } from './constants';
 import { PersistService } from './persist.service';
 import { PreloadService } from './preload.service';
 
@@ -16,9 +17,7 @@ import { PreloadService } from './preload.service';
   providedIn: 'root',
 })
 export class PlayerService extends Player {
-  private readonly playerPersistId = '临时列表';
-
-  public currentPlaylistId = this.playerPersistId;
+  public currentPlaylistId = playerPersistId;
 
   public locate$ = new Subject<void>();
 
@@ -41,20 +40,23 @@ export class PlayerService extends Player {
   }
 
   public loadTempPlaylist(list: Omit<PlayerSong, 'url'>[], currentIndex = 0, isPlay = false, isLoadNext = true) {
-    this.currentPlaylistId = this.playerPersistId;
+    this.currentPlaylistId = playerPersistId;
     return this.loadSongList(list, currentIndex, isPlay, isLoadNext);
   }
 
   public loadPlaylist(playlistId: string, currentIndex = 0, isPlay = false, isLoadNext = true) {
     this.currentPlaylistId = playlistId;
 
-    return this.persistService.getPlaylist(this.currentPlaylistId)
-      .pipe(map((playlist) => {
-        if (!playlist) {
-          return;
-        }
-        this.loadSongList(playlist.songs, currentIndex, isPlay, isLoadNext);
-      }));
+    return this.configService.changeConfig({ currentPlaylistId: this.currentPlaylistId })
+      .pipe(
+        switchMap(() => this.persistService.getPlaylist(this.currentPlaylistId)),
+        map((playlist) => {
+          if (!playlist) {
+            return;
+          }
+          this.loadSongList(playlist.songs, currentIndex, isPlay, isLoadNext);
+        }),
+      );
   }
 
   public add2playlist(
@@ -133,11 +135,21 @@ export class PlayerService extends Player {
       tap((config) => {
         this.setVolume(config.volume);
       }),
-      switchMap(() => merge(
+      switchMap((config) => merge(
         this.whenSongChange$(),
         this.whenPersistTask$(),
         this.whenPreloadTask$(),
         this.whenSongError$(),
+        this.persistService.getPlaylist(config.currentPlaylistId)
+          .pipe(
+            tap((playlist) => {
+              if (!playlist) {
+                return;
+              }
+
+              this.loadSongList(playlist.songs, this.config.currentIndex, false, false);
+            }),
+          ),
       )),
     );
   }
@@ -175,7 +187,7 @@ export class PlayerService extends Player {
 
   private whenPersistTask$() {
     return this.persistTask$.pipe(
-      switchMap(() => this.persistService.persistPlaylist(this.playerPersistId, this.songList)),
+      switchMap(() => this.persistService.persistPlaylist(playerPersistId, this.songList)),
     );
   }
 

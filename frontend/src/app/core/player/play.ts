@@ -182,12 +182,12 @@ export class PlayerPlay extends PlayerAction {
     );
   }
 
-  protected getSong(index: number): PlayerSong {
+  protected getSong(index: number): PlayerSong | null {
     // eslint-disable-next-line no-param-reassign
     index = this.getValidIndex(index);
 
     if (index < 0) {
-      throw new Error('index lower than zero');
+      return null;
     }
 
     return this.songList[index];

@@ -18,6 +18,7 @@ import { HomeComponent } from './modules/home/home.component';
 import { PlayBarComponent } from './modules/play-bar/play-bar.component';
 import { ShareModule } from './share/share/share.module';
 import { PlaylistComponent } from './modules/dialog/playlist/playlist.component';
+import { RankComponent } from './modules/billboard/rank/rank.component';
 
 @NgModule({
   entryComponents: [
@@ -35,6 +36,7 @@ import { PlaylistComponent } from './modules/dialog/playlist/playlist.component'
     SearchComponent,
     SettingComponent,
     PlaylistComponent,
+    RankComponent,
   ],
   imports: [
     CoreModule,

@@ -3,7 +3,6 @@ import { PlayerSong } from '../audio/interface';
 import { Position, Status } from './interface';
 import { PlayerStatus } from './status';
 
-
 export class PlayerAction extends PlayerStatus {
   public setVolume(value: number) {
     this.volume = value;
@@ -35,8 +34,18 @@ export class PlayerAction extends PlayerStatus {
     this.end$.next();
   }
 
-  public playAt(position: Position): void {
-    this.click$.next(this.position2index(position, true));
+  public playAt(position: Position): void;
+
+  public playAt(position: PlayerSong): void;
+
+  public playAt(position: Position | PlayerSong): void {
+    if (typeof position === 'object') {
+      const index = this.song2index(position);
+
+      this.click$.next(this.position2index(index, true));
+    } else {
+      this.click$.next(this.position2index(position, true));
+    }
   }
 
   /**
@@ -63,12 +72,29 @@ export class PlayerAction extends PlayerStatus {
     this.persistTask$.next();
   }
 
-  public remove(index: number) {
-    this.songList.splice(index, 1);
+  public remove(index: number): void;
+
+  public remove(song: PlayerSong): void;
+
+  public remove(item: number | PlayerSong) {
+    let deleteIndex: number;
+    if (typeof item !== 'number') {
+      deleteIndex = this.song2index(item);
+    } else {
+      deleteIndex = item;
+    }
+
+    this.songList.splice(this.getValidIndex(deleteIndex), 1);
+
     this.persistTask$.next();
   }
 
-  protected loadSongList(list: Omit<PlayerSong, 'url'>[], currentIndex = 0, isPlay = false, isLoadNext = true) {
+  protected loadSongList(
+    list: Omit<PlayerSong, 'url'>[],
+    currentIndex = 0,
+    isPlay = false,
+    isLoadNext = true,
+  ) {
     const wrapList = list.map((song) => ({
       ...song,
       url: getSongUrl(song),
@@ -103,13 +129,14 @@ export class PlayerAction extends PlayerStatus {
     } else {
       end = this.getValidIndex(end);
 
-      songs = [
-        ...this.songList.slice(start),
-        ...this.songList.slice(0, end),
-      ];
+      songs = [...this.songList.slice(start), ...this.songList.slice(0, end)];
     }
 
-    console.info('load songs: ', [start, end], songs.map(({ name }) => name));
+    console.info(
+      'load songs: ',
+      [start, end],
+      songs.map(({ name }) => name),
+    );
 
     this.preloadTask$.next(songs);
   }
@@ -129,6 +156,12 @@ export class PlayerAction extends PlayerStatus {
     }
 
     return index;
+  }
+
+  private song2index(playSong: PlayerSong) {
+    return this.songList.findIndex(
+      (song) => song.id === playSong.id && song.provider === playSong.provider,
+    );
   }
 
   protected getValidIndex(nu: number): number {

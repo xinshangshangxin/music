@@ -1,20 +1,18 @@
 import {
   AfterViewInit, Component, ElementRef, OnDestroy, OnInit, QueryList, ViewChildren,
 } from '@angular/core';
-import { MatDialog } from '@angular/material';
 import { ActivatedRoute } from '@angular/router';
 import { untilDestroyed } from 'ngx-take-until-destroy';
-import { combineLatest, merge, of } from 'rxjs';
+import { merge } from 'rxjs';
 import {
   debounceTime, filter, map, pairwise, startWith, switchMap, tap,
 } from 'rxjs/operators';
 
 import { Privilege } from '../../../core/apollo/graphql';
 import { PlayerSong } from '../../../core/audio/interface';
-import { demoSongs } from '../../../core/player/demo';
-import { ConfigService } from '../../../core/services/config.service';
+import { playerPersistId } from '../../../core/services/constants';
+import { PersistService, Playlist } from '../../../core/services/persist.service';
 import { PlayerService } from '../../../core/services/player.service';
-import { ConfirmDialogComponent } from '../../../share/confirm-dialog/confirm-dialog.component';
 
 @Component({
   selector: 'app-song-list',
@@ -22,51 +20,36 @@ import { ConfirmDialogComponent } from '../../../share/confirm-dialog/confirm-di
   styleUrls: ['./song-list.component.scss'],
 })
 export class SongListComponent implements OnInit, AfterViewInit, OnDestroy {
-  public list: PlayerSong[];
-
   public Privilege = Privilege;
+
+  public playlist: Playlist;
 
   @ViewChildren('perSong')
   private songQueryList: QueryList<ElementRef<HTMLDivElement>>;
 
   constructor(
     private readonly playerService: PlayerService,
-    private readonly configService: ConfigService,
-    private readonly dialog: MatDialog,
+    private readonly persistService: PersistService,
     private readonly activatedRoute: ActivatedRoute,
   ) {}
 
   public ngOnInit() {
-    combineLatest(
-      this.activatedRoute.queryParams,
-      this.configService.getConfig(),
-    )
+    this.activatedRoute.queryParams
       .pipe(
-        switchMap(([qs, config]) => {
-          if (!config.viewed) {
-            return this.openDefaultSongsDialog().pipe(map(() => ({ qs, config })));
-          }
-          return of({ qs, config });
-        }),
-        map(({ qs, config }) => {
-          if (qs.id && qs.id !== this.playerService.currentPlaylistId) {
-            return {
-              id: qs.id,
-              index: 0,
-            };
+        map((qs) => {
+          if (qs.id) {
+            return qs.id;
           }
 
-          return {
-            id: this.playerService.currentPlaylistId,
-            index: config.currentIndex,
-          };
+          return playerPersistId;
         }),
-        switchMap(({ id, index }) => this.playerService.loadPlaylist(id, index, false, true)),
-        tap(() => {
-          this.list = this.playerService.songList;
+        switchMap((id) => this.persistService.getPlaylist(id)),
+        tap((playlist) => {
+          this.playlist = playlist;
         }),
+        untilDestroyed(this),
       ).subscribe(() => {
-        console.info('this.list: ', this.list);
+        console.info('this.playlist: ', this.playlist);
       }, console.warn);
   }
 
@@ -78,16 +61,23 @@ export class SongListComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
-  public get currentIndex() {
-    return this.playerService.currentIndex;
+  public get currentSong() {
+    return this.playerService.currentSong;
   }
 
-  public play(index: number) {
-    this.playerService.playAt(index);
+  public play(song: PlayerSong, index: number) {
+    if (this.playerService.currentPlaylistId === this.playlist.id) {
+      this.playerService.playAt(song);
+    } else {
+      this.playerService.loadPlaylist(this.playlist.id, index, true).subscribe(() => {
+      }, (e) => {
+        console.warn(e);
+      });
+    }
   }
 
-  public remove(index: number) {
-    this.playerService.remove(index);
+  public remove(song: PlayerSong) {
+    this.playerService.remove(song);
   }
 
   public formatArtists(artists: { name: string }[]) {
@@ -106,6 +96,10 @@ export class SongListComponent implements OnInit, AfterViewInit, OnDestroy {
       this.playerService.locate$,
     )
       .pipe(
+        filter(() => {
+          console.info(this.playerService.currentPlaylistId, this.playlist.id);
+          return this.playerService.currentPlaylistId === this.playlist.id;
+        }),
         debounceTime(200),
         map(() => {
           const elementRef = this.songQueryList.find(
@@ -128,25 +122,5 @@ export class SongListComponent implements OnInit, AfterViewInit, OnDestroy {
         }),
         untilDestroyed(this),
       );
-  }
-
-  private openDefaultSongsDialog() {
-    return this.dialog
-      .open(ConfirmDialogComponent, {
-        minWidth: 300,
-        data: {
-          content: '是否添加默认歌曲?',
-          no: '否',
-          ok: '是',
-        },
-      })
-      .afterClosed()
-      .pipe(tap((confirm) => {
-        if (confirm) {
-          this.playerService.loadTempPlaylist(demoSongs, 0, true);
-        }
-
-        this.configService.changeConfig({ viewed: true });
-      }));
   }
 }

@@ -1,5 +1,5 @@
 <div class="nav">
-  <p *ngFor="let item of persistService.getPlaylistList() | async" (click)="loadPlaylist(item.id)">
+  <p *ngFor="let item of list" (click)="loadPlaylist(item.id)">
     {{ item.name }}
   </p>
 </div>

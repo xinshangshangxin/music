@@ -1,4 +1,5 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Location } from '@angular/common';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { untilDestroyed } from 'ngx-take-until-destroy';
 
@@ -10,19 +11,28 @@ import { SearchService } from '../../../core/services/search.service';
   styleUrls: ['./top-nav.component.scss'],
 })
 export class TopNavComponent implements OnInit, OnDestroy {
-  private homeUrl = '/';
+  private readonly searchUrl = '/search';
+
+  private readonly settingUrl = '/setting';
 
   public searchValue = '';
 
-  constructor(private readonly router: Router, private readonly searchService: SearchService) {}
+  constructor(
+    private readonly router: Router,
+    private readonly searchService: SearchService,
+    private readonly location: Location,
+  ) {}
 
   public ngOnInit() {
     this.searchService.searchSubject.pipe(untilDestroyed(this)).subscribe(async (value) => {
-      console.info('searchSubject value: ', value);
-      if (value && this.router.url === this.homeUrl) {
+      console.info({
+        search: value,
+        url: this.router.url,
+      });
+      if (value && !this.router.url.startsWith(this.searchUrl)) {
         console.info('navigate to search');
         await this.router.navigate(['search'], { queryParams: { search: value } });
-      } else if (!value && this.router.url !== this.homeUrl) {
+      } else if (!value && this.router.url.startsWith(this.searchUrl)) {
         console.info('navigate to home');
         this.router.navigate(['']);
       }
@@ -51,7 +61,7 @@ export class TopNavComponent implements OnInit, OnDestroy {
   }
 
   public toggleSetting() {
-    if (this.router.url !== this.homeUrl) {
+    if (this.router.url.startsWith(this.settingUrl)) {
       this.router.navigate(['']);
     } else {
       this.router.navigate(['/setting']);

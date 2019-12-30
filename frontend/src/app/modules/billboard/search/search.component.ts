@@ -42,18 +42,15 @@ export class SearchComponent implements OnInit, OnDestroy {
     this.playerService.add(song, position);
 
     if (isPlay) {
-      this.searchService.urlLoadSubject.next('');
-      this.router.navigate(['']);
-
       this.playerService.playAt(position);
     }
   }
 
-  public tempPlay(index: number) {
-    this.playerService.loadTempPlaylist(this.searchList, index, true);
+  public tempPlay(song: SearchSong) {
+    const position = 'end';
 
-    this.searchService.urlLoadSubject.next('');
-    this.router.navigate(['']);
+    this.playerService.add(song, position);
+    this.playerService.playAt(position);
   }
 
   private whenSearch$() {

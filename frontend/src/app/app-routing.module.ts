@@ -2,10 +2,11 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 
 import { BillboardComponent } from './modules/billboard/billboard.component';
-import { HomeComponent } from './modules/home/home.component';
-import { SongListComponent } from './modules/billboard/song-list/song-list.component';
+import { RankComponent } from './modules/billboard/rank/rank.component';
 import { SearchComponent } from './modules/billboard/search/search.component';
 import { SettingComponent } from './modules/billboard/setting/setting.component';
+import { SongListComponent } from './modules/billboard/song-list/song-list.component';
+import { HomeComponent } from './modules/home/home.component';
 
 const routes: Routes = [
   {
@@ -19,8 +20,7 @@ const routes: Routes = [
         children: [
           {
             path: '',
-            redirectTo: 'list',
-            pathMatch: 'full',
+            component: RankComponent,
           },
           {
             path: 'list',

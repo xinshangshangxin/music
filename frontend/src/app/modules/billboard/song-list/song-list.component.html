@@ -1,13 +1,13 @@
-<div class="song-list">
+<div class="song-list" *ngIf="playlist">
   <div
     #perSong
     class="song-box"
-    *ngFor="let song of list; index as i"
+    *ngFor="let song of playlist.songs; index as i"
     [ngClass]="{
-      playing: currentIndex === i,
+      playing: currentSong && currentSong.id === song.id && currentSong.provider === song.provider,
       disabled: song.privilege === Privilege.Deny
     }"
-    (click)="play(i)"
+    (click)="play(song, i)"
   >
     <span class="song-info">
       <img class="logo" src="assets/logos/{{ song.provider }}.png" [alt]="song.provider" />
