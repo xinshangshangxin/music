@@ -53,6 +53,7 @@ export class PreloadService {
           return of({ song: peakSong as PeakSong, changed });
         }
 
+        console.debug(`==buildPeakSong==${peakSong.name}==, local-build`);
         return this.buildPeak({
           song,
           peakConfig,
@@ -82,6 +83,7 @@ export class PreloadService {
       && song.peakStartTime
       && song.peakDuration === peakDuration
     ) {
+      console.debug(`==buildPeakSong==${song.name}, builded`);
       return of({ song, changed: false });
     }
 
@@ -110,6 +112,7 @@ export class PreloadService {
           };
         }
 
+        console.debug(`==buildPeakSong==${song.name}==, server-build`);
         return {
           song: {
             ...song,
