@@ -1,11 +1,7 @@
 import { Observable, Subscription } from 'rxjs';
-import {
-  map, shareReplay, tap, takeUntil,
-} from 'rxjs/operators';
+import { map, shareReplay, tap, takeUntil } from 'rxjs/operators';
 
-import {
-  PeakConfig, PeakSong, PlayerSong, Setting,
-} from './interface';
+import { PeakConfig, PeakSong, PlayerSong, Setting } from './interface';
 import { RxAudio } from './rx-audio';
 
 export type AudioLoadSource = Observable<{
@@ -59,7 +55,7 @@ export class PoolAudio {
           song,
           peakConfig,
         },
-        preload$,
+        preload$
       );
     });
   }
@@ -69,7 +65,7 @@ export class PoolAudio {
     preload$: Observable<{
       song: PeakSong;
       changed: boolean;
-    }>,
+    }>
   ): PoolItem {
     const { song, peakConfig } = setting;
     if (!this.checkInPool(song, peakConfig)) {
@@ -125,7 +121,7 @@ export class PoolAudio {
     preload$: Observable<{
       song: PeakSong;
       changed: boolean;
-    }>,
+    }>
   ): void {
     const { song, peakConfig } = setting;
 
@@ -149,7 +145,7 @@ export class PoolAudio {
         bufferSize: 1,
         refCount: true,
       }),
-      takeUntil(rxAudio.release$),
+      takeUntil(rxAudio.release$)
     );
 
     this.pool[song.url] = {

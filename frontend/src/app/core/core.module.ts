@@ -16,6 +16,5 @@ import { StorageService } from './services/storage.service';
     StorageService,
     SearchService,
   ],
-
 })
 export class CoreModule {}

@@ -56,7 +56,7 @@ export class PlayerAction extends PlayerStatus {
   public add(song: Omit<PlayerSong, 'url'>, position: Position = 'end') {
     // 先删除重复歌曲
     const removeIndex = this.songList.findIndex(
-      ({ provider, id }) => provider === song.provider && id === song.id,
+      ({ provider, id }) => provider === song.provider && id === song.id
     );
     if (removeIndex >= 0) {
       this.songList.splice(removeIndex, 1);
@@ -93,7 +93,7 @@ export class PlayerAction extends PlayerStatus {
     list: Omit<PlayerSong, 'url'>[],
     currentIndex = 0,
     isPlay = false,
-    isLoadNext = true,
+    isLoadNext = true
   ) {
     const wrapList = list.map((song) => ({
       ...song,
@@ -135,7 +135,7 @@ export class PlayerAction extends PlayerStatus {
     console.info(
       'load songs: ',
       [start, end],
-      songs.map(({ name }) => name),
+      songs.map(({ name }) => name)
     );
 
     this.preloadTask$.next(songs);
@@ -160,7 +160,7 @@ export class PlayerAction extends PlayerStatus {
 
   public song2index(playSong: PlayerSong) {
     return this.songList.findIndex(
-      (song) => song.id === playSong.id && song.provider === playSong.provider,
+      (song) => song.id === playSong.id && song.provider === playSong.provider
     );
   }
 

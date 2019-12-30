@@ -1,9 +1,7 @@
 import { Injectable } from '@angular/core';
 import { merge } from 'lodash';
 import { from, Observable } from 'rxjs';
-import {
-  map, mapTo, shareReplay, switchMap, tap,
-} from 'rxjs/operators';
+import { map, mapTo, shareReplay, switchMap, tap } from 'rxjs/operators';
 
 import { defaultPeakConfig } from '../audio/constant';
 import { PlayerSong } from '../audio/interface';
@@ -60,7 +58,7 @@ export class PersistService {
   }
 
   public persistConfig(
-    config: { [key in keyof Config]?: Partial<Config[key]> } = {},
+    config: { [key in keyof Config]?: Partial<Config[key]> } = {}
   ): Observable<Config> {
     merge(this.config, config);
 
@@ -70,17 +68,17 @@ export class PersistService {
   public persistPlaylist(
     playlistId: string,
     songs: PlayerSong[] | true,
-    name?: string,
+    name?: string
   ): Observable<void> {
     // delete playlistId
     if (songs === true) {
       return from(this.storageService.delete(playlistId)).pipe(
-        switchMap(() => this.persistPlaylists({ id: playlistId, name, songs: [] }, true)),
+        switchMap(() => this.persistPlaylists({ id: playlistId, name, songs: [] }, true))
       );
     }
 
     return from(this.storageService.put(playlistId, songs)).pipe(
-      switchMap(() => this.persistPlaylists({ id: playlistId, name, songs })),
+      switchMap(() => this.persistPlaylists({ id: playlistId, name, songs }))
     );
   }
 
@@ -101,31 +99,35 @@ export class PersistService {
     return from(
       this.storageService.put(
         this.playlistsKey,
-        this.playlists.map(({ id, name }) => ({ id, name: name || id })),
-      ),
+        this.playlists.map(({ id, name }) => ({ id, name: name || id }))
+      )
     );
   }
 
   private init() {
     this.init$ = this.initConfig().pipe(
       switchMap(() => from(this.initPlaylists())),
-      shareReplay(1),
+      shareReplay(1)
     );
 
     // as soon as possible run
-    this.init$.subscribe(() => { }, console.warn);
+    this.init$.subscribe(() => {}, console.warn);
   }
 
   private initConfig() {
     return from(this.storageService.get<Config>(this.configKey)).pipe(
       tap((storageConfig) => {
-        this.config = merge({}, {
-          ...PersistService.DEFAULT_CONFIG,
-          currentIndex: 0,
-          basePlaylistId: TEMP_PLAYLIST_ID,
-        }, storageConfig);
+        this.config = merge(
+          {},
+          {
+            ...PersistService.DEFAULT_CONFIG,
+            currentIndex: 0,
+            basePlaylistId: TEMP_PLAYLIST_ID,
+          },
+          storageConfig
+        );
       }),
-      switchMap(() => this.persistConfig(this.config)),
+      switchMap(() => this.persistConfig(this.config))
     );
   }
 
@@ -133,7 +135,7 @@ export class PersistService {
     console.info('initPlaylists', this.playlistsKey);
     const playlists = await this.storageService.get<{ id: string; name: string }[]>(
       this.playlistsKey,
-      [],
+      []
     );
 
     if (!playlists) {
@@ -149,7 +151,7 @@ export class PersistService {
           name: name || id,
           songs,
         };
-      }),
+      })
     );
   }
 }

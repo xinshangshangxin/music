@@ -2,9 +2,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { MatSliderChange } from '@angular/material';
 import { untilDestroyed } from 'ngx-take-until-destroy';
 import { merge, Observable } from 'rxjs';
-import {
-  debounceTime, filter, map, shareReplay, switchMap, takeUntil, tap,
-} from 'rxjs/operators';
+import { debounceTime, filter, map, shareReplay, switchMap, takeUntil, tap } from 'rxjs/operators';
 
 import { AudioEvent } from '../../core/audio/interface';
 import { Status } from '../../core/player/interface';
@@ -37,7 +35,7 @@ export class PlayBarComponent implements OnInit, OnDestroy {
   constructor(
     public readonly playerService: PlayerService,
     private readonly persistService: PersistService,
-    private readonly configService: ConfigService,
+    private readonly configService: ConfigService
   ) {}
 
   public ngOnInit() {
@@ -46,33 +44,29 @@ export class PlayBarComponent implements OnInit, OnDestroy {
       this.playerService.songChange$,
       this.playerService.played$,
       this.playerService.preloadTask$,
-      this.configService.getConfig(),
-    )
-      .pipe(
-        debounceTime(100),
-        filter(() => !!this.playerService.songList.length),
-        map(() => ({
-          provider: this.playerService.currentSong.provider,
-          name: this.playerService.currentSong.name,
-          img: (
-            this.playerService.currentSong.album
-            && this.playerService.currentSong.album.img
-          ) || this.defaultImg,
-          artists: this.playerService.formatArtists(this.playerService.currentSong.artists),
-        })),
-        shareReplay({
-          bufferSize: 1,
-          refCount: true,
-        }),
-        untilDestroyed(this),
-      );
+      this.configService.getConfig()
+    ).pipe(
+      debounceTime(100),
+      filter(() => !!this.playerService.songList.length),
+      map(() => ({
+        provider: this.playerService.currentSong.provider,
+        name: this.playerService.currentSong.name,
+        img:
+          (this.playerService.currentSong.album && this.playerService.currentSong.album.img) ||
+          this.defaultImg,
+        artists: this.playerService.formatArtists(this.playerService.currentSong.artists),
+      })),
+      shareReplay({
+        bufferSize: 1,
+        refCount: true,
+      }),
+      untilDestroyed(this)
+    );
 
-    this.whenProgress$()
-      .subscribe(() => { }, console.warn);
+    this.whenProgress$().subscribe(() => {}, console.warn);
   }
 
-  public ngOnDestroy(): void {
-  }
+  public ngOnDestroy(): void {}
 
   public get volume() {
     return this.playerService.volume * 100;
@@ -119,28 +113,29 @@ export class PlayBarComponent implements OnInit, OnDestroy {
             max: 100,
             current: 0,
           };
-        }),
+        })
       ),
       this.playerService.played$.pipe(
         filter(() => !!this.playerService.rxAudio),
-        switchMap(
-          () => this.playerService.rxAudio.event(AudioEvent.timeupdate)
-            .pipe(takeUntil(this.playerService.songChange$)),
+        switchMap(() =>
+          this.playerService.rxAudio
+            .event(AudioEvent.timeupdate)
+            .pipe(takeUntil(this.playerService.songChange$))
         ),
         map(() => {
           this.progress = this.getProgress();
-        }),
-      ),
-    )
-      .pipe(untilDestroyed(this));
+        })
+      )
+    ).pipe(untilDestroyed(this));
   }
 
   private getProgress() {
     const { duration } = this.playerService.currentSong;
     const min = this.playerService.currentSong.peakStartTime || 0;
-    let max = this.playerService.currentSong.peakStartTime
-              + this.playerService.rxAudio.peakConfig.duration
-              + this.playerService.rxAudio.peakConfig.after;
+    let max =
+      this.playerService.currentSong.peakStartTime +
+      this.playerService.rxAudio.peakConfig.duration +
+      this.playerService.rxAudio.peakConfig.after;
 
     if (duration && max > duration) {
       max = duration;

@@ -1,8 +1,4 @@
-import { HttpClientModule } from '@angular/common/http';
 import { NgModule } from '@angular/core';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { BrowserModule } from '@angular/platform-browser';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -10,20 +6,18 @@ import { GraphQLModule } from './core/apollo/graphql.module';
 import { CoreModule } from './core/core.module';
 import { BillboardComponent } from './modules/billboard/billboard.component';
 import { LeftNavComponent } from './modules/billboard/left-nav/left-nav.component';
+import { RankComponent } from './modules/billboard/rank/rank.component';
 import { SearchComponent } from './modules/billboard/search/search.component';
 import { SettingComponent } from './modules/billboard/setting/setting.component';
 import { SongListComponent } from './modules/billboard/song-list/song-list.component';
 import { TopNavComponent } from './modules/billboard/top-nav/top-nav.component';
+import { PlaylistComponent } from './modules/dialog/playlist/playlist.component';
 import { HomeComponent } from './modules/home/home.component';
 import { PlayBarComponent } from './modules/play-bar/play-bar.component';
 import { ShareModule } from './share/share/share.module';
-import { PlaylistComponent } from './modules/dialog/playlist/playlist.component';
-import { RankComponent } from './modules/billboard/rank/rank.component';
 
 @NgModule({
-  entryComponents: [
-    PlaylistComponent,
-  ],
+  entryComponents: [PlaylistComponent],
   declarations: [
     AppComponent,
     HomeComponent,
@@ -38,12 +32,7 @@ import { RankComponent } from './modules/billboard/rank/rank.component';
     PlaylistComponent,
     RankComponent,
   ],
-  imports: [
-    CoreModule,
-    ShareModule,
-    AppRoutingModule,
-    GraphQLModule,
-  ],
+  imports: [CoreModule, ShareModule, AppRoutingModule, GraphQLModule],
   providers: [],
   bootstrap: [AppComponent],
 })

@@ -1,20 +1,12 @@
 import { Injectable } from '@angular/core';
 import { isNil, omit } from 'lodash';
-import {
-  from, Observable, of, throwError,
-} from 'rxjs';
-import {
-  map, switchMap, tap, timeout,
-} from 'rxjs/operators';
+import { from, Observable, of, throwError } from 'rxjs';
+import { map, switchMap, tap, timeout } from 'rxjs/operators';
 
-import {
-  AddPeakTimeGQL, Privilege, Provider, SongGQL,
-} from '../apollo/graphql';
+import { AddPeakTimeGQL, Privilege, Provider, SongGQL } from '../apollo/graphql';
 import { AudioPeak } from '../audio/audio-peak';
 import { getSongUrl } from '../audio/helper';
-import {
-  PeakConfig, PeakSong, PlayerSong, Setting,
-} from '../audio/interface';
+import { PeakConfig, PeakSong, PlayerSong, Setting } from '../audio/interface';
 import { PoolAudio } from '../audio/pool-audio';
 
 @Injectable({
@@ -42,11 +34,11 @@ export class PreloadService {
 
   private buildPeakSong(
     song: PlayerSong,
-    peakConfig: PeakConfig,
+    peakConfig: PeakConfig
   ): Observable<{
-      song: PeakSong;
-      changed: boolean;
-    }> {
+    song: PeakSong;
+    changed: boolean;
+  }> {
     return this.getPeakSong(song, peakConfig).pipe(
       switchMap(({ song: peakSong, changed }) => {
         if (!isNil(peakSong.peakStartTime)) {
@@ -65,23 +57,23 @@ export class PreloadService {
               peakDuration: peakConfig.duration,
             } as PeakSong,
             changed,
-          })),
+          }))
         );
       }),
-      timeout(10000),
+      timeout(10000)
     );
   }
 
   private getPeakSong(
     song: PlayerSong,
-    peakConfig: PeakConfig,
+    peakConfig: PeakConfig
   ): Observable<{ song: PlayerSong; changed: boolean }> {
     const peakDuration = peakConfig.duration;
 
     if (
-      song.privilege !== Privilege.Deny
-      && song.peakStartTime
-      && song.peakDuration === peakDuration
+      song.privilege !== Privilege.Deny &&
+      song.peakStartTime &&
+      song.peakDuration === peakDuration
     ) {
       console.debug(`==buildPeakSong==${song.name}, builded`);
       return of({ song, changed: false });
@@ -92,10 +84,7 @@ export class PreloadService {
       provider: song.provider,
       duration: peakDuration,
     }).pipe(
-      map(({
-        startTime: serverPeakStartTime,
-        ...rest
-      }) => {
+      map(({ startTime: serverPeakStartTime, ...rest }) => {
         const omitAttrs = ['url'];
         if (song.name) {
           omitAttrs.push('name');
@@ -123,7 +112,7 @@ export class PreloadService {
           },
           changed: true,
         };
-      }),
+      })
     );
   }
 
@@ -153,7 +142,7 @@ export class PreloadService {
             ...song,
             url: getSongUrl(song),
           });
-        }),
+        })
       );
   }
 
@@ -177,7 +166,7 @@ export class PreloadService {
           })
           .subscribe(() => {}, console.warn);
       }),
-      map(({ startTime }) => startTime),
+      map(({ startTime }) => startTime)
     );
   }
 }

@@ -20,7 +20,7 @@ export class PlayerService extends Player {
   constructor(
     private readonly configService: ConfigService,
     private readonly preloadService: PreloadService,
-    private readonly persistService: PersistService,
+    private readonly persistService: PersistService
   ) {
     super();
 
@@ -29,7 +29,7 @@ export class PlayerService extends Player {
       () => {},
       (e) => {
         console.warn('PlayerService init failed', e);
-      },
+      }
     );
   }
 
@@ -42,7 +42,7 @@ export class PlayerService extends Player {
     list: Omit<PlayerSong, 'url'>[],
     currentIndex = 0,
     isPlay = false,
-    isLoadNext = true,
+    isLoadNext = true
   ) {
     return this.loadSongList(list, currentIndex, isPlay, isLoadNext);
   }
@@ -50,16 +50,15 @@ export class PlayerService extends Player {
   public loadPlaylist(playlistId: string, currentIndex = 0, isPlay = false, isLoadNext = true) {
     this.basePlaylistId = playlistId;
 
-    return this.configService.changeConfig({ basePlaylistId: this.basePlaylistId })
-      .pipe(
-        switchMap(() => this.persistService.getPlaylist(playlistId)),
-        map((playlist) => {
-          if (!playlist) {
-            return;
-          }
-          this.loadSongList(playlist.songs, currentIndex, isPlay, isLoadNext);
-        }),
-      );
+    return this.configService.changeConfig({ basePlaylistId: this.basePlaylistId }).pipe(
+      switchMap(() => this.persistService.getPlaylist(playlistId)),
+      map((playlist) => {
+        if (!playlist) {
+          return;
+        }
+        this.loadSongList(playlist.songs, currentIndex, isPlay, isLoadNext);
+      })
+    );
   }
 
   private init() {
@@ -67,21 +66,23 @@ export class PlayerService extends Player {
       tap((config) => {
         this.setVolume(config.volume);
       }),
-      switchMap(() => merge(
-        this.whenSongChange$(),
-        this.whenPersistTask$(),
-        this.whenPreloadTask$(),
-        this.whenSongError$(),
-        this.persistService.getPlaylist(TEMP_PLAYLIST_ID).pipe(
-          tap((playlist) => {
-            if (!playlist) {
-              return;
-            }
+      switchMap(() =>
+        merge(
+          this.whenSongChange$(),
+          this.whenPersistTask$(),
+          this.whenPreloadTask$(),
+          this.whenSongError$(),
+          this.persistService.getPlaylist(TEMP_PLAYLIST_ID).pipe(
+            tap((playlist) => {
+              if (!playlist) {
+                return;
+              }
 
-            this.loadSongList(playlist.songs, this.config.currentIndex, false, false);
-          }),
-        ),
-      )),
+              this.loadSongList(playlist.songs, this.config.currentIndex, false, false);
+            })
+          )
+        )
+      )
     );
   }
 
@@ -96,7 +97,7 @@ export class PlayerService extends Player {
 
           this.persistTask$.next();
         }
-      }),
+      })
     );
   }
 
@@ -112,19 +113,19 @@ export class PlayerService extends Player {
       }),
       tap(() => {
         this.configService.changeConfig({ currentIndex: this.currentIndex });
-      }),
+      })
     );
   }
 
   private whenPersistTask$() {
     return this.persistTask$.pipe(
-      switchMap(() => this.persistService.persistPlaylist(TEMP_PLAYLIST_ID, this.songList)),
+      switchMap(() => this.persistService.persistPlaylist(TEMP_PLAYLIST_ID, this.songList))
     );
   }
 
   private whenPreloadTask$() {
     return this.preloadTask$.pipe(
-      tap((songs) => this.preloadService.load(songs, this.config.peakConfig)),
+      tap((songs) => this.preloadService.load(songs, this.config.peakConfig))
     );
   }
 
@@ -133,7 +134,7 @@ export class PlayerService extends Player {
       tap((config) => {
         console.debug({ config });
         this.config = config;
-      }),
+      })
     );
   }
 }

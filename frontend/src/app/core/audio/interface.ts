@@ -43,11 +43,11 @@ export interface PeakConfig {
 export interface PlayerSong extends Omit<Song, 'artists' | 'album' | '__typename'> {
   url: string;
   artists?:
-  | {
-    id?: string | null;
-    name: string;
-  }[]
-  | null;
+    | {
+        id?: string | null;
+        name: string;
+      }[]
+    | null;
   peakStartTime?: number;
   peakDuration?: number;
   album?: {

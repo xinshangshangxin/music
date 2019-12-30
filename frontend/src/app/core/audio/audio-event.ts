@@ -1,10 +1,6 @@
 import { merge as lodashMerge } from 'lodash';
-import {
-  fromEvent, merge, Observable, Subject,
-} from 'rxjs';
-import {
-  filter, map, mapTo, take, takeUntil, tap,
-} from 'rxjs/operators';
+import { fromEvent, merge, Observable, Subject } from 'rxjs';
+import { filter, map, mapTo, take, takeUntil, tap } from 'rxjs/operators';
 
 import { AudioEvent, PeakConfig } from './interface';
 
@@ -27,11 +23,11 @@ export class AudioListeners {
   }
 
   public event(
-    eventName: AudioEvent,
+    eventName: AudioEvent
   ): Observable<
     | { event: AudioEvent.layoutTouch; data: { endTime: number; currentTime: number } }
     | { event: AudioEvent }
-    > {
+  > {
     switch (eventName) {
       case AudioEvent.play:
         return this.play$();
@@ -52,8 +48,8 @@ export class AudioListeners {
             data,
           })),
           takeUntil(
-            merge(fromEvent(this.audio, 'ended'), fromEvent(this.audio, 'error'), this.release$),
-          ),
+            merge(fromEvent(this.audio, 'ended'), fromEvent(this.audio, 'error'), this.release$)
+          )
         );
     }
   }
@@ -83,22 +79,19 @@ export class AudioListeners {
         console.debug('====> Event:play', e);
       }),
       mapTo({ event: AudioEvent.play }),
-      takeUntil(this.release$),
+      takeUntil(this.release$)
     );
   }
 
   private error$() {
     // 监听错误事件
-    return merge(
-      fromEvent(this.audio, AudioEvent.error),
-      this.layInFailed$,
-    ).pipe(
+    return merge(fromEvent(this.audio, AudioEvent.error), this.layInFailed$).pipe(
       take(1),
       tap((e) => {
         console.debug('====> Event:error', e);
       }),
       mapTo({ event: AudioEvent.error }),
-      takeUntil(this.release$),
+      takeUntil(this.release$)
     );
   }
 
@@ -107,7 +100,7 @@ export class AudioListeners {
     return fromEvent(this.audio, AudioEvent.ended).pipe(
       take(1),
       mapTo({ event: AudioEvent.ended }),
-      takeUntil(this.release$),
+      takeUntil(this.release$)
     );
   }
 
@@ -138,9 +131,7 @@ export class AudioListeners {
       takeUntil<{
         event: AudioEvent.layoutTouch;
         data: { endTime: number; currentTime: number };
-      }>(
-        merge(fromEvent(this.audio, 'ended'), fromEvent(this.audio, 'error'), this.release$),
-      ),
+      }>(merge(fromEvent(this.audio, 'ended'), fromEvent(this.audio, 'error'), this.release$))
     );
   }
 
@@ -163,9 +154,9 @@ export class AudioListeners {
         merge(
           fromEvent(this.audio, AudioEvent.ended),
           fromEvent(this.audio, AudioEvent.error),
-          this.release$,
-        ),
-      ),
+          this.release$
+        )
+      )
     );
   }
 
@@ -173,7 +164,7 @@ export class AudioListeners {
     return fromEvent(this.audio, AudioEvent.playing).pipe(
       take(1),
       mapTo({ event: AudioEvent.played }),
-      takeUntil(this.release$),
+      takeUntil(this.release$)
     );
   }
 }

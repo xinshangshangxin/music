@@ -1,8 +1,14 @@
+import { EMPTY, merge, Observable, of, throwError } from 'rxjs';
 import {
-  EMPTY, merge, Observable, of, throwError,
-} from 'rxjs';
-import {
-  catchError, delay, map, mapTo, share, switchMap, takeUntil, tap, throttleTime,
+  catchError,
+  delay,
+  map,
+  mapTo,
+  share,
+  switchMap,
+  takeUntil,
+  tap,
+  throttleTime,
 } from 'rxjs/operators';
 
 import { AudioEvent, PeakSong, PlayerSong } from '../audio/interface';
@@ -25,7 +31,7 @@ export class PlayerPlay extends PlayerAction {
           // 状态变更
           this.status = Status.playing;
         }),
-        mapTo('click'),
+        mapTo('click')
       ),
       this.end$.pipe(
         throttleTime(500),
@@ -33,7 +39,7 @@ export class PlayerPlay extends PlayerAction {
           // 游标变更
           this.setIndexStep(1);
         }),
-        mapTo('end'),
+        mapTo('end')
       ),
       this.error$.pipe(
         tap(() => {
@@ -55,14 +61,18 @@ export class PlayerPlay extends PlayerAction {
             ...this.config.errorRetry,
           });
         }),
-        mapTo('error'),
-      ),
+        mapTo('error')
+      )
     ).pipe(
       switchMap((eventName) => {
-        console.debug('歌曲变更触发',
-          '触发类型', eventName,
-          '触发歌曲下标', this.currentIndex,
-          this.currentSong);
+        console.debug(
+          '歌曲变更触发',
+          '触发类型',
+          eventName,
+          '触发歌曲下标',
+          this.currentIndex,
+          this.currentSong
+        );
 
         if (eventName === 'click') {
           return of(null);
@@ -91,7 +101,7 @@ export class PlayerPlay extends PlayerAction {
 
         return caught;
       }),
-      share(),
+      share()
     );
   }
 
@@ -111,14 +121,14 @@ export class PlayerPlay extends PlayerAction {
   }
 
   protected playSong(
-    source$: AudioLoadSource,
+    source$: AudioLoadSource
   ): Observable<
     | never
     | {
-      rxAudio: RxAudio;
-      song: PeakSong;
-    }
-    > {
+        rxAudio: RxAudio;
+        song: PeakSong;
+      }
+  > {
     return source$.pipe(
       tap(({ song, rxAudio, changed }) => {
         console.debug(`play ┣ ${song.name} ┫ ┣ ${song.provider} ┫`, {
@@ -139,9 +149,12 @@ export class PlayerPlay extends PlayerAction {
         // 状态变换, 需要做一些操作
         this.songStatus$({ song, rxAudio })
           .pipe(takeUntil(this.songChange$))
-          .subscribe(() => {}, (error) => {
-            console.warn('songStatus$ handle error', error);
-          });
+          .subscribe(
+            () => {},
+            (error) => {
+              console.warn('songStatus$ handle error', error);
+            }
+          );
       }),
       switchMap(({ song, rxAudio }) => {
         if (!rxAudio) {
@@ -161,13 +174,12 @@ export class PlayerPlay extends PlayerAction {
         // 设置音量
         this.setAudioVolume(this.volume);
 
-        return rxAudio.layIn(song.peakStartTime)
-          .pipe(
-            tap(() => {
-              this.play$.next();
-            }),
-            map(() => ({ song, rxAudio })),
-          );
+        return rxAudio.layIn(song.peakStartTime).pipe(
+          tap(() => {
+            this.play$.next();
+          }),
+          map(() => ({ song, rxAudio }))
+        );
       }),
       catchError((err) => {
         console.warn('load audio error', err);
@@ -178,7 +190,7 @@ export class PlayerPlay extends PlayerAction {
 
         return EMPTY;
       }),
-      takeUntil(this.songChange$),
+      takeUntil(this.songChange$)
     );
   }
 
@@ -199,25 +211,25 @@ export class PlayerPlay extends PlayerAction {
       rxAudio.event(AudioEvent.error).pipe(
         tap(() => {
           this.error$.next({ index: this.currentIndex, data: AudioEvent.error });
-        }),
+        })
       ),
       // 结束
       merge(
         // 正常结束
         rxAudio.event(AudioEvent.ended),
         // layOut 结束
-        rxAudio.event(AudioEvent.layoutEnded),
+        rxAudio.event(AudioEvent.layoutEnded)
       ).pipe(
         throttleTime(500),
         tap(() => {
           this.end$.next(song);
-        }),
+        })
       ),
       // 渐出
       rxAudio.event(AudioEvent.layoutTouch).pipe(
         tap(() => {
           rxAudio.layOut();
-        }),
+        })
       ),
       // 当前歌曲播放成功
       rxAudio.event(AudioEvent.played).pipe(
@@ -228,14 +240,14 @@ export class PlayerPlay extends PlayerAction {
           this.errorStatus.continuous = 0;
           // 载入下面歌曲
           this.loadNextSongs();
-        }),
-      ),
+        })
+      )
     );
   }
 
   protected updateSongInfo(song: PlayerSong | PeakSong) {
     const index = this.songList.findIndex(
-      ({ id, provider }) => id === song.id && provider === song.provider,
+      ({ id, provider }) => id === song.id && provider === song.provider
     );
 
     if (index >= 0) {

@@ -1,14 +1,8 @@
-import {
-  EMPTY, from, merge, Observable,
-} from 'rxjs';
-import {
-  catchError, mapTo, switchMap, take, takeUntil, tap, timeout,
-} from 'rxjs/operators';
+import { EMPTY, from, merge, Observable } from 'rxjs';
+import { catchError, mapTo, switchMap, take, takeUntil, tap, timeout } from 'rxjs/operators';
 
 import { AudioListeners } from './audio-event';
-import {
-  AudioEvent, PeakConfig, PlayerSong, Setting,
-} from './interface';
+import { AudioEvent, PeakConfig, PlayerSong, Setting } from './interface';
 
 export class RxAudio extends AudioListeners {
   private audioContext = new AudioContext();
@@ -47,7 +41,10 @@ export class RxAudio extends AudioListeners {
 
     // 标记播放范围
     // https://developer.mozilla.org/zh-CN/docs/Web/Guide/HTML/Using_HTML5_audio_and_video#%E6%A0%87%E8%AE%B0%E6%92%AD%E6%94%BE%E8%8C%83%E5%9B%B4
-    this.audio.src = `${this.song.url}#t=${currentTime},${currentTime + peakConfig.duration + peakConfig.after + 1}`;
+    this.audio.src = `${this.song.url}#t=${currentTime},${currentTime +
+      peakConfig.duration +
+      peakConfig.after +
+      1}`;
     this.audio.load();
 
     this.changePeak({
@@ -84,38 +81,35 @@ export class RxAudio extends AudioListeners {
   public layIn(currentTime?: number): Observable<void> {
     // 处理特殊情况
     // The AudioContext was not allowed to start. It must be resumed (or created) after a user gesture on the page. https://goo.gl/7K7WLu
-    const layInFailedSource$ = this.event(AudioEvent.playing)
-      .pipe(
-        tap(() => {
-          console.info(`======>, layIn checking ┣ ${this.song.name} ┫`, this.audio.src, this.song);
-        }),
-        take(1),
-        switchMap(() => this.event(AudioEvent.timeupdate).pipe(
+    const layInFailedSource$ = this.event(AudioEvent.playing).pipe(
+      tap(() => {
+        console.info(`======>, layIn checking ┣ ${this.song.name} ┫`, this.audio.src, this.song);
+      }),
+      take(1),
+      switchMap(() =>
+        this.event(AudioEvent.timeupdate).pipe(
           take(1),
           timeout(this.errorDelaySeconds * 1000),
-          takeUntil(this.release$),
-        )),
-        tap(() => {
-          console.info(`======>, layIn success ┣ ${this.song.name} ┫`);
-        }),
-        catchError(() => {
-          console.warn(`======>, layIn failed ┣ ${this.song.name} ┫`, this.errorDelaySeconds);
+          takeUntil(this.release$)
+        )
+      ),
+      tap(() => {
+        console.info(`======>, layIn success ┣ ${this.song.name} ┫`);
+      }),
+      catchError(() => {
+        console.warn(`======>, layIn failed ┣ ${this.song.name} ┫`, this.errorDelaySeconds);
 
-          this.pause();
-          this.errorDelaySeconds = (this.errorDelaySeconds + 1) ** 2;
-          this.layInFailed$.next();
-          return EMPTY;
-        }),
-      );
+        this.pause();
+        this.errorDelaySeconds = (this.errorDelaySeconds + 1) ** 2;
+        this.layInFailed$.next();
+        return EMPTY;
+      })
+    );
 
-    return merge(
-      layInFailedSource$,
-      this.tryLayIn(currentTime),
-    )
-      .pipe(
-        mapTo(undefined),
-        takeUntil(this.release$),
-      );
+    return merge(layInFailedSource$, this.tryLayIn(currentTime)).pipe(
+      mapTo(undefined),
+      takeUntil(this.release$)
+    );
   }
 
   private tryLayIn(currentTime?: number): Observable<void> {
@@ -132,7 +126,7 @@ export class RxAudio extends AudioListeners {
     this.gainNode.gain.setValueAtTime(0, this.audioContext.currentTime);
     this.gainNode.gain.linearRampToValueAtTime(
       this.gainVolume,
-      this.audioContext.currentTime + this.peakConfig.layIn,
+      this.audioContext.currentTime + this.peakConfig.layIn
     );
 
     return from(this.audio.play());
@@ -148,7 +142,7 @@ export class RxAudio extends AudioListeners {
 
       this.gainNode.gain.linearRampToValueAtTime(
         this.peakConfig.minVolume,
-        this.audioContext.currentTime + this.peakConfig.layOut,
+        this.audioContext.currentTime + this.peakConfig.layOut
       );
     }
   }

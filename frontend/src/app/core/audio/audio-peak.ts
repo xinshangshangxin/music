@@ -10,14 +10,14 @@ export class AudioPeak {
   public async get(
     audioUrl: string,
     cutSeconds: number,
-    precision = 10,
+    precision = 10
   ): Promise<{
-      cutSeconds: number;
-      precision: number;
-      startTime: number;
-      peaks: number[];
-      audioBuffer: AudioBuffer;
-    }> {
+    cutSeconds: number;
+    precision: number;
+    startTime: number;
+    peaks: number[];
+    audioBuffer: AudioBuffer;
+  }> {
     const response = await fetch(audioUrl);
     if (response.status >= 400) {
       throw new Error(`response.status: ${response.status}`);
@@ -28,7 +28,7 @@ export class AudioPeak {
 
     const peaks = AudioPeak.getPeaks(
       precision * parseInt(`${audioBuffer.duration + 1}`, 10),
-      channelData,
+      channelData
     );
 
     const startTime = AudioPeak.findMaxIndex(peaks, cutSeconds * precision) / precision;

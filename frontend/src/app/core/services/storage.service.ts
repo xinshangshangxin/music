@@ -1,9 +1,7 @@
 import { Injectable } from '@angular/core';
 import { v4 as uuidV4 } from 'uuid';
 
-import {
-  Action, Defer, defer, RequestMessage, ResponseMessage,
-} from '../workers/helper';
+import { Action, Defer, defer, RequestMessage, ResponseMessage } from '../workers/helper';
 
 @Injectable({
   providedIn: 'root',

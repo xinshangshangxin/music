@@ -13,20 +13,19 @@ import { PersistService, Playlist } from '../../../core/services/persist.service
 export class LeftNavComponent implements OnInit {
   public list: Playlist[] = [];
 
-  constructor(
-    public readonly persistService: PersistService,
-    private readonly router: Router,
-  ) {}
+  constructor(public readonly persistService: PersistService, private readonly router: Router) {}
 
   public ngOnInit() {
-    this.persistService.getPlaylistList()
-      .pipe(map((list) => list.filter(({ id }) => id !== TEMP_PLAYLIST_ID))).subscribe(
+    this.persistService
+      .getPlaylistList()
+      .pipe(map((list) => list.filter(({ id }) => id !== TEMP_PLAYLIST_ID)))
+      .subscribe(
         (list) => {
           this.list = list;
         },
         (e) => {
           console.warn(e);
-        },
+        }
       );
   }
 

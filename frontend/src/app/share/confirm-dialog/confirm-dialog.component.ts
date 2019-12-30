@@ -8,7 +8,6 @@ export interface DialogData {
   ok?: string;
 }
 
-
 @Component({
   selector: 'app-confirm-dialog',
   templateUrl: './confirm-dialog.component.html',
@@ -17,12 +16,10 @@ export interface DialogData {
 export class ConfirmDialogComponent implements OnInit {
   constructor(
     public dialogRef: MatDialogRef<ConfirmDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: DialogData,
-  ) { }
+    @Inject(MAT_DIALOG_DATA) public data: DialogData
+  ) {}
 
-
-  public ngOnInit() {
-  }
+  public ngOnInit() {}
 
   public close(confirm: boolean): void {
     this.dialogRef.close(confirm);

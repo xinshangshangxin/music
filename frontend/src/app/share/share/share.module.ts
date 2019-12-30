@@ -51,7 +51,6 @@ import { NgSelectModule } from '@ng-select/ng-select';
 
 import { ConfirmDialogComponent } from '../confirm-dialog/confirm-dialog.component';
 
-
 const modules = [
   BrowserModule,
   BrowserAnimationsModule,
@@ -105,13 +104,9 @@ const modules = [
 ];
 
 @NgModule({
-  declarations: [
-    ConfirmDialogComponent,
-  ],
-  entryComponents: [
-    ConfirmDialogComponent,
-  ],
+  declarations: [ConfirmDialogComponent],
+  entryComponents: [ConfirmDialogComponent],
   imports: modules,
   exports: modules,
 })
-export class ShareModule { }
+export class ShareModule {}

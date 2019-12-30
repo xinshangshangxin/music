@@ -42,7 +42,7 @@ export class PlaylistComponent implements OnInit {
   constructor(
     private readonly persistService: PersistService,
     private readonly dialogRef: MatDialogRef<ConfirmDialogComponent, PlaylistDialogResult>,
-    private readonly snackBar: MatSnackBar,
+    private readonly snackBar: MatSnackBar
   ) {}
 
   public ngOnInit() {

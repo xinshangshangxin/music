@@ -2,9 +2,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { untilDestroyed } from 'ngx-take-until-destroy';
 import { merge } from 'rxjs';
-import {
-  debounceTime, distinctUntilChanged, filter, map, switchMap, tap,
-} from 'rxjs/operators';
+import { debounceTime, distinctUntilChanged, filter, map, switchMap, tap } from 'rxjs/operators';
 
 import { SearchSong } from '../../../core/apollo/graphql';
 import { Position } from '../../../core/player/interface';
@@ -23,17 +21,20 @@ export class SearchComponent implements OnInit, OnDestroy {
     private readonly playerService: PlayerService,
     private readonly searchService: SearchService,
     private readonly activatedRoute: ActivatedRoute,
-    private readonly router: Router,
+    private readonly router: Router
   ) {}
 
   public ngOnInit() {
-    this.whenSearch$().subscribe((data) => {
-      if (data.type === SearchType.search) {
-        this.searchList = data.result;
+    this.whenSearch$().subscribe(
+      (data) => {
+        if (data.type === SearchType.search) {
+          this.searchList = data.result;
+        }
+      },
+      (e) => {
+        console.warn('SearchComponent whenSearch$ error', e);
       }
-    }, (e) => {
-      console.warn('SearchComponent whenSearch$ error', e);
-    });
+    );
   }
 
   public ngOnDestroy(): void {}
@@ -65,7 +66,7 @@ export class SearchComponent implements OnInit, OnDestroy {
       }),
       map((keyword) => SearchService.getSearchQs(keyword)),
       switchMap((data) => this.searchService.action(data)),
-      untilDestroyed(this),
+      untilDestroyed(this)
     );
   }
 
@@ -79,7 +80,7 @@ export class SearchComponent implements OnInit, OnDestroy {
       tap((value) => {
         this.searchService.urlLoadSubject.next(value);
       }),
-      untilDestroyed(this),
+      untilDestroyed(this)
     );
   }
 
@@ -90,7 +91,7 @@ export class SearchComponent implements OnInit, OnDestroy {
       }),
       map((data) => (data || '').trim()),
       filter((data) => !!data),
-      untilDestroyed(this),
+      untilDestroyed(this)
     );
   }
 }

@@ -2,15 +2,14 @@ import { Location } from '@angular/common';
 import { Injectable } from '@angular/core';
 import { MatDialog } from '@angular/material';
 import { Router } from '@angular/router';
-import {
-  BehaviorSubject, from, Observable, of, Subject,
-} from 'rxjs';
+import { BehaviorSubject, from, Observable, of, Subject } from 'rxjs';
 import { map, switchMap, tap } from 'rxjs/operators';
 
-import { PlaylistComponent, PlaylistDialogResult } from '../../modules/dialog/playlist/playlist.component';
 import {
-  ParseUrlGQL, Provider, SearchGQL, SearchSong,
-} from '../apollo/graphql';
+  PlaylistComponent,
+  PlaylistDialogResult,
+} from '../../modules/dialog/playlist/playlist.component';
+import { ParseUrlGQL, Provider, SearchGQL, SearchSong } from '../apollo/graphql';
 import { PlayerService } from './player.service';
 import { PlaylistService } from './playlist.service';
 
@@ -38,7 +37,7 @@ export class SearchService {
     private readonly searchGQL: SearchGQL,
     private readonly playerService: PlayerService,
     private readonly playlistService: PlaylistService,
-    private readonly dialog: MatDialog,
+    private readonly dialog: MatDialog
   ) {}
 
   public changeHref(search: string) {
@@ -81,7 +80,7 @@ export class SearchService {
   }): Observable<
     | { type: Exclude<SearchType, SearchType.search>; result: boolean }
     | { type: SearchType.search; result: SearchSong[] }
-    > {
+  > {
     console.info('do action: ', { type, data });
 
     if (type === SearchType.parse) {
@@ -97,7 +96,7 @@ export class SearchService {
         map((result) => ({
           type,
           result: result.data.search,
-        })),
+        }))
       );
     }
 
@@ -107,23 +106,26 @@ export class SearchService {
   private parseUrl(url: string): Observable<boolean> {
     return this.parseUrlGQL.fetch({ url }).pipe(
       map((result) => result.data.parseUrl || []),
-      switchMap((songs) => this.dialog
-        .open<PlaylistComponent, any, PlaylistDialogResult>(PlaylistComponent, {
-        minWidth: 300,
-      })
-        .afterClosed()
-        .pipe(
-          map((item) => ({ ...item, songs })),
-        )),
-      switchMap(({
-        id, name, position, songs,
-      }) => this.playlistService.add2playlist({
-        id, name, songs, position,
-      })),
+      switchMap((songs) =>
+        this.dialog
+          .open<PlaylistComponent, any, PlaylistDialogResult>(PlaylistComponent, {
+            minWidth: 300,
+          })
+          .afterClosed()
+          .pipe(map((item) => ({ ...item, songs })))
+      ),
+      switchMap(({ id, name, position, songs }) =>
+        this.playlistService.add2playlist({
+          id,
+          name,
+          songs,
+          position,
+        })
+      ),
       tap(() => {
         this.urlLoadSubject.next('');
       }),
-      switchMap(() => from(this.router.navigate(['']))),
+      switchMap(() => from(this.router.navigate([''])))
     );
   }
 }

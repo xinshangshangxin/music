@@ -86,7 +86,7 @@ export class PlaylistService {
       }),
       // 去重
       map(({ songs, name }) => ({ songs: uniqBy(songs, 'id'), name })),
-      switchMap(({ songs, name }) => this.persistService.persistPlaylist(id, songs, name)),
+      switchMap(({ songs, name }) => this.persistService.persistPlaylist(id, songs, name))
     );
   }
 }

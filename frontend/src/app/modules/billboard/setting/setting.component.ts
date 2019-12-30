@@ -69,12 +69,11 @@ export class SettingComponent implements OnInit, OnDestroy {
   constructor(
     private readonly formBuilder: FormBuilder,
     private readonly configService: ConfigService,
-    private readonly playerService: PlayerService,
-  ) { }
+    private readonly playerService: PlayerService
+  ) {}
 
   public ngOnInit() {
-    this.subscription = this.whenPersistConfig()
-      .subscribe(console.info, console.warn);
+    this.subscription = this.whenPersistConfig().subscribe(console.info, console.warn);
   }
 
   public ngOnDestroy(): void {
@@ -95,48 +94,48 @@ export class SettingComponent implements OnInit, OnDestroy {
 
   public setDefaultConfig() {
     console.info(PersistService.DEFAULT_CONFIG);
-    this.configService.changeConfig(PersistService.DEFAULT_CONFIG)
+    this.configService
+      .changeConfig(PersistService.DEFAULT_CONFIG)
       .pipe(
         map(() => {
           this.subscription.unsubscribe();
         }),
-        switchMap(() => this.whenPersistConfig()),
+        switchMap(() => this.whenPersistConfig())
       )
       .subscribe(console.info, console.warn);
   }
 
   private whenPersistConfig() {
-    return this.configService.getConfig()
-      .pipe(
-        map((config) => {
-          this.config = config;
+    return this.configService.getConfig().pipe(
+      map((config) => {
+        this.config = config;
 
-          this.settingFormGroup = this.formBuilder.group({
-            peakConfig: this.formBuilder.group({
-              duration: [this.config.peakConfig.duration, Validators.required],
-              minVolume: [this.config.peakConfig.minVolume, Validators.required],
-              layIn: [this.config.peakConfig.layIn, Validators.required],
-              layOut: [this.config.peakConfig.layOut, Validators.required],
-              after: [this.config.peakConfig.after, Validators.required],
-              before: [this.config.peakConfig.before, Validators.required],
-            }),
-            errorRetry: this.formBuilder.group({
-              songRetries: [this.config.errorRetry.songRetries, Validators.required],
-              playerRetries: [this.config.errorRetry.playerRetries, Validators.required],
-            }),
-            preloadLen: [this.config.preloadLen, Validators.required],
-          });
+        this.settingFormGroup = this.formBuilder.group({
+          peakConfig: this.formBuilder.group({
+            duration: [this.config.peakConfig.duration, Validators.required],
+            minVolume: [this.config.peakConfig.minVolume, Validators.required],
+            layIn: [this.config.peakConfig.layIn, Validators.required],
+            layOut: [this.config.peakConfig.layOut, Validators.required],
+            after: [this.config.peakConfig.after, Validators.required],
+            before: [this.config.peakConfig.before, Validators.required],
+          }),
+          errorRetry: this.formBuilder.group({
+            songRetries: [this.config.errorRetry.songRetries, Validators.required],
+            playerRetries: [this.config.errorRetry.playerRetries, Validators.required],
+          }),
+          preloadLen: [this.config.preloadLen, Validators.required],
+        });
 
-          return this.settingFormGroup;
-        }),
-        switchMap((formGroup) => formGroup.valueChanges),
-        filter(() => this.settingFormGroup.valid),
-        switchMap((config) => {
-          console.info('new config: ', config);
+        return this.settingFormGroup;
+      }),
+      switchMap((formGroup) => formGroup.valueChanges),
+      filter(() => this.settingFormGroup.valid),
+      switchMap((config) => {
+        console.info('new config: ', config);
 
-          return this.configService.changeConfig(config);
-        }),
-        map(() => this.playerService.loadNextSongs()),
-      );
+        return this.configService.changeConfig(config);
+      }),
+      map(() => this.playerService.loadNextSongs())
+    );
   }
 }

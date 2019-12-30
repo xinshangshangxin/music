@@ -15,7 +15,7 @@ export class ConfigService {
   }
 
   public changeConfig(
-    config?: { [key in keyof Config]?: Partial<Config[key]> },
+    config?: { [key in keyof Config]?: Partial<Config[key]> }
   ): Observable<Config> {
     return this.persistService.persistConfig(config);
   }

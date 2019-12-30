@@ -17,25 +17,28 @@ export class RankComponent implements OnInit {
   constructor(
     private readonly configService: ConfigService,
     private readonly dialog: MatDialog,
-    private readonly playerService: PlayerService,
-  ) { }
+    private readonly playerService: PlayerService
+  ) {}
 
   public ngOnInit() {
-    this.configService.getConfig()
-      .pipe(switchMap((config) => {
-        if (!config.viewed) {
-          return this.openDefaultSongsDialog().pipe(map(() => (config)));
+    this.configService
+      .getConfig()
+      .pipe(
+        switchMap((config) => {
+          if (!config.viewed) {
+            return this.openDefaultSongsDialog().pipe(map(() => config));
+          }
+
+          return of(config);
+        })
+      )
+      .subscribe(
+        () => {},
+        (e) => {
+          console.warn(e);
         }
-
-        return of(config);
-      }))
-      .subscribe(() => {
-
-      }, (e) => {
-        console.warn(e);
-      });
+      );
   }
-
 
   private openDefaultSongsDialog() {
     return this.dialog
@@ -48,12 +51,14 @@ export class RankComponent implements OnInit {
         },
       })
       .afterClosed()
-      .pipe(tap((confirm) => {
-        if (confirm) {
-          this.playerService.loadTempPlaylist(demoSongs, 0, true);
-        }
+      .pipe(
+        tap((confirm) => {
+          if (confirm) {
+            this.playerService.loadTempPlaylist(demoSongs, 0, true);
+          }
 
-        this.configService.changeConfig({ viewed: true });
-      }));
+          this.configService.changeConfig({ viewed: true });
+        })
+      );
   }
 }

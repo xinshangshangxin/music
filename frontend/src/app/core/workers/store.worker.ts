@@ -1,11 +1,7 @@
 // / <reference lib="webworker" />
-import {
-  DBSchema, IDBPDatabase, IDBPObjectStore, openDB,
-} from 'idb';
+import { DBSchema, IDBPDatabase, IDBPObjectStore, openDB } from 'idb';
 
-import {
-  Action, awaitWrap, Defer, defer, RequestMessage,
-} from './helper';
+import { Action, awaitWrap, Defer, defer, RequestMessage } from './helper';
 
 interface MusicDBSchema extends DBSchema {
   'music-structured': {
@@ -95,7 +91,7 @@ addEventListener('message', async ({ data }: { data: RequestMessage & { uuid: st
     dealAction({
       store,
       ...data,
-    }),
+    })
   );
 
   let errorMessage: string | undefined;

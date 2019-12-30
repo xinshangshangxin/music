@@ -1,12 +1,16 @@
 import {
-  AfterViewInit, Component, ElementRef, OnDestroy, OnInit, QueryList, ViewChildren,
+  AfterViewInit,
+  Component,
+  ElementRef,
+  OnDestroy,
+  OnInit,
+  QueryList,
+  ViewChildren,
 } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { untilDestroyed } from 'ngx-take-until-destroy';
 import { merge } from 'rxjs';
-import {
-  debounceTime, filter, map, pairwise, startWith, switchMap, tap,
-} from 'rxjs/operators';
+import { debounceTime, filter, map, pairwise, startWith, switchMap, tap } from 'rxjs/operators';
 
 import { Privilege } from '../../../core/apollo/graphql';
 import { PlayerSong } from '../../../core/audio/interface';
@@ -30,7 +34,7 @@ export class SongListComponent implements OnInit, AfterViewInit, OnDestroy {
   constructor(
     private readonly playerService: PlayerService,
     private readonly persistService: PersistService,
-    private readonly activatedRoute: ActivatedRoute,
+    private readonly activatedRoute: ActivatedRoute
   ) {}
 
   public ngOnInit() {
@@ -47,8 +51,9 @@ export class SongListComponent implements OnInit, AfterViewInit, OnDestroy {
         tap((playlist) => {
           this.playlist = playlist;
         }),
-        untilDestroyed(this),
-      ).subscribe(() => {
+        untilDestroyed(this)
+      )
+      .subscribe(() => {
         console.info('this.playlist: ', this.playlist);
       }, console.warn);
   }
@@ -56,9 +61,12 @@ export class SongListComponent implements OnInit, AfterViewInit, OnDestroy {
   public ngOnDestroy() {}
 
   public ngAfterViewInit() {
-    this.getLocateSource().subscribe(() => {}, (e) => {
-      console.warn('ngAfterViewInit Locate e', e);
-    });
+    this.getLocateSource().subscribe(
+      () => {},
+      (e) => {
+        console.warn('ngAfterViewInit Locate e', e);
+      }
+    );
 
     this.playerService.locate$.next();
   }
@@ -68,7 +76,12 @@ export class SongListComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   public play(song: PlayerSong, index: number) {
-    console.info('basePlaylistId: ', this.playerService.basePlaylistId, 'current: ', this.playlist.id);
+    console.info(
+      'basePlaylistId: ',
+      this.playerService.basePlaylistId,
+      'current: ',
+      this.playlist.id
+    );
 
     // 当前是临时播放列表
     if (this.playlist.id === TEMP_PLAYLIST_ID) {
@@ -88,10 +101,12 @@ export class SongListComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     // 载入当前列表
-    this.playerService.loadPlaylist(this.playlist.id, index, true).subscribe(() => {
-    }, (e) => {
-      console.warn(e);
-    });
+    this.playerService.loadPlaylist(this.playlist.id, index, true).subscribe(
+      () => {},
+      (e) => {
+        console.warn(e);
+      }
+    );
   }
 
   public remove(song: PlayerSong) {
@@ -104,45 +119,45 @@ export class SongListComponent implements OnInit, AfterViewInit, OnDestroy {
 
   private getLocateSource() {
     return merge(
-      this.songQueryList.changes
-        .pipe(
-          startWith(this.songQueryList),
-          map((query: QueryList<ElementRef<HTMLDivElement>>) => query.length),
-          pairwise(),
-          filter(([len1, len2]) => len1 !== len2),
-        ),
-      this.playerService.locate$,
-    )
-      .pipe(
-        filter(() => {
-          if (!this.playlist) {
-            return true;
-          }
+      this.songQueryList.changes.pipe(
+        startWith(this.songQueryList),
+        map((query: QueryList<ElementRef<HTMLDivElement>>) => query.length),
+        pairwise(),
+        filter(([len1, len2]) => len1 !== len2)
+      ),
+      this.playerService.locate$
+    ).pipe(
+      filter(() => {
+        if (!this.playlist) {
+          return true;
+        }
 
-          return this.playlist.id === TEMP_PLAYLIST_ID
-          || this.playerService.basePlaylistId === this.playlist.id;
-        }),
-        debounceTime(200),
-        map(() => {
-          const elementRef = this.songQueryList.find(
-            (item, index) => index === this.playerService.currentIndex,
-          );
+        return (
+          this.playlist.id === TEMP_PLAYLIST_ID ||
+          this.playerService.basePlaylistId === this.playlist.id
+        );
+      }),
+      debounceTime(200),
+      map(() => {
+        const elementRef = this.songQueryList.find(
+          (item, index) => index === this.playerService.currentIndex
+        );
 
-          if (elementRef) {
-            return elementRef.nativeElement;
-          }
+        if (elementRef) {
+          return elementRef.nativeElement;
+        }
 
-          return null;
-        }),
-        filter((ele) => !!ele),
-        tap((ele) => {
-          ele.scrollIntoView({
-            behavior: 'smooth',
-            block: 'start',
-            inline: 'center',
-          });
-        }),
-        untilDestroyed(this),
-      );
+        return null;
+      }),
+      filter((ele) => !!ele),
+      tap((ele) => {
+        ele.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start',
+          inline: 'center',
+        });
+      }),
+      untilDestroyed(this)
+    );
   }
 }

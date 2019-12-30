@@ -20,33 +20,39 @@ export class TopNavComponent implements OnInit, OnDestroy {
   constructor(
     private readonly router: Router,
     private readonly searchService: SearchService,
-    private readonly location: Location,
+    private readonly location: Location
   ) {}
 
   public ngOnInit() {
-    this.searchService.searchSubject.pipe(untilDestroyed(this)).subscribe(async (value) => {
-      console.info({
-        search: value,
-        url: this.router.url,
-      });
-      if (value && !this.router.url.startsWith(this.searchUrl)) {
-        console.info('navigate to search');
-        await this.router.navigate(['search'], { queryParams: { search: value } });
-      } else if (!value && this.router.url.startsWith(this.searchUrl)) {
-        console.info('navigate to home');
-        this.router.navigate(['']);
+    this.searchService.searchSubject.pipe(untilDestroyed(this)).subscribe(
+      async (value) => {
+        console.info({
+          search: value,
+          url: this.router.url,
+        });
+        if (value && !this.router.url.startsWith(this.searchUrl)) {
+          console.info('navigate to search');
+          await this.router.navigate(['search'], { queryParams: { search: value } });
+        } else if (!value && this.router.url.startsWith(this.searchUrl)) {
+          console.info('navigate to home');
+          this.router.navigate(['']);
+        }
+      },
+      (e) => {
+        console.warn('TopNavComponent search check e: ', e);
       }
-    }, (e) => {
-      console.warn('TopNavComponent search check e: ', e);
-    });
+    );
 
-    this.searchService.urlLoadSubject.pipe(untilDestroyed(this)).subscribe(async (value) => {
-      Promise.resolve().then(() => {
-        this.searchValue = value;
-      });
-    }, (e) => {
-      console.warn('TopNavComponent urlLoad check e: ', e);
-    });
+    this.searchService.urlLoadSubject.pipe(untilDestroyed(this)).subscribe(
+      async (value) => {
+        Promise.resolve().then(() => {
+          this.searchValue = value;
+        });
+      },
+      (e) => {
+        console.warn('TopNavComponent urlLoad check e: ', e);
+      }
+    );
   }
 
   public ngOnDestroy(): void {}
