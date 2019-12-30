@@ -14,7 +14,7 @@ import { TopNavComponent } from './modules/billboard/top-nav/top-nav.component';
 import { PlaylistComponent } from './modules/dialog/playlist/playlist.component';
 import { HomeComponent } from './modules/home/home.component';
 import { PlayBarComponent } from './modules/play-bar/play-bar.component';
-import { ShareModule } from './share/share/share.module';
+import { ShareModule } from './share/share.module';
 
 @NgModule({
   entryComponents: [PlaylistComponent],
