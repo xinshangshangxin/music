@@ -8,7 +8,6 @@ module.exports = {
   rules: {
     'no-console': ['off'],
     'class-methods-use-this': ['error', { exceptMethods: ['ngOnInit', 'ngOnDestroy'] }],
-    'no-dupe-class-members': ['off'],
 
     'rxjs/no-compat': ['error'],
     'rxjs/no-ignored-error': ['error'],
