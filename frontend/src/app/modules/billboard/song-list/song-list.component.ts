@@ -114,8 +114,14 @@ export class SongListComponent implements OnInit, AfterViewInit, OnDestroy {
       this.playerService.locate$,
     )
       .pipe(
-        filter(() => this.playlist.id === TEMP_PLAYLIST_ID
-          || this.playerService.basePlaylistId === this.playlist.id),
+        filter(() => {
+          if (!this.playlist) {
+            return true;
+          }
+
+          return this.playlist.id === TEMP_PLAYLIST_ID
+          || this.playerService.basePlaylistId === this.playlist.id;
+        }),
         debounceTime(200),
         map(() => {
           const elementRef = this.songQueryList.find(
