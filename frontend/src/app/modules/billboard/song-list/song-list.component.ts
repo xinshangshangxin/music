@@ -10,7 +10,7 @@ import {
 
 import { Privilege } from '../../../core/apollo/graphql';
 import { PlayerSong } from '../../../core/audio/interface';
-import { playerPersistId } from '../../../core/services/constants';
+import { TEMP_PLAYLIST_ID } from '../../../core/player/constants';
 import { PersistService, Playlist } from '../../../core/services/persist.service';
 import { PlayerService } from '../../../core/services/player.service';
 
@@ -41,7 +41,7 @@ export class SongListComponent implements OnInit, AfterViewInit, OnDestroy {
             return qs.id;
           }
 
-          return playerPersistId;
+          return TEMP_PLAYLIST_ID;
         }),
         switchMap((id) => this.persistService.getPlaylist(id)),
         tap((playlist) => {
@@ -59,6 +59,8 @@ export class SongListComponent implements OnInit, AfterViewInit, OnDestroy {
     this.getLocateSource().subscribe(() => {}, (e) => {
       console.warn('ngAfterViewInit Locate e', e);
     });
+
+    this.playerService.locate$.next();
   }
 
   public get currentSong() {
@@ -66,14 +68,30 @@ export class SongListComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   public play(song: PlayerSong, index: number) {
-    if (this.playerService.currentPlaylistId === this.playlist.id) {
+    console.info('basePlaylistId: ', this.playerService.basePlaylistId, 'current: ', this.playlist.id);
+
+    // 当前是临时播放列表
+    if (this.playlist.id === TEMP_PLAYLIST_ID) {
       this.playerService.playAt(song);
-    } else {
-      this.playerService.loadPlaylist(this.playlist.id, index, true).subscribe(() => {
-      }, (e) => {
-        console.warn(e);
-      });
+      return;
     }
+
+    // 当前播放列表基于playlist
+    if (this.playerService.basePlaylistId === this.playlist.id) {
+      const i = this.playerService.song2index(song);
+      // 并且当前播放列表能找到这首歌
+      if (i >= 0) {
+        this.playerService.playAt(i);
+
+        return;
+      }
+    }
+
+    // 载入当前列表
+    this.playerService.loadPlaylist(this.playlist.id, index, true).subscribe(() => {
+    }, (e) => {
+      console.warn(e);
+    });
   }
 
   public remove(song: PlayerSong) {
@@ -96,10 +114,8 @@ export class SongListComponent implements OnInit, AfterViewInit, OnDestroy {
       this.playerService.locate$,
     )
       .pipe(
-        filter(() => {
-          console.info(this.playerService.currentPlaylistId, this.playlist.id);
-          return this.playerService.currentPlaylistId === this.playlist.id;
-        }),
+        filter(() => this.playlist.id === TEMP_PLAYLIST_ID
+          || this.playerService.basePlaylistId === this.playlist.id),
         debounceTime(200),
         map(() => {
           const elementRef = this.songQueryList.find(

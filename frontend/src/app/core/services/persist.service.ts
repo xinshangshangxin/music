@@ -7,8 +7,8 @@ import {
 
 import { defaultPeakConfig } from '../audio/constant';
 import { PlayerSong } from '../audio/interface';
+import { TEMP_PLAYLIST_ID } from '../player/constants';
 import { Config } from '../player/interface';
-import { playerPersistId } from './constants';
 import { StorageService } from './storage.service';
 
 export interface Playlist {
@@ -21,7 +21,7 @@ export interface Playlist {
   providedIn: 'root',
 })
 export class PersistService {
-  public static DEFAULT_CONFIG: Omit<Config, 'currentIndex' | 'currentPlaylistId'> = {
+  public static DEFAULT_CONFIG: Omit<Config, 'currentIndex' | 'basePlaylistId'> = {
     preloadLen: 2,
     peakConfig: {
       ...defaultPeakConfig,
@@ -122,7 +122,7 @@ export class PersistService {
         this.config = merge({}, {
           ...PersistService.DEFAULT_CONFIG,
           currentIndex: 0,
-          currentPlaylistId: playerPersistId,
+          basePlaylistId: TEMP_PLAYLIST_ID,
         }, storageConfig);
       }),
       switchMap(() => this.persistConfig(this.config)),

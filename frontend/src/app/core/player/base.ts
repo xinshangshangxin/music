@@ -2,6 +2,7 @@ import { Observable, Subject } from 'rxjs';
 
 import { PlayerSong } from '../audio/interface';
 import { RxAudio } from '../audio/rx-audio';
+import { TEMP_PLAYLIST_ID } from './constants';
 import { Config } from './interface';
 
 export class PlayerBase {
@@ -43,6 +44,9 @@ export class PlayerBase {
 
   // 当前音量
   public volume: number;
+
+  // 当前播放列表的 基础列表 (即初始化时是哪个列表载入的)
+  public basePlaylistId: string = TEMP_PLAYLIST_ID;
 
   // 错误状态
   protected errorStatus = {

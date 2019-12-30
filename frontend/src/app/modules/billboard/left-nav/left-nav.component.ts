@@ -2,9 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { map } from 'rxjs/operators';
 
-import { playerPersistId } from '../../../core/services/constants';
+import { TEMP_PLAYLIST_ID } from '../../../core/player/constants';
 import { PersistService, Playlist } from '../../../core/services/persist.service';
-import { PlayerService } from '../../../core/services/player.service';
 
 @Component({
   selector: 'app-left-nav',
@@ -16,13 +15,12 @@ export class LeftNavComponent implements OnInit {
 
   constructor(
     public readonly persistService: PersistService,
-    private readonly playerService: PlayerService,
     private readonly router: Router,
   ) {}
 
   public ngOnInit() {
     this.persistService.getPlaylistList()
-      .pipe(map((list) => list.filter(({ id }) => id !== playerPersistId))).subscribe(
+      .pipe(map((list) => list.filter(({ id }) => id !== TEMP_PLAYLIST_ID))).subscribe(
         (list) => {
           this.list = list;
         },

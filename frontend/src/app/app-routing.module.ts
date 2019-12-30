@@ -2,7 +2,6 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 
 import { BillboardComponent } from './modules/billboard/billboard.component';
-import { RankComponent } from './modules/billboard/rank/rank.component';
 import { SearchComponent } from './modules/billboard/search/search.component';
 import { SettingComponent } from './modules/billboard/setting/setting.component';
 import { SongListComponent } from './modules/billboard/song-list/song-list.component';
@@ -18,9 +17,14 @@ const routes: Routes = [
         component: BillboardComponent,
 
         children: [
+          // {
+          //   path: '',
+          //   component: RankComponent,
+          // },
           {
             path: '',
-            component: RankComponent,
+            redirectTo: 'list',
+            pathMatch: 'full',
           },
           {
             path: 'list',

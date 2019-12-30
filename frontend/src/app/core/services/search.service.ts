@@ -5,15 +5,14 @@ import { Router } from '@angular/router';
 import {
   BehaviorSubject, from, Observable, of, Subject,
 } from 'rxjs';
-import {
-  delay, map, switchMap, tap,
-} from 'rxjs/operators';
+import { map, switchMap, tap } from 'rxjs/operators';
 
 import { PlaylistComponent, PlaylistDialogResult } from '../../modules/dialog/playlist/playlist.component';
 import {
   ParseUrlGQL, Provider, SearchGQL, SearchSong,
 } from '../apollo/graphql';
 import { PlayerService } from './player.service';
+import { PlaylistService } from './playlist.service';
 
 export enum SearchType {
   redirect = 'redirect',
@@ -38,6 +37,7 @@ export class SearchService {
     private readonly parseUrlGQL: ParseUrlGQL,
     private readonly searchGQL: SearchGQL,
     private readonly playerService: PlayerService,
+    private readonly playlistService: PlaylistService,
     private readonly dialog: MatDialog,
   ) {}
 
@@ -117,7 +117,7 @@ export class SearchService {
         )),
       switchMap(({
         id, name, position, songs,
-      }) => this.playerService.add2playlist({
+      }) => this.playlistService.add2playlist({
         id, name, songs, position,
       })),
       tap(() => {

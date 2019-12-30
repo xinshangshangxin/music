@@ -8,11 +8,12 @@ export interface ErrorRetry {
 export interface Config {
   errorRetry: ErrorRetry;
   currentIndex: number;
-  currentPlaylistId: string;
   preloadLen: number;
   peakConfig: PeakConfig;
   volume: number;
   viewed?: boolean;
+
+  basePlaylistId: string;
 }
 
 export enum Status {

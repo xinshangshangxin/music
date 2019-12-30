@@ -158,7 +158,7 @@ export class PlayerAction extends PlayerStatus {
     return index;
   }
 
-  private song2index(playSong: PlayerSong) {
+  public song2index(playSong: PlayerSong) {
     return this.songList.findIndex(
       (song) => song.id === playSong.id && song.provider === playSong.provider,
     );
