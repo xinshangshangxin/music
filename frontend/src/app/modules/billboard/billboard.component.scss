@@ -12,9 +12,10 @@
         height: 70px;
     }
 
-    mat-drawer-container {
-        flex: 1 1 auto;
-
-        background-color: inherit;
+    mat-sidenav-container {
+        height: 100%;
+    }
+    mat-sidenav-content {
+        background-color: white;
     }
 }

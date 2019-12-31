@@ -3,13 +3,13 @@
     <app-top-nav></app-top-nav>
   </div>
 
-  <mat-drawer-container>
-    <mat-drawer #drawer mode="side" opened>
+  <mat-sidenav-container>
+    <mat-sidenav #sidenav [mode]="drawer.mode" [(opened)]="drawer.opened">
       <app-left-nav></app-left-nav>
-    </mat-drawer>
+    </mat-sidenav>
 
-    <mat-drawer-content>
+    <mat-sidenav-content>
       <router-outlet></router-outlet>
-    </mat-drawer-content>
-  </mat-drawer-container>
+    </mat-sidenav-content>
+  </mat-sidenav-container>
 </div>

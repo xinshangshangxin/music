@@ -49,7 +49,7 @@ export class SongListComponent implements OnInit, AfterViewInit, OnDestroy {
         }),
         switchMap((id) => this.persistService.getPlaylist(id)),
         tap((playlist) => {
-          this.playlist = playlist;
+          this.playlist = playlist || { id: TEMP_PLAYLIST_ID, songs: [] };
         }),
         untilDestroyed(this)
       )

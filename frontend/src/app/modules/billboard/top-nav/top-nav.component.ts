@@ -1,9 +1,9 @@
-import { Location } from '@angular/common';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { untilDestroyed } from 'ngx-take-until-destroy';
 
 import { SearchService } from '../../../core/services/search.service';
+import { SidenavService } from '../../../core/services/sidenav.service';
 
 @Component({
   selector: 'app-top-nav',
@@ -20,7 +20,7 @@ export class TopNavComponent implements OnInit, OnDestroy {
   constructor(
     private readonly router: Router,
     private readonly searchService: SearchService,
-    private readonly location: Location
+    public readonly sidenavService: SidenavService
   ) {}
 
   public ngOnInit() {
