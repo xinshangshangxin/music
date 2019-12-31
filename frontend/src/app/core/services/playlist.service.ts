@@ -27,7 +27,7 @@ export class PlaylistService {
     console.info(inputSongs.length, JSON.stringify(inputSongs[0]));
 
     if (position === 'drop') {
-      return this.persistService.persistPlaylist(id, true);
+      return this.persistService.persistPlaylist(id, true, '');
     }
 
     return this.persistService.getPlaylist(id).pipe(

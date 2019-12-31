@@ -7,7 +7,7 @@ import {
   QueryList,
   ViewChildren,
 } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { untilDestroyed } from 'ngx-take-until-destroy';
 import { merge } from 'rxjs';
 import { debounceTime, filter, map, pairwise, startWith, switchMap, tap } from 'rxjs/operators';
@@ -34,28 +34,14 @@ export class SongListComponent implements OnInit, AfterViewInit, OnDestroy {
   constructor(
     private readonly playerService: PlayerService,
     private readonly persistService: PersistService,
-    private readonly activatedRoute: ActivatedRoute
+    private readonly activatedRoute: ActivatedRoute,
+    private readonly router: Router
   ) {}
 
   public ngOnInit() {
-    this.activatedRoute.queryParams
-      .pipe(
-        map((qs) => {
-          if (qs.id) {
-            return qs.id;
-          }
-
-          return TEMP_PLAYLIST_ID;
-        }),
-        switchMap((id) => this.persistService.getPlaylist(id)),
-        tap((playlist) => {
-          this.playlist = playlist || { id: TEMP_PLAYLIST_ID, songs: [] };
-        }),
-        untilDestroyed(this)
-      )
-      .subscribe(() => {
-        console.info('this.playlist: ', this.playlist);
-      }, console.warn);
+    this.queryParams().subscribe(() => {
+      console.info('this.playlist: ', this.playlist);
+    }, console.warn);
   }
 
   public ngOnDestroy() {}
@@ -115,6 +101,23 @@ export class SongListComponent implements OnInit, AfterViewInit, OnDestroy {
 
   public formatArtists(artists: { name: string }[]) {
     return this.playerService.formatArtists(artists);
+  }
+
+  private queryParams() {
+    return this.activatedRoute.queryParams.pipe(
+      map((qs) => {
+        if (qs.id) {
+          return qs.id;
+        }
+
+        return TEMP_PLAYLIST_ID;
+      }),
+      switchMap((id) => this.persistService.getPlaylist(id)),
+      tap((playlist) => {
+        this.playlist = playlist;
+      }),
+      untilDestroyed(this)
+    );
   }
 
   private getLocateSource() {

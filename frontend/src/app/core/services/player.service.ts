@@ -119,7 +119,9 @@ export class PlayerService extends Player {
 
   private whenPersistTask$() {
     return this.persistTask$.pipe(
-      switchMap(() => this.persistService.persistPlaylist(TEMP_PLAYLIST_ID, this.songList))
+      switchMap(() =>
+        this.persistService.persistPlaylist(TEMP_PLAYLIST_ID, this.songList, TEMP_PLAYLIST_ID)
+      )
     );
   }
 

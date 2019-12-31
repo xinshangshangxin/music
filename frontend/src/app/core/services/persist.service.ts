@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { merge } from 'lodash';
-import { from, Observable } from 'rxjs';
+import { from, Observable, of, Subject } from 'rxjs';
 import { map, mapTo, shareReplay, switchMap, tap } from 'rxjs/operators';
 
 import { defaultPeakConfig } from '../audio/constant';
@@ -30,6 +30,8 @@ export class PersistService {
     },
     volume: 1,
   };
+
+  public playlistChange$ = new Subject<void>();
 
   private readonly configKey = 'config';
 
@@ -68,17 +70,38 @@ export class PersistService {
   public persistPlaylist(
     playlistId: string,
     songs: PlayerSong[] | true,
-    name?: string
+    name: string
   ): Observable<void> {
-    // delete playlistId
-    if (songs === true) {
-      return from(this.storageService.delete(playlistId)).pipe(
-        switchMap(() => this.persistPlaylists({ id: playlistId, name, songs: [] }, true))
-      );
-    }
+    return of(undefined).pipe(
+      switchMap(() => {
+        // delete playlistId
+        if (songs === true) {
+          return from(this.storageService.delete(playlistId)).pipe(
+            switchMap(() => this.persistPlaylists({ id: playlistId, name, songs: [] }, true))
+          );
+        }
 
-    return from(this.storageService.put(playlistId, songs)).pipe(
-      switchMap(() => this.persistPlaylists({ id: playlistId, name, songs }))
+        return from(this.storageService.put(playlistId, songs)).pipe(
+          switchMap(() => this.persistPlaylists({ id: playlistId, name, songs }))
+        );
+      }),
+      map(() => {
+        const index = this.playlists.findIndex((item) => {
+          return item.id === playlistId;
+        });
+
+        if (songs === true) {
+          if (index >= 0) {
+            this.playlists.splice(index, 1);
+          }
+        } else if (index >= 0) {
+          this.playlists.splice(index, 1, { id: playlistId, name, songs });
+        } else {
+          this.playlists.splice(-1, 0, { id: playlistId, name, songs });
+        }
+
+        this.playlistChange$.next();
+      })
     );
   }
 
@@ -93,7 +116,6 @@ export class PersistService {
     } else if (!remove && index >= 0) {
       // eslint-disable-next-line no-param-reassign
       playlist.name = playlist.name || this.playlists[index].name;
-      this.playlists.splice(index, 1, playlist);
     }
 
     return from(
@@ -133,13 +155,18 @@ export class PersistService {
 
   private async initPlaylists(): Promise<void> {
     console.info('initPlaylists', this.playlistsKey);
-    const playlists = await this.storageService.get<{ id: string; name: string }[]>(
+    let playlists = await this.storageService.get<{ id: string; name: string }[]>(
       this.playlistsKey,
       []
     );
 
-    if (!playlists) {
-      return;
+    if (!playlists || !playlists.length) {
+      playlists = [
+        {
+          id: TEMP_PLAYLIST_ID,
+          name: TEMP_PLAYLIST_ID,
+        },
+      ];
     }
 
     this.playlists = await Promise.all(

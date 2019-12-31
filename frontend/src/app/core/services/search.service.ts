@@ -3,14 +3,13 @@ import { Injectable } from '@angular/core';
 import { MatDialog } from '@angular/material';
 import { Router } from '@angular/router';
 import { BehaviorSubject, from, Observable, of, Subject } from 'rxjs';
-import { map, switchMap, tap } from 'rxjs/operators';
+import { map, switchMap } from 'rxjs/operators';
 
 import {
   PlaylistComponent,
   PlaylistDialogResult,
 } from '../../modules/dialog/playlist/playlist.component';
 import { ParseUrlGQL, Provider, SearchGQL, SearchSong } from '../apollo/graphql';
-import { PlayerService } from './player.service';
 import { PlaylistService } from './playlist.service';
 
 export enum SearchType {
@@ -35,7 +34,6 @@ export class SearchService {
     private readonly location: Location,
     private readonly parseUrlGQL: ParseUrlGQL,
     private readonly searchGQL: SearchGQL,
-    private readonly playerService: PlayerService,
     private readonly playlistService: PlaylistService,
     private readonly dialog: MatDialog
   ) {}
@@ -114,18 +112,25 @@ export class SearchService {
           .afterClosed()
           .pipe(map((item) => ({ ...item, songs })))
       ),
-      switchMap(({ id, name, position, songs }) =>
-        this.playlistService.add2playlist({
-          id,
-          name,
-          songs,
-          position,
-        })
-      ),
-      tap(() => {
-        this.urlLoadSubject.next('');
+      switchMap(({ id, name, position, songs }) => {
+        return this.playlistService
+          .add2playlist({
+            id,
+            name,
+            songs,
+            position,
+          })
+          .pipe(
+            map(() => {
+              return id;
+            })
+          );
       }),
-      switchMap(() => from(this.router.navigate([''])))
+      switchMap((id) => {
+        this.urlLoadSubject.next('');
+
+        return from(this.router.navigate([''], { queryParams: { id } }));
+      })
     );
   }
 }

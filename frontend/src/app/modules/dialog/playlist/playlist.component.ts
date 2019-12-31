@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { MatDialogRef, MatSnackBar } from '@angular/material';
 import { Observable } from 'rxjs';
+import { startWith, switchMap } from 'rxjs/operators';
 import uuidV4 from 'uuid/v4';
 
 import { PlaylistPosition } from '../../../core/player/interface';
@@ -17,10 +18,7 @@ export type PlaylistDialogResult = Pick<Playlist, 'id' | 'name'> & { position: P
 export class PlaylistComponent implements OnInit {
   public list$: Observable<Playlist[]>;
 
-  public playlist: {
-    id: string;
-    name: string;
-  };
+  public playlist: Playlist = undefined;
 
   public positions = [
     {
@@ -46,7 +44,12 @@ export class PlaylistComponent implements OnInit {
   ) {}
 
   public ngOnInit() {
-    this.list$ = this.persistService.getPlaylistList();
+    this.list$ = this.persistService.playlistChange$.pipe(
+      startWith(undefined),
+      switchMap(() => {
+        return this.persistService.getPlaylistList();
+      })
+    );
   }
 
   public close(confirm: boolean): void {

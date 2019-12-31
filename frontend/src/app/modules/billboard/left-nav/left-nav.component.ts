@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { map } from 'rxjs/operators';
+import { map, startWith, switchMap } from 'rxjs/operators';
 
 import { TEMP_PLAYLIST_ID } from '../../../core/player/constants';
 import { PersistService, Playlist } from '../../../core/services/persist.service';
@@ -16,9 +16,14 @@ export class LeftNavComponent implements OnInit {
   constructor(public readonly persistService: PersistService, private readonly router: Router) {}
 
   public ngOnInit() {
-    this.persistService
-      .getPlaylistList()
-      .pipe(map((list) => list.filter(({ id }) => id !== TEMP_PLAYLIST_ID)))
+    this.persistService.playlistChange$
+      .pipe(
+        startWith(undefined),
+        switchMap(() => {
+          return this.persistService.getPlaylistList();
+        }),
+        map((list) => list.filter(({ id }) => id !== TEMP_PLAYLIST_ID))
+      )
       .subscribe(
         (list) => {
           this.list = list;
