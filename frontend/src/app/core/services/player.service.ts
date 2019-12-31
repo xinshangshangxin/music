@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { merge, Observable, Subject } from 'rxjs';
-import { map, switchMap, tap } from 'rxjs/operators';
+import { filter, map, switchMap, tap } from 'rxjs/operators';
 
 import { Privilege } from '../apollo/graphql';
 import { PlayerSong } from '../audio/interface';
@@ -79,6 +79,17 @@ export class PlayerService extends Player {
               }
 
               this.loadSongList(playlist.songs, this.config.currentIndex, false, false);
+            })
+          ),
+          this.persistService.playlistChange$.pipe(
+            filter((playlistId) => {
+              return playlistId === TEMP_PLAYLIST_ID;
+            }),
+            switchMap((playlistId) => {
+              return this.persistService.getPlaylist(playlistId);
+            }),
+            map((playlist) => {
+              return this.updateSongs(playlist.songs);
             })
           )
         )

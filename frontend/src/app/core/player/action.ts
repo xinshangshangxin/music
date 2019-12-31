@@ -89,21 +89,27 @@ export class PlayerAction extends PlayerStatus {
     this.persistTask$.next();
   }
 
+  protected updateSongs(songs: Omit<PlayerSong, 'url'>[]) {
+    const wrapList = songs.map((song) => ({
+      ...song,
+      url: getSongUrl(song),
+    }));
+
+    // 更新列表
+    this.songList.length = 0;
+    this.songList.push(...wrapList);
+  }
+
   protected loadSongList(
     list: Omit<PlayerSong, 'url'>[],
     currentIndex = 0,
     isPlay = false,
     isLoadNext = true
   ) {
-    const wrapList = list.map((song) => ({
-      ...song,
-      url: getSongUrl(song),
-    }));
     // 更正游标
     this.currentIndex = currentIndex;
     // 更新列表
-    this.songList.length = 0;
-    this.songList.push(...wrapList);
+    this.updateSongs(list);
 
     // 保存到storage
     this.persistTask$.next();

@@ -31,7 +31,7 @@ export class PersistService {
     volume: 1,
   };
 
-  public playlistChange$ = new Subject<void>();
+  public playlistChange$ = new Subject<string>();
 
   private readonly configKey = 'config';
 
@@ -100,7 +100,7 @@ export class PersistService {
           this.playlists.splice(-1, 0, { id: playlistId, name, songs });
         }
 
-        this.playlistChange$.next();
+        this.playlistChange$.next(playlistId);
       })
     );
   }
