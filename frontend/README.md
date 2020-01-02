@@ -3,8 +3,9 @@
 - [x] 侧边栏隐藏显示
 - [x] 侧边栏 添加歌单后 不显示
 - [x] 删除歌曲后 index 不正确
-- [ ] 添加歌曲, 但是歌曲已存在时 index 不正确
-- [ ] privilege 临时列表未更新, base 列表也没有更新
+- [x] 添加歌曲, 但是歌曲已存在时 index 不正确
+- [ ] 解析 URL 后, 更新播放列表后 index 和 songs 都不对
+- [x] privilege 临时列表未更新, base 列表也没有更新
 - [ ]  精简 `../../../core/`
 - [x] `eslint` 和 `prettier` 规则
 - [ ] 静音按钮

@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { merge, Observable, Subject } from 'rxjs';
+import { merge, Observable, of, Subject } from 'rxjs';
 import { filter, map, switchMap, tap } from 'rxjs/operators';
 
 import { Privilege } from '../apollo/graphql';
@@ -9,6 +9,7 @@ import { TEMP_PLAYLIST_ID } from '../player/constants';
 import { Config } from '../player/interface';
 import { ConfigService } from './config.service';
 import { PersistService } from './persist.service';
+import { PlaylistService } from './playlist.service';
 import { PreloadService } from './preload.service';
 
 @Injectable({
@@ -20,6 +21,7 @@ export class PlayerService extends Player {
   constructor(
     private readonly configService: ConfigService,
     private readonly preloadService: PreloadService,
+    private readonly playlistService: PlaylistService,
     private readonly persistService: PersistService
   ) {
     super();
@@ -101,15 +103,34 @@ export class PlayerService extends Player {
 
   private whenSongError$() {
     return this.error$.pipe(
-      tap(({ index, data }) => {
-        if (data && data.message === 'GraphQL error: NO_SONG_FOUND') {
-          this.updateSongInfo({
+      switchMap(({ index, data }) => {
+        if (!data) {
+          return of(undefined);
+        }
+
+        if (
+          data.message === 'GraphQL error: NO_SONG_FOUND' ||
+          data.message === 'response.status: 400'
+        ) {
+          const song = {
             ...this.getSong(index),
             privilege: Privilege.Deny,
-          });
+          };
 
-          this.persistTask$.next();
+          return of(undefined).pipe(
+            switchMap(() => {
+              if (this.basePlaylistId !== TEMP_PLAYLIST_ID) {
+                return this.playlistService.updateSong(this.basePlaylistId, song);
+              }
+              return of(undefined);
+            }),
+            switchMap(() => {
+              return this.playlistService.updateSong(TEMP_PLAYLIST_ID, song);
+            })
+          );
         }
+
+        return of(undefined);
       })
     );
   }

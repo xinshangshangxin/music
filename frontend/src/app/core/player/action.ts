@@ -54,6 +54,7 @@ export class PlayerAction extends PlayerStatus {
    * @param position next 插入到下一首, end 插入到末尾
    */
   public add(song: Omit<PlayerSong, 'url'>, position: Position = 'end') {
+    const oldSong = this.currentSong;
     // 先删除重复歌曲
     const removeIndex = this.songList.findIndex(
       ({ provider, id }) => provider === song.provider && id === song.id
@@ -71,7 +72,7 @@ export class PlayerAction extends PlayerStatus {
     });
 
     // 更正游标
-    this.currentIndex = this.song2index(this.currentSong);
+    this.currentIndex = this.song2index(oldSong);
 
     this.persistTask$.next();
   }

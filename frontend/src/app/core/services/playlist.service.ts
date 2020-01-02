@@ -114,6 +114,41 @@ export class PlaylistService {
     );
   }
 
+  public updateSong(
+    playlistId: string,
+    song: { [key in keyof PlayerSong]?: Partial<PlayerSong[key]> } &
+      Pick<PlayerSong, 'id' | 'provider'>
+  ) {
+    return this.persistService.getPlaylist(playlistId).pipe(
+      filter((playlist) => {
+        return !!playlist;
+      }),
+      map((playlist) => {
+        const index = playlist.songs.findIndex(
+          ({ id, provider }) => id === song.id && provider === song.provider
+        );
+
+        return { playlist, index };
+      }),
+      filter(({ index }) => {
+        return index >= 0;
+      }),
+      map(({ index, playlist }) => {
+        const oldSong = playlist.songs[index];
+        const newSong = {
+          ...oldSong,
+          ...song,
+        } as PlayerSong;
+        playlist.songs.splice(index, 1, newSong);
+
+        return playlist;
+      }),
+      switchMap((playlist) => {
+        return this.persistService.persistPlaylist(playlist.id, playlist.songs, playlist.name);
+      })
+    );
+  }
+
   public static song2index(songs: PlayerSong[], playSong: PlayerSong) {
     if (playSong === null) {
       return -1;
