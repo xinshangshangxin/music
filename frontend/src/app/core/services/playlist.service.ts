@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { uniqBy } from 'lodash';
-import { map, switchMap } from 'rxjs/operators';
+import { Observable } from 'rxjs';
+import { filter, map, switchMap } from 'rxjs/operators';
 
 import { getSongUrl } from '../audio/helper';
 import { PlayerSong } from '../audio/interface';
@@ -87,6 +88,39 @@ export class PlaylistService {
       // 去重
       map(({ songs, name }) => ({ songs: uniqBy(songs, 'id'), name })),
       switchMap(({ songs, name }) => this.persistService.persistPlaylist(id, songs, name))
+    );
+  }
+
+  public removeSong(playlistId: string, song: PlayerSong): Observable<void> {
+    return this.persistService.getPlaylist(playlistId).pipe(
+      filter((playlist) => {
+        return !!playlist;
+      }),
+      map((playlist) => {
+        const index = PlaylistService.song2index(playlist.songs, song);
+        return {
+          playlist,
+          index,
+        };
+      }),
+      filter(({ index }) => {
+        return index >= 0;
+      }),
+      switchMap(({ playlist, index }) => {
+        playlist.songs.splice(index, 1);
+
+        return this.persistService.persistPlaylist(playlist.id, playlist.songs, playlist.name);
+      })
+    );
+  }
+
+  public static song2index(songs: PlayerSong[], playSong: PlayerSong) {
+    if (playSong === null) {
+      return -1;
+    }
+
+    return songs.findIndex(
+      (song) => song.id === playSong.id && song.provider === playSong.provider
     );
   }
 }

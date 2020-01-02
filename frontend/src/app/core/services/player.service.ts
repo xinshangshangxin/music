@@ -65,6 +65,8 @@ export class PlayerService extends Player {
     return this.getConfig().pipe(
       tap((config) => {
         this.setVolume(config.volume);
+
+        this.basePlaylistId = config.basePlaylistId;
       }),
       switchMap(() =>
         merge(
@@ -81,7 +83,7 @@ export class PlayerService extends Player {
               this.loadSongList(playlist.songs, this.config.currentIndex, false, false);
             })
           ),
-          this.persistService.playlistChange$.pipe(
+          this.persistService.persist$.pipe(
             filter((playlistId) => {
               return playlistId === TEMP_PLAYLIST_ID;
             }),

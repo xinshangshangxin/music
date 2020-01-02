@@ -31,7 +31,7 @@ export class PersistService {
     volume: 1,
   };
 
-  public playlistChange$ = new Subject<string>();
+  public persist$ = new Subject<string>();
 
   private readonly configKey = 'config';
 
@@ -73,18 +73,6 @@ export class PersistService {
     name: string
   ): Observable<void> {
     return of(undefined).pipe(
-      switchMap(() => {
-        // delete playlistId
-        if (songs === true) {
-          return from(this.storageService.delete(playlistId)).pipe(
-            switchMap(() => this.persistPlaylists({ id: playlistId, name, songs: [] }, true))
-          );
-        }
-
-        return from(this.storageService.put(playlistId, songs)).pipe(
-          switchMap(() => this.persistPlaylists({ id: playlistId, name, songs }))
-        );
-      }),
       map(() => {
         const index = this.playlists.findIndex((item) => {
           return item.id === playlistId;
@@ -99,8 +87,18 @@ export class PersistService {
         } else {
           this.playlists.splice(-1, 0, { id: playlistId, name, songs });
         }
+      }),
+      switchMap(() => {
+        // delete playlistId
+        if (songs === true) {
+          return from(this.storageService.delete(playlistId)).pipe(
+            switchMap(() => this.persistPlaylists({ id: playlistId, name, songs: [] }, true))
+          );
+        }
 
-        this.playlistChange$.next(playlistId);
+        return from(this.storageService.put(playlistId, songs)).pipe(
+          switchMap(() => this.persistPlaylists({ id: playlistId, name, songs }))
+        );
       })
     );
   }
@@ -117,6 +115,8 @@ export class PersistService {
       // eslint-disable-next-line no-param-reassign
       playlist.name = playlist.name || this.playlists[index].name;
     }
+
+    this.persist$.next(playlistId);
 
     return from(
       this.storageService.put(

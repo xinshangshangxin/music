@@ -16,7 +16,7 @@ export class LeftNavComponent implements OnInit {
   constructor(public readonly persistService: PersistService, private readonly router: Router) {}
 
   public ngOnInit() {
-    this.persistService.playlistChange$
+    this.persistService.persist$
       .pipe(
         startWith(undefined),
         switchMap(() => {

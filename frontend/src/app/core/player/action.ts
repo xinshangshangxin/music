@@ -69,6 +69,10 @@ export class PlayerAction extends PlayerStatus {
       ...song,
       url: getSongUrl(song),
     });
+
+    // 更正游标
+    this.currentIndex = this.song2index(this.currentSong);
+
     this.persistTask$.next();
   }
 
@@ -77,6 +81,8 @@ export class PlayerAction extends PlayerStatus {
   public remove(song: PlayerSong): void;
 
   public remove(item: number | PlayerSong) {
+    const oldSong = this.currentSong;
+
     let deleteIndex: number;
     if (typeof item !== 'number') {
       deleteIndex = this.song2index(item);
@@ -85,6 +91,17 @@ export class PlayerAction extends PlayerStatus {
     }
 
     this.songList.splice(this.getValidIndex(deleteIndex), 1);
+
+    // 正在播放的歌曲被删除, 播放下一首
+    if (this.currentIndex === deleteIndex) {
+      this.error$.next({ index: this.currentIndex, data: 'delete playing song' });
+
+      if (this.status === Status.paused) {
+        this.pause();
+      }
+    } else {
+      this.currentIndex = this.song2index(oldSong);
+    }
 
     this.persistTask$.next();
   }
@@ -165,9 +182,17 @@ export class PlayerAction extends PlayerStatus {
   }
 
   public song2index(playSong: PlayerSong) {
+    if (playSong === null) {
+      return -1;
+    }
+
     return this.songList.findIndex(
       (song) => song.id === playSong.id && song.provider === playSong.provider
     );
+  }
+
+  public get currentSong() {
+    return this.getSong(this.currentIndex);
   }
 
   protected getValidIndex(nu: number): number {
@@ -201,5 +226,16 @@ export class PlayerAction extends PlayerStatus {
     if (this.rxAudio) {
       this.rxAudio.volume = value;
     }
+  }
+
+  protected getSong(index: number): PlayerSong | null {
+    // eslint-disable-next-line no-param-reassign
+    index = this.getValidIndex(index);
+
+    if (index < 0) {
+      return null;
+    }
+
+    return this.songList[index];
   }
 }

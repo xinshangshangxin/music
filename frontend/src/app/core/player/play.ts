@@ -29,7 +29,7 @@ export class PlayerPlay extends PlayerAction {
           this.setIndex(nu);
 
           // 状态变更
-          this.status = Status.playing;
+          this.status = Status.loading;
         }),
         mapTo('click')
       ),
@@ -103,10 +103,6 @@ export class PlayerPlay extends PlayerAction {
       }),
       share()
     );
-  }
-
-  public get currentSong() {
-    return this.getSong(this.currentIndex);
   }
 
   public play() {
@@ -192,17 +188,6 @@ export class PlayerPlay extends PlayerAction {
       }),
       takeUntil(this.songChange$)
     );
-  }
-
-  protected getSong(index: number): PlayerSong | null {
-    // eslint-disable-next-line no-param-reassign
-    index = this.getValidIndex(index);
-
-    if (index < 0) {
-      return null;
-    }
-
-    return this.songList[index];
   }
 
   private songStatus$({ song, rxAudio }: { song: PeakSong; rxAudio: RxAudio }) {

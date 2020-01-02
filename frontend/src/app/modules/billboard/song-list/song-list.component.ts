@@ -17,6 +17,7 @@ import { PlayerSong } from '../../../core/audio/interface';
 import { TEMP_PLAYLIST_ID } from '../../../core/player/constants';
 import { PersistService, Playlist } from '../../../core/services/persist.service';
 import { PlayerService } from '../../../core/services/player.service';
+import { PlaylistService } from '../../../core/services/playlist.service';
 
 @Component({
   selector: 'app-song-list',
@@ -33,6 +34,7 @@ export class SongListComponent implements OnInit, AfterViewInit, OnDestroy {
 
   constructor(
     private readonly playerService: PlayerService,
+    private readonly playlistService: PlaylistService,
     private readonly persistService: PersistService,
     private readonly activatedRoute: ActivatedRoute,
     private readonly router: Router
@@ -96,7 +98,19 @@ export class SongListComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   public remove(song: PlayerSong) {
-    this.playerService.remove(song);
+    // 当前是临时播放列表
+    if (this.playlist.id === TEMP_PLAYLIST_ID) {
+      this.playerService.remove(song);
+    } else {
+      this.playlistService
+        .removeSong(this.playlist.id, song)
+        .pipe(
+          map(() => {
+            this.playerService.remove(song);
+          })
+        )
+        .subscribe(() => {}, console.warn);
+    }
   }
 
   public formatArtists(artists: { name: string }[]) {

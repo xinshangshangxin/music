@@ -44,7 +44,7 @@ export class PlaylistComponent implements OnInit {
   ) {}
 
   public ngOnInit() {
-    this.list$ = this.persistService.playlistChange$.pipe(
+    this.list$ = this.persistService.persist$.pipe(
       startWith(undefined),
       switchMap(() => {
         return this.persistService.getPlaylistList();
