@@ -121,6 +121,9 @@ MIT
 @angular/router
 MIT
 
+@ng-select/ng-select
+MIT
+
 @wry/context
 MIT
 MIT License
