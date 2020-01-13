@@ -1,3 +1,4 @@
+import { HashLocationStrategy, LocationStrategy } from '@angular/common';
 import { NgModule } from '@angular/core';
 
 import { AppRoutingModule } from './app-routing.module';
@@ -33,7 +34,7 @@ import { ShareModule } from './share/share.module';
     RankComponent,
   ],
   imports: [CoreModule, ShareModule, AppRoutingModule, GraphQLModule],
-  providers: [],
+  providers: [{ provide: LocationStrategy, useClass: HashLocationStrategy }],
   bootstrap: [AppComponent],
 })
 export class AppModule {}
