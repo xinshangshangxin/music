@@ -13,7 +13,7 @@ export class AudioListeners {
 
   protected layInFailed$ = new Subject<any>();
 
-  protected peakStartTime: number;
+  protected peakStartTime = 0;
 
   constructor(peakConfig: PeakConfig) {
     this.audio.crossOrigin = 'anonymous';
@@ -69,7 +69,7 @@ export class AudioListeners {
 
   protected destroy() {
     this.release$.next(Date.now());
-    this.audio = null;
+    delete this.audio;
   }
 
   private play$() {

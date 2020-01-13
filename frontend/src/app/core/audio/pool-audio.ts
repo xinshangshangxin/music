@@ -127,7 +127,7 @@ export class PoolAudio {
 
     let rxAudio: RxAudio;
     if (this.restList.length) {
-      rxAudio = this.restList.pop();
+      rxAudio = this.restList.pop() as RxAudio;
     } else {
       rxAudio = new RxAudio(peakConfig);
     }

@@ -2,6 +2,7 @@ import { EMPTY, merge, Observable, of, throwError } from 'rxjs';
 import {
   catchError,
   delay,
+  filter,
   map,
   mapTo,
   share,
@@ -18,6 +19,9 @@ import { PlayerAction } from './action';
 import { Status } from './interface';
 
 export class PlayerPlay extends PlayerAction {
+  // 切换其它歌曲
+  public songChange$: Observable<PlayerSong>;
+
   constructor() {
     super();
 
@@ -95,6 +99,9 @@ export class PlayerPlay extends PlayerAction {
         }
       }),
       map(() => this.getSong(this.currentIndex)),
+      filter((song): song is PlayerSong => {
+        return !!song;
+      }),
       catchError((err, caught) => {
         console.warn('songChange$ error', err);
         this.status = Status.paused;

@@ -16,9 +16,9 @@ export type PlaylistDialogResult = Pick<Playlist, 'id' | 'name'> & { position: P
   styleUrls: ['./playlist.component.scss'],
 })
 export class PlaylistComponent implements OnInit {
-  public list$: Observable<Playlist[]>;
+  public list$!: Observable<Playlist[]>;
 
-  public playlist: Playlist = undefined;
+  public playlist: Playlist | undefined = undefined;
 
   public positions = [
     {

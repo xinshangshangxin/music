@@ -8,7 +8,7 @@ import { Player } from '../player';
 import { TEMP_PLAYLIST_ID } from '../player/constants';
 import { Config } from '../player/interface';
 import { ConfigService } from './config.service';
-import { PersistService } from './persist.service';
+import { PersistService, Playlist } from './persist.service';
 import { PlaylistService } from './playlist.service';
 import { PreloadService } from './preload.service';
 
@@ -36,7 +36,10 @@ export class PlayerService extends Player {
   }
 
   // eslint-disable-next-line class-methods-use-this
-  public formatArtists(artists: { name: string }[]) {
+  public formatArtists(artists?: { name: string }[] | null) {
+    if (!artists) {
+      return '';
+    }
     return artists.map(({ name }) => name).join(' ');
   }
 
@@ -92,6 +95,9 @@ export class PlayerService extends Player {
             switchMap((playlistId) => {
               return this.persistService.getPlaylist(playlistId);
             }),
+            filter((playlist): playlist is Playlist => {
+              return !!playlist;
+            }),
             map((playlist) => {
               return this.updateSongs(playlist.songs);
             })
@@ -112,8 +118,13 @@ export class PlayerService extends Player {
           data.message === 'GraphQL error: NO_SONG_FOUND' ||
           data.message === 'response.status: 400'
         ) {
+          const currentSong = this.getSong(index);
+          if (!currentSong) {
+            return of(undefined);
+          }
+
           const song = {
-            ...this.getSong(index),
+            ...currentSong,
             privilege: Privilege.Deny,
           };
 

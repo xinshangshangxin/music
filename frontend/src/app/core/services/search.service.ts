@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { MatDialog } from '@angular/material';
 import { Router } from '@angular/router';
 import { BehaviorSubject, from, Observable, of, Subject } from 'rxjs';
-import { map, switchMap } from 'rxjs/operators';
+import { filter, map, switchMap } from 'rxjs/operators';
 
 import {
   PlaylistComponent,
@@ -110,7 +110,12 @@ export class SearchService {
             minWidth: 300,
           })
           .afterClosed()
-          .pipe(map((item) => ({ ...item, songs })))
+          .pipe(
+            filter((item): item is PlaylistDialogResult => {
+              return !!item;
+            }),
+            map((item) => ({ ...item, songs }))
+          )
       ),
       switchMap(({ id, name, position, songs }) => {
         return this.playlistService

@@ -6,13 +6,21 @@ import { filter, map, switchMap } from 'rxjs/operators';
 import { getSongUrl } from '../audio/helper';
 import { PlayerSong } from '../audio/interface';
 import { PlaylistPosition } from '../player/interface';
-import { PersistService } from './persist.service';
+import { PersistService, Playlist } from './persist.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class PlaylistService {
   constructor(private readonly persistService: PersistService) {}
+
+  public getPlaylist(playlistId: string) {
+    return this.persistService.getPlaylist(playlistId);
+  }
+
+  public getPlaylistList(): Observable<Playlist[]> {
+    return this.persistService.getPlaylistList();
+  }
 
   public add2playlist({
     id,
@@ -93,7 +101,7 @@ export class PlaylistService {
 
   public removeSong(playlistId: string, song: PlayerSong): Observable<void> {
     return this.persistService.getPlaylist(playlistId).pipe(
-      filter((playlist) => {
+      filter((playlist): playlist is Playlist => {
         return !!playlist;
       }),
       map((playlist) => {
@@ -120,7 +128,7 @@ export class PlaylistService {
       Pick<PlayerSong, 'id' | 'provider'>
   ) {
     return this.persistService.getPlaylist(playlistId).pipe(
-      filter((playlist) => {
+      filter((playlist): playlist is Playlist => {
         return !!playlist;
       }),
       map((playlist) => {

@@ -7,7 +7,7 @@ import {
   QueryList,
   ViewChildren,
 } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { untilDestroyed } from 'ngx-take-until-destroy';
 import { merge } from 'rxjs';
 import { debounceTime, filter, map, pairwise, startWith, switchMap, tap } from 'rxjs/operators';
@@ -27,17 +27,20 @@ import { PlaylistService } from '../../../core/services/playlist.service';
 export class SongListComponent implements OnInit, AfterViewInit, OnDestroy {
   public Privilege = Privilege;
 
-  public playlist: Playlist;
+  public playlist: Playlist = {
+    id: TEMP_PLAYLIST_ID,
+    name: TEMP_PLAYLIST_ID,
+    songs: [],
+  };
 
   @ViewChildren('perSong')
-  private songQueryList: QueryList<ElementRef<HTMLDivElement>>;
+  private songQueryList!: QueryList<ElementRef<HTMLDivElement>>;
 
   constructor(
     private readonly playerService: PlayerService,
     private readonly playlistService: PlaylistService,
     private readonly persistService: PersistService,
-    private readonly activatedRoute: ActivatedRoute,
-    private readonly router: Router
+    private readonly activatedRoute: ActivatedRoute
   ) {}
 
   public ngOnInit() {
@@ -127,6 +130,9 @@ export class SongListComponent implements OnInit, AfterViewInit, OnDestroy {
         return TEMP_PLAYLIST_ID;
       }),
       switchMap((id) => this.persistService.getPlaylist(id)),
+      filter((playlist): playlist is Playlist => {
+        return !!playlist;
+      }),
       tap((playlist) => {
         this.playlist = playlist;
       }),
@@ -157,7 +163,7 @@ export class SongListComponent implements OnInit, AfterViewInit, OnDestroy {
       debounceTime(200),
       map(() => {
         const elementRef = this.songQueryList.find(
-          (item, index) => index === this.playerService.currentIndex
+          (_item, index) => index === this.playerService.currentIndex
         );
 
         if (elementRef) {
@@ -166,7 +172,7 @@ export class SongListComponent implements OnInit, AfterViewInit, OnDestroy {
 
         return null;
       }),
-      filter((ele) => !!ele),
+      filter((ele): ele is HTMLDivElement => !!ele),
       tap((ele) => {
         ele.scrollIntoView({
           behavior: 'smooth',

@@ -3,48 +3,43 @@ import { merge } from 'lodash';
 import { from, Observable, of, Subject } from 'rxjs';
 import { map, mapTo, shareReplay, switchMap, tap } from 'rxjs/operators';
 
-import { defaultPeakConfig } from '../audio/constant';
 import { PlayerSong } from '../audio/interface';
-import { TEMP_PLAYLIST_ID } from '../player/constants';
+import { DEFAULT_CONFIG, TEMP_PLAYLIST_ID } from '../player/constants';
 import { Config } from '../player/interface';
 import { StorageService } from './storage.service';
 
 export interface Playlist {
   id: string;
   songs: PlayerSong[];
-  name?: string;
+  name: string;
 }
 
 @Injectable({
   providedIn: 'root',
 })
 export class PersistService {
-  public static DEFAULT_CONFIG: Omit<Config, 'currentIndex' | 'basePlaylistId'> = {
-    preloadLen: 2,
-    peakConfig: {
-      ...defaultPeakConfig,
-    },
-    errorRetry: {
-      songRetries: 3,
-      playerRetries: 10,
-    },
-    volume: 1,
-  };
-
   public persist$ = new Subject<string>();
 
   private readonly configKey = 'config';
 
   private readonly playlistsKey = 'playlistIds';
 
-  private config: Config;
+  private config: Config = {
+    ...DEFAULT_CONFIG,
+  };
 
   private playlists: Playlist[] = [];
 
   private init$: Observable<void>;
 
   constructor(private readonly storageService: StorageService) {
-    this.init();
+    this.init$ = this.initConfig().pipe(
+      switchMap(() => from(this.initPlaylists())),
+      shareReplay(1)
+    );
+
+    // as soon as possible run
+    this.init$.subscribe(() => {}, console.warn);
   }
 
   public getConfig(): Observable<Config> {
@@ -126,23 +121,13 @@ export class PersistService {
     );
   }
 
-  private init() {
-    this.init$ = this.initConfig().pipe(
-      switchMap(() => from(this.initPlaylists())),
-      shareReplay(1)
-    );
-
-    // as soon as possible run
-    this.init$.subscribe(() => {}, console.warn);
-  }
-
   private initConfig() {
     return from(this.storageService.get<Config>(this.configKey)).pipe(
       tap((storageConfig) => {
         this.config = merge(
           {},
           {
-            ...PersistService.DEFAULT_CONFIG,
+            ...DEFAULT_CONFIG,
             currentIndex: 0,
             basePlaylistId: TEMP_PLAYLIST_ID,
           },

@@ -7,7 +7,7 @@ import { AudioEvent, PeakConfig, PlayerSong, Setting } from './interface';
 export class RxAudio extends AudioListeners {
   private audioContext = new AudioContext();
 
-  private song: PlayerSong;
+  private song: PlayerSong | null = null;
 
   private source: MediaElementAudioSourceNode;
 
@@ -79,11 +79,12 @@ export class RxAudio extends AudioListeners {
   }
 
   public layIn(currentTime?: number): Observable<void> {
+    const song = this.song as PlayerSong;
     // 处理特殊情况
     // The AudioContext was not allowed to start. It must be resumed (or created) after a user gesture on the page. https://goo.gl/7K7WLu
     const layInFailedSource$ = this.event(AudioEvent.playing).pipe(
       tap(() => {
-        console.info(`======>, layIn checking ┣ ${this.song.name} ┫`, this.audio.src, this.song);
+        console.info(`======>, layIn checking ┣ ${song.name} ┫`, this.audio.src, song);
       }),
       take(1),
       switchMap(() =>
@@ -94,10 +95,10 @@ export class RxAudio extends AudioListeners {
         )
       ),
       tap(() => {
-        console.info(`======>, layIn success ┣ ${this.song.name} ┫`);
+        console.info(`======>, layIn success ┣ ${song.name} ┫`);
       }),
       catchError(() => {
-        console.warn(`======>, layIn failed ┣ ${this.song.name} ┫`, this.errorDelaySeconds);
+        console.warn(`======>, layIn failed ┣ ${song.name} ┫`, this.errorDelaySeconds);
 
         this.pause();
         this.errorDelaySeconds = (this.errorDelaySeconds + 1) ** 2;
@@ -159,10 +160,10 @@ export class RxAudio extends AudioListeners {
     this.gainNode.disconnect();
     this.audioContext.close();
 
-    this.source = null;
-    this.analyser = null;
-    this.gainNode = null;
-    this.audioContext = null;
+    delete this.source;
+    delete this.analyser;
+    delete this.gainNode;
+    delete this.audioContext;
 
     super.destroy();
   }

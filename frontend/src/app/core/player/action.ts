@@ -182,7 +182,7 @@ export class PlayerAction extends PlayerStatus {
     return index;
   }
 
-  public song2index(playSong: PlayerSong) {
+  public song2index(playSong: PlayerSong | null) {
     if (playSong === null) {
       return -1;
     }

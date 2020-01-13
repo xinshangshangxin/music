@@ -4,7 +4,8 @@ import { untilDestroyed } from 'ngx-take-until-destroy';
 import { merge, Observable } from 'rxjs';
 import { debounceTime, filter, map, shareReplay, switchMap, takeUntil, tap } from 'rxjs/operators';
 
-import { AudioEvent } from '../../core/audio/interface';
+import { AudioEvent, PlayerSong } from '../../core/audio/interface';
+import { RxAudio } from '../../core/audio/rx-audio';
 import { Status } from '../../core/player/interface';
 import { ConfigService } from '../../core/services/config.service';
 import { PersistService } from '../../core/services/persist.service';
@@ -26,7 +27,7 @@ export class PlayBarComponent implements OnInit, OnDestroy {
 
   public defaultImg = 'assets/logos/kugou.png';
 
-  public currentSong$: Observable<{
+  public currentSong$!: Observable<{
     name: string;
     artists: string;
     img?: string;
@@ -48,13 +49,17 @@ export class PlayBarComponent implements OnInit, OnDestroy {
     ).pipe(
       debounceTime(100),
       filter(() => !!this.playerService.songList.length),
-      map(() => ({
-        provider: this.playerService.currentSong.provider,
-        name: this.playerService.currentSong.name,
-        img:
-          (this.playerService.currentSong.album && this.playerService.currentSong.album.img) ||
-          this.defaultImg,
-        artists: this.playerService.formatArtists(this.playerService.currentSong.artists),
+      map(() => {
+        return this.playerService.currentSong;
+      }),
+      filter((currentSong): currentSong is PlayerSong => {
+        return !!currentSong;
+      }),
+      map((currentSong) => ({
+        provider: currentSong.provider,
+        name: currentSong.name,
+        img: (currentSong.album && currentSong.album.img) || this.defaultImg,
+        artists: this.playerService.formatArtists(currentSong.artists),
       })),
       shareReplay({
         bufferSize: 1,
@@ -100,7 +105,7 @@ export class PlayBarComponent implements OnInit, OnDestroy {
 
   public progressInput(e: MatSliderChange) {
     if (this.playerService.rxAudio) {
-      this.playerService.rxAudio.audio.currentTime = e.value;
+      this.playerService.rxAudio.audio.currentTime = e.value as number;
     }
   }
 
@@ -118,7 +123,7 @@ export class PlayBarComponent implements OnInit, OnDestroy {
       this.playerService.played$.pipe(
         filter(() => !!this.playerService.rxAudio),
         switchMap(() =>
-          this.playerService.rxAudio
+          (this.playerService.rxAudio as RxAudio)
             .event(AudioEvent.timeupdate)
             .pipe(takeUntil(this.playerService.songChange$))
         ),
@@ -130,10 +135,18 @@ export class PlayBarComponent implements OnInit, OnDestroy {
   }
 
   private getProgress() {
+    if (!this.playerService.currentSong || !this.playerService.rxAudio) {
+      return {
+        min: 0,
+        max: 0,
+        current: 0,
+      };
+    }
+
     const { duration } = this.playerService.currentSong;
     const min = this.playerService.currentSong.peakStartTime || 0;
     let max =
-      this.playerService.currentSong.peakStartTime +
+      min +
       this.playerService.rxAudio.peakConfig.duration +
       this.playerService.rxAudio.peakConfig.after;
 

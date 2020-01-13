@@ -1,8 +1,8 @@
-import { Observable, Subject } from 'rxjs';
+import { Subject } from 'rxjs';
 
 import { PlayerSong } from '../audio/interface';
 import { RxAudio } from '../audio/rx-audio';
-import { TEMP_PLAYLIST_ID } from './constants';
+import { DEFAULT_CONFIG, TEMP_PLAYLIST_ID } from './constants';
 import { Config } from './interface';
 
 export class PlayerBase {
@@ -27,9 +27,6 @@ export class PlayerBase {
   // 歌曲预载入列表有变更
   public preloadTask$ = new Subject<PlayerSong[]>();
 
-  // 切换其它歌曲
-  public songChange$: Observable<PlayerSong>;
-
   // 歌曲触发播放了
   public play$ = new Subject<void>();
 
@@ -37,13 +34,15 @@ export class PlayerBase {
   public played$ = new Subject<void>();
 
   // 配置, 需要手动配置
-  public config: Config;
+  public config: Config = {
+    ...DEFAULT_CONFIG,
+  };
 
   // 当前音频对象
   public rxAudio: RxAudio | undefined;
 
   // 当前音量
-  public volume: number;
+  public volume = 1;
 
   // 当前播放列表的 基础列表 (即初始化时是哪个列表载入的)
   public basePlaylistId: string = TEMP_PLAYLIST_ID;

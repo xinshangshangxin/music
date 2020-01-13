@@ -24,7 +24,8 @@ export class BillboardComponent implements OnInit, OnDestroy {
     mode: 'push',
   };
 
-  @ViewChild('sidenav', { static: true }) public sidenav: MatSidenav;
+  @ViewChild('sidenav', { static: true })
+  public sidenav!: MatSidenav;
 
   constructor(
     private readonly sidenavService: SidenavService,

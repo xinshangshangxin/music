@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { untilDestroyed } from 'ngx-take-until-destroy';
 import { merge } from 'rxjs';
 import { debounceTime, distinctUntilChanged, filter, map, switchMap, tap } from 'rxjs/operators';
@@ -15,13 +15,12 @@ import { SearchService, SearchType } from '../../../core/services/search.service
   styleUrls: ['./search.component.scss'],
 })
 export class SearchComponent implements OnInit, OnDestroy {
-  public searchList: SearchSong[];
+  public searchList: SearchSong[] = [];
 
   constructor(
     private readonly playerService: PlayerService,
     private readonly searchService: SearchService,
-    private readonly activatedRoute: ActivatedRoute,
-    private readonly router: Router
+    private readonly activatedRoute: ActivatedRoute
   ) {}
 
   public ngOnInit() {

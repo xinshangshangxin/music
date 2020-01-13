@@ -1,12 +1,13 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatSelectChange } from '@angular/material';
-import { Subscription } from 'rxjs';
-import { filter, map, switchMap } from 'rxjs/operators';
+import { untilDestroyed } from 'ngx-take-until-destroy';
+import { Subject } from 'rxjs';
+import { filter, map, switchMap, takeUntil } from 'rxjs/operators';
 
+import { DEFAULT_CONFIG } from '../../../core/player/constants';
 import { Config } from '../../../core/player/interface';
 import { ConfigService } from '../../../core/services/config.service';
-import { PersistService } from '../../../core/services/persist.service';
 import { PlayerService } from '../../../core/services/player.service';
 
 @Component({
@@ -17,9 +18,9 @@ import { PlayerService } from '../../../core/services/player.service';
 export class SettingComponent implements OnInit, OnDestroy {
   public step = 0;
 
-  public config: Config;
+  public config: Config | null = null;
 
-  public settingFormGroup: FormGroup;
+  public settingFormGroup: FormGroup | null = null;
 
   public peaks = [
     // {
@@ -64,7 +65,7 @@ export class SettingComponent implements OnInit, OnDestroy {
     },
   ];
 
-  private subscription: Subscription;
+  public defaultConfig$ = new Subject<void>();
 
   constructor(
     private readonly formBuilder: FormBuilder,
@@ -73,12 +74,12 @@ export class SettingComponent implements OnInit, OnDestroy {
   ) {}
 
   public ngOnInit() {
-    this.subscription = this.whenPersistConfig().subscribe(console.info, console.warn);
+    this.whenPersistConfig()
+      .pipe(untilDestroyed(this), takeUntil(this.defaultConfig$))
+      .subscribe(() => {}, console.warn);
   }
 
-  public ngOnDestroy(): void {
-    this.subscription.unsubscribe();
-  }
+  public ngOnDestroy(): void {}
 
   public setStep(index: number) {
     this.step = index;
@@ -93,12 +94,12 @@ export class SettingComponent implements OnInit, OnDestroy {
   }
 
   public setDefaultConfig() {
-    console.info(PersistService.DEFAULT_CONFIG);
+    console.info(DEFAULT_CONFIG);
     this.configService
-      .changeConfig(PersistService.DEFAULT_CONFIG)
+      .changeConfig(DEFAULT_CONFIG)
       .pipe(
         map(() => {
-          this.subscription.unsubscribe();
+          this.defaultConfig$.next();
         }),
         switchMap(() => this.whenPersistConfig())
       )
@@ -129,7 +130,7 @@ export class SettingComponent implements OnInit, OnDestroy {
         return this.settingFormGroup;
       }),
       switchMap((formGroup) => formGroup.valueChanges),
-      filter(() => this.settingFormGroup.valid),
+      filter(() => (this.settingFormGroup && this.settingFormGroup.valid) || false),
       switchMap((config) => {
         console.info('new config: ', config);
 
