@@ -46,8 +46,14 @@ export class BillboardComponent implements OnInit, OnDestroy {
 
   private watchToggle() {
     return this.sidenavService.toggleSubject.pipe(
-      map(() => {
-        this.sidenav.toggle();
+      map((value) => {
+        if (!value) {
+          this.sidenav.toggle();
+        }
+
+        if (value === 'pushHide' && this.drawer.mode === 'push') {
+          this.sidenav.close();
+        }
       }),
       untilDestroyed(this)
     );

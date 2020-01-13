@@ -1,5 +1,22 @@
 <div class="nav">
-  <p *ngFor="let item of list" (click)="loadPlaylist(item.id)">
-    {{ item.name }}
+  <p
+    *ngFor="let item of list; index as i"
+    #menuTrigger="matMenuTrigger"
+    [matMenuTriggerFor]="playlistMenu"
+  >
+    <button
+      mat-raised-button
+      [color]="colors[i % colors.length]"
+      app-click-stop-propagation
+      (click)="loadPlaylist(item.id)"
+      (press)="press($event, menuTrigger, item);"
+    >
+      {{ item.name }}
+    </button>
   </p>
+
+  <mat-menu #playlistMenu="matMenu">
+    <button mat-menu-item (click)="renamePlaylist()">重命名</button>
+    <button mat-menu-item (click)="removePlaylist()">删除</button>
+  </mat-menu>
 </div>

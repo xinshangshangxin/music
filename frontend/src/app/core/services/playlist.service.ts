@@ -168,6 +168,17 @@ export class PlaylistService {
     );
   }
 
+  public removePlaylist(playlistId: string) {
+    return this.persistService.getPlaylist(playlistId).pipe(
+      filter((playlist): playlist is Playlist => {
+        return !!playlist;
+      }),
+      switchMap((playlist) => {
+        return this.persistService.persistPlaylist(playlist.id, true, playlist.name);
+      })
+    );
+  }
+
   public static song2index(songs: PlayerSong[], playSong: PlayerSong) {
     if (playSong === null) {
       return -1;

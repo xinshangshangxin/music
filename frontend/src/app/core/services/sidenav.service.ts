@@ -5,5 +5,5 @@ import { Subject } from 'rxjs';
   providedIn: 'root',
 })
 export class SidenavService {
-  public toggleSubject = new Subject<void>();
+  public toggleSubject = new Subject<undefined | 'pushHide'>();
 }

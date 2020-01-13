@@ -49,7 +49,9 @@ import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { NgSelectModule } from '@ng-select/ng-select';
 
+import { ClickStopPropagationDirective } from './click-stop-propagation.directive';
 import { ConfirmDialogComponent } from './confirm-dialog/confirm-dialog.component';
+import { PromptDialogComponent } from './prompt-dialog/prompt-dialog.component';
 
 const modules = [
   BrowserModule,
@@ -104,9 +106,9 @@ const modules = [
 ];
 
 @NgModule({
-  declarations: [ConfirmDialogComponent],
-  entryComponents: [ConfirmDialogComponent],
+  declarations: [ConfirmDialogComponent, ClickStopPropagationDirective, PromptDialogComponent],
+  entryComponents: [ConfirmDialogComponent, PromptDialogComponent],
   imports: modules,
-  exports: modules,
+  exports: [...modules, ClickStopPropagationDirective],
 })
 export class ShareModule {}

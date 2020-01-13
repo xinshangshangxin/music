@@ -1,0 +1,12 @@
+<h1 mat-dialog-title *ngIf="data.title">{{ data.title }}</h1>
+<div mat-dialog-content>
+  <mat-form-field>
+    <input matInput [(ngModel)]="data.prompt">
+  </mat-form-field>
+</div>
+<div mat-dialog-actions class="actions">
+  <button mat-raised-button *ngIf="data.no" (click)="close(false)">{{ data.no }}</button>
+  <button mat-raised-button color="primary" cdkFocusInitial *ngIf="data.ok" (click)="close(true)">
+    {{ data.ok }}
+  </button>
+</div>
