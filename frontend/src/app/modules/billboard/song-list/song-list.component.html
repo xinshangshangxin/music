@@ -1,7 +1,8 @@
-<div class="song-list" *ngIf="playlist">
+<div class="song-list" *ngIf="playlist" cdkDropList (cdkDropListDropped)="drop($event)">
   <div
-    #perSong
     class="song-box"
+    cdkDrag
+    #perSong
     *ngFor="let song of playlist.songs; index as i"
     [ngClass]="{
       playing: currentSong && currentSong.id === song.id && currentSong.provider === song.provider,
@@ -9,8 +10,9 @@
     }"
     (click)="play(song, i)"
   >
-    <span class="song-info">
-      <img class="logo" src="assets/logos/{{ song.provider }}.png" [alt]="song.provider" />
+    <div class="song-info">
+      <img class="logo" src="assets/logos/{{ song.provider }}.png" [alt]="song.provider" cdkDragHandle />
+
       <span
         class="song-name"
         matTooltip="{{ song.name }}"
@@ -19,25 +21,24 @@
         >{{ song.name }}
       </span>
 
-      <span
+      <div
         class="song-artists"
         matTooltip="{{ formatArtists(song.artists) }}"
         matTooltipPosition="above"
         matTooltipShowDelay="500"
       >
         <span *ngFor="let artist of song.artists"> {{ artist.name }} </span>
-      </span>
+      </div>
 
       <span class="song-control" (click)="$event.stopPropagation()">
         <i class="material-icons" mat-button [matMenuTriggerFor]="menu">more_vert</i>
       </span>
-
       <mat-menu #menu="matMenu">
         <button mat-menu-item (click)="remove(song)">
           <mat-icon>delete</mat-icon>
           <span>delete</span>
         </button>
       </mat-menu>
-    </span>
+    </div>
   </div>
 </div>

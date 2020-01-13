@@ -1,3 +1,4 @@
+import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import {
   AfterViewInit,
   Component,
@@ -118,6 +119,19 @@ export class SongListComponent implements OnInit, AfterViewInit, OnDestroy {
 
   public formatArtists(artists: { name: string }[]) {
     return this.playerService.formatArtists(artists);
+  }
+
+  public drop(event: CdkDragDrop<string[]>) {
+    const { currentSong } = this;
+    moveItemInArray(this.playlist.songs, event.previousIndex, event.currentIndex);
+
+    // 当前是临时播放列表
+    if (this.playlist.id === TEMP_PLAYLIST_ID && currentSong) {
+      this.playerService.currentIndex = this.playerService.song2index(currentSong);
+      this.playerService.loadNextSongs();
+    }
+
+    this.playlistService.persist(this.playlist.id).subscribe(() => {}, console.warn);
   }
 
   private queryParams() {

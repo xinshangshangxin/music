@@ -157,6 +157,17 @@ export class PlaylistService {
     );
   }
 
+  public persist(playlistId: string) {
+    return this.persistService.getPlaylist(playlistId).pipe(
+      filter((playlist): playlist is Playlist => {
+        return !!playlist;
+      }),
+      switchMap((playlist) => {
+        return this.persistService.persistPlaylist(playlist.id, playlist.songs, playlist.name);
+      })
+    );
+  }
+
   public static song2index(songs: PlayerSong[], playSong: PlayerSong) {
     if (playSong === null) {
       return -1;

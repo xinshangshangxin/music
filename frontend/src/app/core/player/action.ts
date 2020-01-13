@@ -107,7 +107,7 @@ export class PlayerAction extends PlayerStatus {
     this.persistTask$.next();
   }
 
-  protected updateSongs(songs: Omit<PlayerSong, 'url'>[]) {
+  public updateSongs(songs: Omit<PlayerSong, 'url'>[]) {
     const wrapList = songs.map((song) => ({
       ...song,
       url: getSongUrl(song),
