@@ -29,67 +29,13 @@
             width: auto;
         }
 
-        .left {
-            display: flex;
-            align-items: center;
-            height: 100%;
-
-            .cover {
-                height: 100%;
-
-                img {
-                    height: 100%;
-                }
-            }
-
-            .info {
-                margin-left: 8px;
-
-                display: flex;
-                flex-direction: column;
-                flex-wrap: nowrap;
-
-                width: 130px;
-                overflow: hidden;
-
-                @media (max-width: 700px) {
-                    width: 90px;
-                }
-
-                .song-name {
-                    font-size: 14px;
-                    line-height: 18px;
-
-                    @media (max-width: 700px) {
-                        font-size: 12px;
-                    }
-                }
-
-                .singers {
-                    font-size: 12px;
-
-                    @media (max-width: 700px) {
-                        font-size: 10px;
-                    }
-                }
-            }
-        }
-
-        .right {
-            display: flex;
-            justify-content: space-around;
-
-            height: 100%;
-            width: 100%;
-            margin: 0 5px;
-
-            @media (max-width: 700px) {
-                justify-content: space-between;
-            }
+        .center {
+            width: 120px;
 
             .controls {
                 display: flex;
                 align-items: center;
+                justify-content: space-around;
 
                 .previous {
                     margin-right: 10px;
@@ -114,6 +60,62 @@
                     }
                 }
             }
+        }
+
+        .left,
+        .right {
+            flex-grow: 1;
+            width: 100%;
+        }
+
+        .left {
+            display: flex;
+            align-items: center;
+            height: 100%;
+            overflow: hidden;
+
+            .cover {
+                height: 100%;
+
+                img {
+                    height: 100%;
+                }
+            }
+
+            .info {
+                margin-left: 8px;
+
+                display: flex;
+                flex-direction: column;
+                flex-wrap: nowrap;
+
+                overflow: hidden;
+
+                .song-name {
+                    font-size: 14px;
+                    line-height: 18px;
+
+                    @media (max-width: 700px) {
+                        font-size: 12px;
+                    }
+                }
+
+                .singers {
+                    font-size: 12px;
+
+                    @media (max-width: 700px) {
+                        font-size: 10px;
+                    }
+                }
+            }
+        }
+
+        .right {
+            display: flex;
+            justify-content: flex-end;
+
+            height: 100%;
+            margin: 0 5px;
 
             .tools {
                 display: flex;
@@ -150,3 +152,4 @@
         }
     }
 }
+
