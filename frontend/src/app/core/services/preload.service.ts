@@ -52,7 +52,7 @@ export class PreloadService {
         }).pipe(
           map((startTime) => ({
             song: {
-              ...song,
+              ...peakSong,
               peakStartTime: startTime,
               peakDuration: peakConfig.duration,
             } as PeakSong,
