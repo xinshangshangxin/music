@@ -19,6 +19,7 @@ import { TEMP_PLAYLIST_ID } from '../../../core/player/constants';
 import { PersistService, Playlist } from '../../../core/services/persist.service';
 import { PlayerService } from '../../../core/services/player.service';
 import { PlaylistService } from '../../../core/services/playlist.service';
+import { SidenavService } from '../../../core/services/sidenav.service';
 
 @Component({
   selector: 'app-song-list',
@@ -41,7 +42,8 @@ export class SongListComponent implements OnInit, AfterViewInit, OnDestroy {
     private readonly playerService: PlayerService,
     private readonly playlistService: PlaylistService,
     private readonly persistService: PersistService,
-    private readonly activatedRoute: ActivatedRoute
+    private readonly activatedRoute: ActivatedRoute,
+    private readonly sidenavService: SidenavService
   ) {}
 
   public ngOnInit() {
@@ -154,6 +156,8 @@ export class SongListComponent implements OnInit, AfterViewInit, OnDestroy {
       }),
       tap((playlist) => {
         this.playlist = playlist;
+
+        this.sidenavService.next({ mode: 'side', trigger: 'open' });
       }),
       untilDestroyed(this)
     );

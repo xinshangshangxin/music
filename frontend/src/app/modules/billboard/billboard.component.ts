@@ -3,7 +3,7 @@ import { MatDialog, MatSidenav } from '@angular/material';
 import { Router } from '@angular/router';
 import { untilDestroyed } from 'ngx-take-until-destroy';
 import { fromEvent, merge, of } from 'rxjs';
-import { debounceTime, map, switchMap } from 'rxjs/operators';
+import { debounceTime, filter, map, switchMap } from 'rxjs/operators';
 
 import { DEFAULT_PLAYLIST_ID } from '../../core/player/constants';
 import { demoSongs } from '../../core/player/demo';
@@ -45,15 +45,12 @@ export class BillboardComponent implements OnInit, OnDestroy {
   public ngOnDestroy(): void {}
 
   private watchToggle() {
-    return this.sidenavService.toggleSubject.pipe(
-      map((value) => {
-        if (!value) {
-          this.sidenav.toggle();
-        }
-
-        if (value === 'pushHide' && this.drawer.mode === 'push') {
-          this.sidenav.close();
-        }
+    return this.sidenavService.sidenavStatus$.pipe(
+      filter(({ mode }) => {
+        return !mode || mode === this.drawer.mode;
+      }),
+      map(({ trigger }) => {
+        this.sidenav[trigger]();
       }),
       untilDestroyed(this)
     );

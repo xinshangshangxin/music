@@ -52,7 +52,7 @@ export class LeftNavComponent implements OnInit {
 
   public loadPlaylist(id: string) {
     this.router.navigate(['/list'], { queryParams: { id } }).then(() => {
-      this.sidenavService.toggleSubject.next('pushHide');
+      this.sidenavService.next({ mode: 'push', trigger: 'close' });
     });
   }
 
@@ -147,11 +147,11 @@ export class LeftNavComponent implements OnInit {
           return this.playlistService.persist(playlist.id);
         }),
         map(() => {
-          this.sidenavService.toggleSubject.next();
+          this.sidenavService.next();
         }),
         delay(10),
         map(() => {
-          this.sidenavService.toggleSubject.next();
+          this.sidenavService.next();
         })
       )
       .subscribe(() => {}, console.warn);
