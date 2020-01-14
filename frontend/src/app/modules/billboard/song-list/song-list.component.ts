@@ -123,12 +123,17 @@ export class SongListComponent implements OnInit, AfterViewInit, OnDestroy {
 
   public drop(event: CdkDragDrop<string[]>) {
     const { currentSong } = this;
-    moveItemInArray(this.playlist.songs, event.previousIndex, event.currentIndex);
 
     // 当前是临时播放列表
-    if (this.playlist.id === TEMP_PLAYLIST_ID && currentSong) {
-      this.playerService.currentIndex = this.playerService.song2index(currentSong);
-      this.playerService.loadNextSongs();
+    if (this.playlist.id === TEMP_PLAYLIST_ID) {
+      moveItemInArray(this.playerService.songList, event.previousIndex, event.currentIndex);
+
+      if (currentSong) {
+        this.playerService.currentIndex = this.playerService.song2index(currentSong);
+        this.playerService.loadNextSongs();
+      }
+    } else {
+      moveItemInArray(this.playlist.songs, event.previousIndex, event.currentIndex);
     }
 
     this.playlistService.persist(this.playlist.id).subscribe(() => {}, console.warn);
