@@ -22,6 +22,11 @@ export enum Status {
   loading = 'loading',
 }
 
-export type Position = number | 'next' | 'end';
+export type Position = number | 'next' | 'end' | 'current';
 
-export type PlaylistPosition = Position | 'append' | 'insert' | 'cover' | 'drop';
+export type PlaylistPosition =
+  | Exclude<Position, 'current'>
+  | 'append'
+  | 'insert'
+  | 'cover'
+  | 'drop';

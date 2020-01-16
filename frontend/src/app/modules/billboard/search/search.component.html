@@ -24,22 +24,31 @@
         >
           <mat-icon>more_vert</mat-icon>
         </button>
+
         <mat-menu #menu="matMenu">
-          <button mat-menu-item (click)="add(song, 'end', true)">
+          <button mat-menu-item [matMenuTriggerFor]="currentPlaylist">当前播放列表</button>
+          <button mat-menu-item [matMenuTriggerFor]="addMenu">加入歌单</button>
+        </mat-menu>
+
+        <mat-menu #currentPlaylist="matMenu">
+          <button mat-menu-item (click)="add(song, 'next', true)">
             添加并播放
           </button>
           <button mat-menu-item (click)="add(song, 'next')">
             下一首播放
           </button>
           <button mat-menu-item (click)="add(song, 'end')">
-            添加到播放列表
+            添加到末尾
           </button>
-          <button mat-menu-item [matMenuTriggerFor]="addMenu">加入歌单</button>
         </mat-menu>
 
         <mat-menu #addMenu="matMenu">
-          <button mat-menu-item>歌单1(待实现)</button>
-          <button mat-menu-item>歌单2(待实现)</button>
+          <ng-template matMenuContent>
+            <app-add-song-to-playlist
+              [song]="song"
+              [excludeBase]="false"
+            ></app-add-song-to-playlist>
+          </ng-template>
         </mat-menu>
       </ng-container>
     </ng-container>

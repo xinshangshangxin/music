@@ -5,8 +5,9 @@ import { merge } from 'rxjs';
 import { debounceTime, distinctUntilChanged, filter, map, switchMap, tap } from 'rxjs/operators';
 
 import { SearchSong } from '../../../core/apollo/graphql';
-import { Position } from '../../../core/player/interface';
+import { PlaylistPosition, Position } from '../../../core/player/interface';
 import { PlayerService } from '../../../core/services/player.service';
+import { PlaylistService } from '../../../core/services/playlist.service';
 import { SearchService, SearchType } from '../../../core/services/search.service';
 
 @Component({
@@ -18,6 +19,7 @@ export class SearchComponent implements OnInit, OnDestroy {
   public searchList: SearchSong[] = [];
 
   constructor(
+    public readonly playlistService: PlaylistService,
     private readonly playerService: PlayerService,
     private readonly searchService: SearchService,
     private readonly activatedRoute: ActivatedRoute
@@ -46,11 +48,22 @@ export class SearchComponent implements OnInit, OnDestroy {
     }
   }
 
+  public addSong2playlist(
+    playlistId: string,
+    song: SearchSong,
+    position: Exclude<PlaylistPosition, 'drop' | 'cover'>
+  ) {
+    this.playlistService
+      .addSong2playlist({ id: playlistId, song, position })
+      .subscribe(() => {}, console.warn);
+  }
+
   public tempPlay(song: SearchSong) {
-    const position = 'end';
+    const position = 'current';
 
     this.playerService.add(song, position);
-    this.playerService.playAt(position);
+    const songIndex = this.playerService.song2index(song);
+    this.playerService.playAt(songIndex);
   }
 
   private whenSearch$() {

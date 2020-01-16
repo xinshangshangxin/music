@@ -11,7 +11,12 @@
     (click)="play(song, i)"
   >
     <div class="song-info">
-      <img class="logo" src="assets/logos/{{ song.provider }}.png" [alt]="song.provider" cdkDragHandle />
+      <img
+        class="logo"
+        src="assets/logos/{{ song.provider }}.png"
+        [alt]="song.provider"
+        cdkDragHandle
+      />
 
       <span
         class="song-name"
@@ -36,8 +41,16 @@
       <mat-menu #menu="matMenu">
         <button mat-menu-item (click)="remove(song)">
           <mat-icon>delete</mat-icon>
-          <span>delete</span>
+          <span>删除</span>
         </button>
+
+        <button mat-menu-item [matMenuTriggerFor]="addMenu">加入歌单</button>
+      </mat-menu>
+
+      <mat-menu #addMenu="matMenu">
+        <ng-template matMenuContent>
+          <app-add-song-to-playlist [song]="song"></app-add-song-to-playlist>
+        </ng-template>
       </mat-menu>
     </div>
   </div>

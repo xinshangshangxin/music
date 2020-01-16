@@ -53,7 +53,7 @@ export class PlayerAction extends PlayerStatus {
    * @param song PlayerSong
    * @param position next 插入到下一首, end 插入到末尾
    */
-  public add(song: Omit<PlayerSong, 'url'>, position: Position = 'end') {
+  public add(song: Omit<PlayerSong, 'url'>, position: Position = 'current') {
     const oldSong = this.currentSong;
     // 先删除重复歌曲
     const removeIndex = this.songList.findIndex(
@@ -167,22 +167,31 @@ export class PlayerAction extends PlayerStatus {
 
   public position2index(position: Position, endShiftLeft = false) {
     let index: number;
-    if (position === 'next') {
-      index = this.getValidIndex(this.currentIndex + 1);
-    } else if (position === 'end') {
-      index = this.songList.length;
-
-      if (endShiftLeft) {
-        index -= 1;
-      }
-    } else {
-      index = position;
+    switch (position) {
+      case 'current':
+        index = this.getValidIndex(this.currentIndex);
+        if (index === -1) {
+          index = 0;
+        }
+        break;
+      case 'next':
+        index = this.getValidIndex(this.currentIndex + 1);
+        break;
+      case 'end':
+        index = this.songList.length;
+        if (endShiftLeft) {
+          index = this.getValidIndex(index - 1);
+        }
+        break;
+      default:
+        index = position;
+        break;
     }
 
     return index;
   }
 
-  public song2index(playSong: PlayerSong | null) {
+  public song2index(playSong: Pick<PlayerSong, 'id' | 'provider'> | null) {
     if (playSong === null) {
       return -1;
     }

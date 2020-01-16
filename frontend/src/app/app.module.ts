@@ -16,6 +16,7 @@ import { PlaylistComponent } from './modules/dialog/playlist/playlist.component'
 import { HomeComponent } from './modules/home/home.component';
 import { PlayBarComponent } from './modules/play-bar/play-bar.component';
 import { ShareModule } from './share/share.module';
+import { AddSongToPlaylistComponent } from './modules/playlist/add-song-to-playlist/add-song-to-playlist.component';
 
 @NgModule({
   entryComponents: [PlaylistComponent],
@@ -32,6 +33,7 @@ import { ShareModule } from './share/share.module';
     SettingComponent,
     PlaylistComponent,
     RankComponent,
+    AddSongToPlaylistComponent,
   ],
   imports: [CoreModule, ShareModule, AppRoutingModule, GraphQLModule],
   providers: [{ provide: LocationStrategy, useClass: HashLocationStrategy }],

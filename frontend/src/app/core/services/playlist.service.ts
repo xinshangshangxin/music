@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { uniqBy } from 'lodash';
+import { uniqWith } from 'lodash';
 import { Observable } from 'rxjs';
 import { filter, map, switchMap } from 'rxjs/operators';
 
@@ -22,7 +22,7 @@ export class PlaylistService {
     return this.persistService.getPlaylistList();
   }
 
-  public add2playlist({
+  public addSongs2playlist({
     id,
     name: inputName,
     songs: inputSongs,
@@ -33,7 +33,7 @@ export class PlaylistService {
     songs: Omit<PlayerSong, 'url'>[];
     position?: PlaylistPosition;
   }) {
-    console.info(inputSongs.length, JSON.stringify(inputSongs[0]));
+    console.info('addSongs2playlist', inputSongs.length, JSON.stringify(inputSongs[0]));
 
     if (position === 'drop') {
       return this.persistService.persistPlaylist(id, true, '');
@@ -94,7 +94,63 @@ export class PlaylistService {
         };
       }),
       // 去重
-      map(({ songs, name }) => ({ songs: uniqBy(songs, 'id'), name })),
+      map(({ songs, name }) => ({
+        songs: uniqWith(songs, (song1, song2) => {
+          return song1.id === song2.id && song1.provider === song2.provider;
+        }),
+        name,
+      })),
+      switchMap(({ songs, name }) => this.persistService.persistPlaylist(id, songs, name))
+    );
+  }
+
+  public addSong2playlist({
+    id,
+    song: inputSong,
+    position = 'insert',
+  }: {
+    id: string;
+    song: Omit<PlayerSong, 'url'>;
+    position?: Exclude<PlaylistPosition, 'drop' | 'cover'>;
+  }) {
+    return this.persistService.getPlaylist(id).pipe(
+      filter((playlist): playlist is Playlist => {
+        return !!playlist;
+      }),
+      map((playlist) => {
+        return {
+          playlist,
+          song: { ...inputSong, url: getSongUrl(inputSong) },
+        };
+      }),
+      map(({ playlist, song }) => {
+        // 插入到最后
+        if (position === 'append' || position === 'end') {
+          playlist.songs.push(song);
+          return playlist;
+        }
+
+        let index = 0;
+        // insert 是插入开头
+        // TODO: next 应该要判断当前播放列表是否为插入的列表, 然后再处理
+        if (position === 'insert' || position === 'next') {
+          index = 0;
+        } else {
+          index = position;
+        }
+
+        playlist.songs.splice(index, 0, song);
+        return playlist;
+      }),
+      // 去重
+      map((playlist) => {
+        // eslint-disable-next-line no-param-reassign
+        playlist.songs = uniqWith(playlist.songs, (song1, song2) => {
+          return song1.id === song2.id && song1.provider === song2.provider;
+        });
+
+        return playlist;
+      }),
       switchMap(({ songs, name }) => this.persistService.persistPlaylist(id, songs, name))
     );
   }

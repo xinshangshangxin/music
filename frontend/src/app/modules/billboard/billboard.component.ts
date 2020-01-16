@@ -105,7 +105,7 @@ export class BillboardComponent implements OnInit, OnDestroy {
       .pipe(
         switchMap((confirm) => {
           if (confirm) {
-            return this.playlistService.add2playlist({
+            return this.playlistService.addSongs2playlist({
               id: DEFAULT_PLAYLIST_ID,
               songs: demoSongs,
             });

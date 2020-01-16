@@ -119,7 +119,7 @@ export class SearchService {
       ),
       switchMap(({ id, name, position, songs }) => {
         return this.playlistService
-          .add2playlist({
+          .addSongs2playlist({
             id,
             name,
             songs,
