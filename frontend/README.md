@@ -2,7 +2,7 @@
 
 ## Online demo
 
-[Music player](http://music.xinshangshangxin.com/)
+[Music player](http://m.xinshangshangxin.com/)
 
 ## Develop
 

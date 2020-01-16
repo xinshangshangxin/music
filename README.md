@@ -4,16 +4,16 @@
 
 ## 目录说明
 
-### [api](./api)
+### [frontend](./frontend)
+
+基于 `Angular` 提供播放界面
+
+### [api](https://github.com/xinshangshangxin/music/tree/5.x/api)
 
 支持 酷狗/网易/虾米 音乐获取
 
 [![npm](https://img.shields.io/npm/v/@s4p/music-api.svg?label=%40s4p%2Fmusic-api&style=flat-square)](https://www.npmjs.com/package/@s4p/music-api)
 ![coverage](https://gitlab.com/shang-music/music-api/badges/master/coverage.svg)
-
-### [frontend](./frontend)
-
-基于 `Angular` 提供简易的界面
 
 ### [backend](https://github.com/xinshangshangxin/music/tree/5.x/backend)
 
