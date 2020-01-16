@@ -185,9 +185,21 @@ export class SongListComponent implements OnInit, AfterViewInit, OnDestroy {
       }),
       debounceTime(200),
       map(() => {
-        const elementRef = this.songQueryList.find(
-          (_item, index) => index === this.playerService.currentIndex
-        );
+        if (!this.playlist || this.playlist.id === TEMP_PLAYLIST_ID) {
+          return this.playerService.currentIndex;
+        }
+
+        const { currentSong } = this.playerService;
+        if (!currentSong) {
+          return this.playerService.currentIndex;
+        }
+
+        return this.playlist.songs.findIndex(({ id, provider }) => {
+          return currentSong.id === id && currentSong.provider === provider;
+        });
+      }),
+      map((targetIndex) => {
+        const elementRef = this.songQueryList.find((_item, index) => index === targetIndex);
 
         if (elementRef) {
           return elementRef.nativeElement;
