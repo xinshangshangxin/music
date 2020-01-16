@@ -1,21 +1,16 @@
-# TODO
+# Music Frontend
 
-- [x] 侧边栏隐藏显示
-- [x] 侧边栏 添加歌单后 不显示
-- [x] 删除歌曲后 index 不正确
-- [x] 添加歌曲, 但是歌曲已存在时 index 不正确
-- [ ] 解析 URL 后, 更新播放列表后 index 和 songs 都不对
-- [x] privilege 临时列表未更新, base 列表也没有更新
-- [ ]  精简 `../../../core/`
-- [x] `eslint` 和 `prettier` 规则
-- [ ] 静音按钮
-- [ ] 进度条 优化
-- [ ] 搜索列表加入歌单
-- [ ] 播放控制栏 更多按钮处理
-- [ ] 播放控制栏 样式
-- [ ] 随心听 界面
-- [ ] 歌词界面
-- [ ] 临时歌单界面优化
-- [ ] 歌单界面优化, 支持标注当前哪个歌单, 支持删除, 支持多选等
-- [ ] 无法播放歌曲添加一键搜索按钮
-- [x] 侧边栏优化
+## Online demo
+
+[Music player](http://music.xinshangshangxin.com/)
+
+## Develop
+
+1. `node version >= 10`
+2. `npm install`
+3. `npm start`
+4. open browser `http://localhost:4200/`
+
+## TODO
+
+[see issue](https://github.com/xinshangshangxin/music/issues?q=is%3Aissue+is%3Aopen+label%3ATODO)
