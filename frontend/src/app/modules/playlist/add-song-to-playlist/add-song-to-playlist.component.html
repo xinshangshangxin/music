@@ -3,7 +3,11 @@
   *ngFor="let item of playlistList | async"
   (click)="addSong2playlist(item.id, song, 'end')"
 >
-  {{ item.name }}
+  <mat-icon>library_music</mat-icon>
+  <span>{{ item.name }}</span>
 </button>
 
-<button mat-menu-item disabled *ngIf="!(playlistList | async).length">请先创建歌单</button>
+<button mat-menu-item (click)="createPlaylist(song)">
+  <mat-icon>open_in_browser</mat-icon>
+  <span>更多</span>
+</button>

@@ -1,14 +1,9 @@
 import { Location } from '@angular/common';
 import { Injectable } from '@angular/core';
-import { MatDialog } from '@angular/material';
 import { Router } from '@angular/router';
 import { BehaviorSubject, from, Observable, of, Subject } from 'rxjs';
-import { filter, map, switchMap } from 'rxjs/operators';
+import { map, switchMap } from 'rxjs/operators';
 
-import {
-  PlaylistComponent,
-  PlaylistDialogResult,
-} from '../../modules/dialog/playlist/playlist.component';
 import { ParseUrlGQL, Provider, SearchGQL, SearchSong } from '../apollo/graphql';
 import { PlaylistService } from './playlist.service';
 
@@ -34,8 +29,7 @@ export class SearchService {
     private readonly location: Location,
     private readonly parseUrlGQL: ParseUrlGQL,
     private readonly searchGQL: SearchGQL,
-    private readonly playlistService: PlaylistService,
-    private readonly dialog: MatDialog
+    private readonly playlistService: PlaylistService
   ) {}
 
   public changeHref(search: string) {
@@ -104,32 +98,8 @@ export class SearchService {
   private parseUrl(url: string): Observable<boolean> {
     return this.parseUrlGQL.fetch({ url }).pipe(
       map((result) => result.data.parseUrl || []),
-      switchMap((songs) =>
-        this.dialog
-          .open<PlaylistComponent, any, PlaylistDialogResult>(PlaylistComponent, {
-            minWidth: 300,
-          })
-          .afterClosed()
-          .pipe(
-            filter((item): item is PlaylistDialogResult => {
-              return !!item;
-            }),
-            map((item) => ({ ...item, songs }))
-          )
-      ),
-      switchMap(({ id, name, position, songs }) => {
-        return this.playlistService
-          .addSongs2playlist({
-            id,
-            name,
-            songs,
-            position,
-          })
-          .pipe(
-            map(() => {
-              return id;
-            })
-          );
+      switchMap((songs) => {
+        return this.playlistService.addSongs2playlistDialog(songs);
       }),
       switchMap((id) => {
         this.urlLoadSubject.next('');

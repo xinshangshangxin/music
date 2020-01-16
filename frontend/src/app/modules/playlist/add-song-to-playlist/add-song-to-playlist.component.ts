@@ -61,4 +61,8 @@ export class AddSongToPlaylistComponent implements OnInit {
       .addSong2playlist({ id: playlistId, song, position })
       .subscribe(() => {}, console.warn);
   }
+
+  public createPlaylist(song: SearchSong) {
+    this.playlistService.addSong2playlistDialog(song).subscribe(() => {}, console.warn);
+  }
 }

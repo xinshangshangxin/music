@@ -18,7 +18,7 @@ export type PlaylistDialogResult = Pick<Playlist, 'id' | 'name'> & { position: P
 export class PlaylistComponent implements OnInit {
   public list$!: Observable<Playlist[]>;
 
-  public playlist: Playlist | undefined = undefined;
+  public playlist?: Playlist = undefined;
 
   public positions = [
     {

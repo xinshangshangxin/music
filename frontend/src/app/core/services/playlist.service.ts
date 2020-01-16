@@ -1,8 +1,13 @@
 import { Injectable } from '@angular/core';
+import { MatDialog } from '@angular/material';
 import { uniqWith } from 'lodash';
 import { Observable } from 'rxjs';
 import { filter, map, switchMap } from 'rxjs/operators';
 
+import {
+  PlaylistComponent,
+  PlaylistDialogResult,
+} from '../../modules/dialog/playlist/playlist.component';
 import { getSongUrl } from '../audio/helper';
 import { PlayerSong } from '../audio/interface';
 import { PlaylistPosition } from '../player/interface';
@@ -12,7 +17,10 @@ import { PersistService, Playlist } from './persist.service';
   providedIn: 'root',
 })
 export class PlaylistService {
-  constructor(private readonly persistService: PersistService) {}
+  constructor(
+    private readonly persistService: PersistService,
+    private readonly dialog: MatDialog
+  ) {}
 
   public getPlaylist(playlistId: string) {
     return this.persistService.getPlaylist(playlistId);
@@ -20,6 +28,36 @@ export class PlaylistService {
 
   public getPlaylistList(): Observable<Playlist[]> {
     return this.persistService.getPlaylistList();
+  }
+
+  public addSong2playlistDialog(inputSong: Omit<PlayerSong, 'url'>) {
+    return this.addSongs2playlistDialog([inputSong]);
+  }
+
+  public addSongs2playlistDialog(inputSongs: Omit<PlayerSong, 'url'>[]) {
+    return this.dialog
+      .open<PlaylistComponent, any, PlaylistDialogResult>(PlaylistComponent, {
+        minWidth: 300,
+      })
+      .afterClosed()
+      .pipe(
+        filter((item): item is PlaylistDialogResult => {
+          return !!item;
+        }),
+        map((item) => ({ ...item, songs: inputSongs })),
+        switchMap(({ id, name, position, songs }) => {
+          return this.addSongs2playlist({
+            id,
+            name,
+            songs,
+            position,
+          }).pipe(
+            map(() => {
+              return id;
+            })
+          );
+        })
+      );
   }
 
   public addSongs2playlist({
