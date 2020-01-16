@@ -16,7 +16,7 @@ import { PlayerService } from '../../../core/services/player.service';
   styleUrls: ['./setting.component.scss'],
 })
 export class SettingComponent implements OnInit, OnDestroy {
-  public step = 0;
+  public step = -1;
 
   public config: Config | null = null;
 
