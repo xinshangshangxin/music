@@ -1,4 +1,9 @@
 .play-bar {
+    @media (min-width: 700px) {
+        position: relative;
+        z-index: 1001;
+    }
+
     display: flex;
     flex-direction: column;
 
@@ -121,7 +126,8 @@
                 flex-grow: 0;
                 width: 60px;
                 .tools {
-                    .volume, .more {
+                    .volume,
+                    .more {
                         display: none !important;
                     }
                 }
@@ -158,4 +164,3 @@
         }
     }
 }
-

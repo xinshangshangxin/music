@@ -7,6 +7,7 @@ import {
   OnInit,
   QueryList,
   ViewChildren,
+  Input,
 } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { untilDestroyed } from 'ngx-take-until-destroy';
@@ -34,6 +35,9 @@ export class SongListComponent implements OnInit, AfterViewInit, OnDestroy {
     name: TEMP_PLAYLIST_ID,
     songs: [],
   };
+
+  @Input()
+  private playlistId: string | null = null;
 
   @ViewChildren('perSong')
   private songQueryList!: QueryList<ElementRef<HTMLDivElement>>;
@@ -144,6 +148,12 @@ export class SongListComponent implements OnInit, AfterViewInit, OnDestroy {
   private queryParams() {
     return this.activatedRoute.queryParams.pipe(
       map((qs) => {
+        console.info('input playlistId: ', this.playlistId);
+
+        if (this.playlistId) {
+          return this.playlistId;
+        }
+
         if (qs.id) {
           return qs.id;
         }

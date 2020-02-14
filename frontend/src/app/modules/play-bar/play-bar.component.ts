@@ -4,13 +4,13 @@ import { untilDestroyed } from 'ngx-take-until-destroy';
 import { merge, Observable } from 'rxjs';
 import {
   debounceTime,
+  delay,
   filter,
   map,
   shareReplay,
   switchMap,
   takeUntil,
   tap,
-  delay,
 } from 'rxjs/operators';
 
 import { AudioEvent, PlayerSong } from '../../core/audio/interface';
@@ -19,6 +19,7 @@ import { Status } from '../../core/player/interface';
 import { ConfigService } from '../../core/services/config.service';
 import { PersistService } from '../../core/services/persist.service';
 import { PlayerService } from '../../core/services/player.service';
+import { TempSongOverlayService } from '../../core/services/temp-song-overlay.service';
 
 @Component({
   selector: 'app-play-bar',
@@ -45,7 +46,8 @@ export class PlayBarComponent implements OnInit, OnDestroy {
   constructor(
     public readonly playerService: PlayerService,
     private readonly persistService: PersistService,
-    private readonly configService: ConfigService
+    private readonly configService: ConfigService,
+    private readonly tempSongOverlayService: TempSongOverlayService
   ) {}
 
   public ngOnInit() {
@@ -116,6 +118,10 @@ export class PlayBarComponent implements OnInit, OnDestroy {
     if (this.playerService.rxAudio) {
       this.playerService.rxAudio.audio.currentTime = e.value as number;
     }
+  }
+
+  public showTempList() {
+    this.tempSongOverlayService.toggle();
   }
 
   private whenProgress$() {

@@ -55,7 +55,7 @@
           <mat-icon>location_searching</mat-icon>
         </div>
 
-        <div class="play-list" [routerLink]="['/list']">
+        <div #ref (click)="showTempList()">
           <mat-icon>list</mat-icon>
         </div>
 

@@ -11,15 +11,16 @@ import { RankComponent } from './modules/billboard/rank/rank.component';
 import { SearchComponent } from './modules/billboard/search/search.component';
 import { SettingComponent } from './modules/billboard/setting/setting.component';
 import { SongListComponent } from './modules/billboard/song-list/song-list.component';
+import { TempSongOverlayComponent } from './modules/billboard/temp-song-overlay/temp-song-overlay.component';
 import { TopNavComponent } from './modules/billboard/top-nav/top-nav.component';
 import { PlaylistComponent } from './modules/dialog/playlist/playlist.component';
 import { HomeComponent } from './modules/home/home.component';
 import { PlayBarComponent } from './modules/play-bar/play-bar.component';
-import { ShareModule } from './share/share.module';
 import { AddSongToPlaylistComponent } from './modules/playlist/add-song-to-playlist/add-song-to-playlist.component';
+import { ShareModule } from './share/share.module';
 
 @NgModule({
-  entryComponents: [PlaylistComponent],
+  entryComponents: [PlaylistComponent, TempSongOverlayComponent],
   declarations: [
     AppComponent,
     HomeComponent,
@@ -34,6 +35,7 @@ import { AddSongToPlaylistComponent } from './modules/playlist/add-song-to-playl
     PlaylistComponent,
     RankComponent,
     AddSongToPlaylistComponent,
+    TempSongOverlayComponent,
   ],
   imports: [CoreModule, ShareModule, AppRoutingModule, GraphQLModule],
   providers: [{ provide: LocationStrategy, useClass: HashLocationStrategy }],
