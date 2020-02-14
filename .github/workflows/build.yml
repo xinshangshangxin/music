@@ -3,36 +3,21 @@ name: build on push
 on:
   push:
     branches:
-      - develop
+      - workflow
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
-    strategy:
-      matrix:
-        node-version: [12]
-
     steps:
       - uses: actions/checkout@v1
 
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v1
-        with:
-          node-version: ${{ matrix.node-version }}
-
-      - name: build
+      - name: Docker build
         working-directory: ./
-        run: |
-          cd frontend
-          npm ci
-          npm run build
-          echo "m.xinshangshangxin.com" > dist/CNAME
-          ls -la dist
-
-      - name: Deploy
-        uses: peaceiris/actions-gh-pages@v2
         env:
-          PERSONAL_TOKEN: ${{ secrets.ACCESS_TOKEN }}
-          PUBLISH_BRANCH: gh-pages
-          PUBLISH_DIR: ./frontend/dist
+          ALI_CONTAINER_HOST: ${{ secrets.ALI_CONTAINER_HOST }}
+          ALI_CONTAINER_USER_NAME: ${{ secrets.ALI_CONTAINER_USER_NAME }}
+          ALI_CONTAINER_NAMESPACE: ${{ secrets.ALI_CONTAINER_NAMESPACE }}
+          ALI_CONTAINER_PASSWORD: ${{ secrets.ALI_CONTAINER_PASSWORD }}
+        run: |
+          bash devtools/frontend/docker-build.sh
