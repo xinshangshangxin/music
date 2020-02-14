@@ -1,0 +1,23 @@
+name: build on push
+
+on:
+  push:
+    branches:
+      - develop
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v1
+
+      - name: Docker build
+        working-directory: ./
+        env:
+          ALI_CONTAINER_HOST: ${{ secrets.ALI_CONTAINER_HOST }}
+          ALI_CONTAINER_USER_NAME: ${{ secrets.ALI_CONTAINER_USER_NAME }}
+          ALI_CONTAINER_NAMESPACE: ${{ secrets.ALI_CONTAINER_NAMESPACE }}
+          ALI_CONTAINER_PASSWORD: ${{ secrets.ALI_CONTAINER_PASSWORD }}
+        run: |
+          bash devtools/frontend/docker-build.sh
