@@ -6,7 +6,7 @@ export const environment = {
   production: false,
   // backendUrl: 'http://127.0.0.1:3000',
   backendUrl: 'https://music.xinshangshangxin.com',
-  proxyUrl: '//musicproxy.leanapp.cn',
+  proxyUrl: '//proxy.music.xinshangshangxin.com',
 
   build: {
     when: new Date().toISOString(),
