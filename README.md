@@ -15,7 +15,7 @@
 [![npm](https://img.shields.io/npm/v/@s4p/music-api.svg?label=%40s4p%2Fmusic-api&style=flat-square)](https://www.npmjs.com/package/@s4p/music-api)
 ![coverage](https://gitlab.com/shang-music/music-api/badges/master/coverage.svg)
 
-### [backend](https://github.com/xinshangshangxin/music/tree/5.x/backend)
+### [backend](./backend)
 
 基于 `nestjs` 调用 `@s4p/music-api` 提供 `graphql` 接口的后台服务
 
@@ -64,6 +64,23 @@
 
 **代码位置:**
 [audio-peak.ts](https://github.com/xinshangshangxin/music/blob/develop/frontend/src/app/core/audio/audio-peak.ts#L10-L20)
+
+## 如何部署
+
+```bash
+# 安装 docker 和 docker-compose
+
+# 创建一个文件夹, 比如 my-music
+mkdir my-music
+# 复制 devtools/docker-compose.yml 文件 到  my-music 下
+cp devtools/docker-compose.yml my-music/docker-compose.yml
+# 复制 devtools/.env-example文件到 my-music下, 并命名为 .env
+cp devtools/.env-example my-music/.env
+# 修改 my-music/.env 中 MONGO_URL (数据库链接) 和 PORT (端口)
+
+# 启动
+docker-compose pull && docker-compose up -d
+```
 
 ## History
 
