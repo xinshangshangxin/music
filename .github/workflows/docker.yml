@@ -1,9 +1,7 @@
 name: Deploy to ALI Docker
 
 on:
-  push:
-    branches:
-      - develop
+  - push
 
 jobs:
   build:
@@ -20,4 +18,4 @@ jobs:
           ALI_CONTAINER_NAMESPACE: ${{ secrets.ALI_CONTAINER_NAMESPACE }}
           ALI_CONTAINER_PASSWORD: ${{ secrets.ALI_CONTAINER_PASSWORD }}
         run: |
-          bash devtools/frontend/docker-build.sh
+          bash devtools/docker-build.sh

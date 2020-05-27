@@ -1,0 +1,28 @@
+version: "3"
+services:
+  music_backend:
+    restart: always
+    image: ${ALI_CONTAINER_HOST}/${ALI_CONTAINER_NAMESPACE}/backend:latest
+    environment:
+      - NODE_ENV=docker
+      - PORT=80
+      - SAVE_DIR=/app/.music
+      - MONGO_URL=${MONGO_URL}
+    # volumes:
+    #   - /data/music:/app/.music
+
+  music_frontend:
+    restart: always
+    image: ${ALI_CONTAINER_HOST}/${ALI_CONTAINER_NAMESPACE}/frontend:latest
+    environment:
+      - NODE_ENV=docker
+      - PORT=80
+
+  music_nginx:
+    restart: always
+    image: ${ALI_CONTAINER_HOST}/${ALI_CONTAINER_NAMESPACE}/nginx:latest
+    depends_on:
+      - music_backend
+      - music_frontend
+    ports:
+      - ${PORT}:80

@@ -1,6 +1,6 @@
 export const environment = {
   production: true,
-  backendUrl: '//music.xinshangshangxin.com',
+  backendUrl: '',
   proxyUrl: '//proxy.music.xinshangshangxin.com',
 
   build: {
