@@ -1,6 +1,6 @@
-# [Music Player](https://m.xinshangshangxin.com/)
+# [Music Player](https://music.xinshangshangxin.com/)
 
-## [在线试用](https://m.xinshangshangxin.com/)
+## [在线试用](https://music.xinshangshangxin.com/)
 
 ## 目录说明
 
