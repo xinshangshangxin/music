@@ -1,0 +1,9 @@
+query lrc($id: String!, $provider: Provider!) {
+  lrc(id: $id, provider: $provider) {
+    items {
+      duration
+      offset
+      line
+    }
+  }
+}

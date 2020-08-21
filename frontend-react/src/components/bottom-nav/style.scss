@@ -1,0 +1,172 @@
+.play-bar {
+  @media (min-width: 700px) {
+      position: relative;
+      z-index: 1001;
+  }
+
+  display: flex;
+  flex-direction: column;
+
+  height: 72px;
+  color: #e7e7e7;
+  background-color: #303030;
+
+  .top {
+      display: flex;
+      position: relative;
+
+      height: 2px;
+
+      .progress {
+          top: -25px;
+          width: 100%;
+          position: absolute;
+      }
+  }
+
+  .bottom {
+      display: flex;
+      align-items: center;
+
+      height: 100%;
+
+      mat-icon {
+          font-size: 20px;
+          height: auto;
+          width: auto;
+      }
+
+      .center {
+          width: 120px;
+
+          .controls {
+              display: flex;
+              align-items: center;
+              justify-content: space-around;
+
+
+              .previous {
+                  margin-right: 10px;
+                  font-size: 25px;
+                  color: white;
+                }
+
+              .play-btn {
+                  font-size: 40px;
+                  * {
+                    color: white;
+                  }
+                }
+
+              .next {
+                  margin-left: 10px;
+                  font-size: 25px;
+                  color: white;
+                }
+
+              @media (max-width: 700px) {
+                  .previous {
+                      margin-right: 0;
+                  }
+                  .next {
+                      margin-left: 0;
+                  }
+              }
+          }
+      }
+
+      .left,
+      .right {
+          flex-grow: 1;
+          width: 100%;
+      }
+
+      .left {
+          display: flex;
+          align-items: center;
+          height: 100%;
+          overflow: hidden;
+
+          .cover {
+              height: 72px;
+              width: 72px;
+
+              img {
+                  height: 100%;
+              }
+          }
+
+          .info {
+              margin-left: 8px;
+
+              display: flex;
+              flex-direction: column;
+              flex-wrap: nowrap;
+
+              overflow: hidden;
+
+              .song-name {
+                  font-size: 14px;
+                  line-height: 18px;
+
+                  @media (max-width: 700px) {
+                      font-size: 12px;
+                  }
+              }
+
+              .singers {
+                  font-size: 12px;
+
+                  @media (max-width: 700px) {
+                      font-size: 10px;
+                  }
+              }
+          }
+      }
+
+      .right {
+          display: flex;
+          justify-content: flex-end;
+
+          @media (max-width: 700px) {
+              flex-grow: 0;
+              width: 60px;
+              .tools {
+                  .volume,
+                  .more {
+                      display: none !important;
+                  }
+              }
+          }
+
+          height: 100%;
+          margin: 0 5px;
+
+          .tools {
+              display: flex;
+              align-items: center;
+
+              .volume {
+                  display: flex;
+                  align-items: center;
+
+                  .range {
+                      width: 80px;
+
+                      ::ng-deep .mat-slider-track-wrapper,
+                      .mat-slider-track-background,
+                      .mat-slider-ticks,
+                      .mat-slider-ticks-container {
+                          background-color: #e7e7e7;
+                      }
+                  }
+              }
+
+              > div {
+                  margin-left: 10px;
+                  display: flex;
+              }
+          }
+      }
+  }
+}

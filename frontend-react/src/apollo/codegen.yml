@@ -1,0 +1,12 @@
+overwrite: true
+# schema: "http://127.0.0.1:3000/graphql"
+schema: "http://music.xinshangshangxin.com/graphql"
+documents: "{,!(node_modules)/**/}*.graphql"
+generates:
+  src/apollo/graphql.ts:
+    plugins:
+      - typescript
+      - typescript-operations
+      # - typescript-react-apollo
+      - typescript-graphql-request
+

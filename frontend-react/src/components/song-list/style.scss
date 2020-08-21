@@ -1,0 +1,22 @@
+.song-list {
+    width: 100%;
+
+    min-height: 60px;
+    display: block;
+    background: white;
+    overflow: auto;
+    -webkit-overflow-scrolling: touch;
+
+    .playing {
+        background-color: #ededed;
+    }
+
+    .disabled {
+        background-color: #ededed;
+        opacity: 0.45;
+    }
+}
+
+.song-box:last-child {
+    border: none;
+}

@@ -1,0 +1,7 @@
+mutation addPeakTime(
+  $id: String!
+  $provider: Provider!
+  $peak: SongPeaksInput!
+) {
+  addPeakTime(id: $id, provider: $provider, peak: $peak)
+}

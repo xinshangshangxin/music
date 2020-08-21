@@ -1,0 +1,9 @@
+overwrite: true
+schema: "http://music.xinshangshangxin.com/graphql"
+documents: "{,!(node_modules)/**/}*.graphql"
+generates:
+  src/apollo/graphql.ts:
+    plugins:
+      - "typescript"
+      - "typescript-operations"
+      - "typescript-react-apollo"
