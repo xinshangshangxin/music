@@ -1,12 +1,4 @@
-import {
-  Dispatch,
-  SetStateAction,
-  useCallback,
-  useEffect,
-  useLayoutEffect,
-  useMemo,
-  useState,
-} from 'react';
+import { useCallback, useEffect, useLayoutEffect, useMemo } from 'react';
 import { BehaviorSubject, Observable, Subject, Subscription } from 'rxjs';
 
 // export const useObservable = <T>(maker: () => Observable<T>, initValue: T) => {
