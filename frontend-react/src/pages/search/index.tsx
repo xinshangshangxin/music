@@ -1,8 +1,8 @@
+import './style.scss';
+
 import React, { useEffect, useState } from 'react';
 import { from, of } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
-
-import './style.scss';
 
 import { sdk } from '../../apollo';
 import { BottomNav } from '../../components/bottom-nav';
@@ -13,7 +13,7 @@ import { player } from '../../helpers/player';
 import { searchSubject } from '../../helpers/singleton';
 
 export function Search() {
-  const [songs, setSongs] = useState<Omit<PlayerSong, 'url'>[]>([]);
+  const [songs, setSongs] = useState<Omit<PlayerSong, 'url'>[]>(player.songList);
 
   useEffect(() => {
     const s = searchSubject
@@ -27,6 +27,7 @@ export function Search() {
         })
       )
       .subscribe((songList) => {
+        console.info(songList);
         setSongs(songList.search);
       });
 

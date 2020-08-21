@@ -25,6 +25,8 @@ function BottomNav() {
   });
 
   const [paused, setPaused] = useState(player.isPaused);
+  useEffect(() => {});
+
   const [onClick, click$] = useEventHandler();
 
   useEffect(() => {
