@@ -69,7 +69,6 @@ enum Privilege {
 enum Provider {
   kugou
   netease
-  xiami
 }
 
 type Query {
