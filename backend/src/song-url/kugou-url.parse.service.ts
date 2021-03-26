@@ -17,6 +17,7 @@ enum Privilege {
 @Injectable()
 export class KugouUrlParseService {
   supportedUrlReg = {
+    zlistJson: /https?:\/\/\w+\.kugou\.com\/zlist\/list/,
     rawShare: /^https?:\/\/\w+\.kugou\.com\/song\.html\?id=(\w+)$/,
     chainShare: /https?:\/\/m\.kugou\.com\/share\/\?chain=(\w+)/,
     zlistShare: /https?:\/\/\w+\.kugou\.com\/share\/zlist.html/,
@@ -120,6 +121,53 @@ export class KugouUrlParseService {
     }
 
     return [];
+  }
+
+  async zlistJson(url: string): Promise<SearchSong[]> {
+    if (!this.supportedUrlReg.zlistJson.test(url)) {
+      throw new Error('not match zlistJson');
+    }
+
+    let page = 1;
+    let result: any[] = [];
+    while (true) {
+      const content = await this.client({
+        url,
+        qs: {
+          page,
+          pagesize: 100,
+        },
+        json: true,
+      });
+
+      const songs = content.list.info as any[];
+
+      result.push(...songs);
+
+      if (result.length < page * 100) {
+        break;
+      }
+
+      page += 1;
+
+      if (page > 10) {
+        break;
+      }
+    }
+
+    return result.map(item => {
+      return {
+        privilege: Privilege.unknown,
+        provider: Provider.kugou,
+        id: item.hash,
+        name: ((item.name || '').split('-')[1] || '').trim(),
+        artists: [
+          {
+            name: ((item.name || '').split('-')[0] || '').trim(),
+          },
+        ],
+      } as any;
+    });
   }
 
   private async getPlaylistId(
