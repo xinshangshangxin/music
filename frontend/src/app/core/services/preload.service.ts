@@ -60,7 +60,7 @@ export class PreloadService {
           }))
         );
       }),
-      timeout(10000)
+      timeout(60 * 1000)
     );
   }
 
