@@ -1,3 +1,4 @@
+import { environment } from '../../../environments/environment';
 import { DEFAULT_PEAK_CONFIG } from '../audio/constant';
 import { Config } from './interface';
 
@@ -16,4 +17,6 @@ export const DEFAULT_CONFIG: Config = {
   volume: 1,
   currentIndex: 0,
   basePlaylistId: TEMP_PLAYLIST_ID,
+  proxyUrl: environment.proxyUrl,
+  backendUrl: environment.backendUrl,
 };

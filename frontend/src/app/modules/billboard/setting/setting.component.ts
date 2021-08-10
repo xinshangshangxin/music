@@ -125,6 +125,7 @@ export class SettingComponent implements OnInit, OnDestroy {
             playerRetries: [this.config.errorRetry.playerRetries, Validators.required],
           }),
           preloadLen: [this.config.preloadLen, Validators.required],
+          proxyUrl: [this.config.proxyUrl, Validators.required],
         });
 
         return this.settingFormGroup;

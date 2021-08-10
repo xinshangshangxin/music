@@ -14,6 +14,9 @@ export interface Config {
   viewed?: boolean;
 
   basePlaylistId: string;
+
+  backendUrl: string;
+  proxyUrl: string;
 }
 
 export enum Status {

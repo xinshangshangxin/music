@@ -1,8 +1,14 @@
 import { environment } from '../../../environments/environment';
 import { Provider } from '../apollo/graphql';
 
-function getSongUrl(song: { id: string; provider: Provider; name?: string }) {
-  return `${environment.proxyUrl}?id=${song.id}&provider=${song.provider}`;
+let { proxyUrl } = environment;
+
+function setProxyUrl(url: string) {
+  proxyUrl = url;
 }
 
-export { getSongUrl };
+function getSongUrl(song: { id: string; provider: Provider; name?: string }) {
+  return `${proxyUrl}?id=${song.id}&provider=${song.provider}`;
+}
+
+export { getSongUrl, setProxyUrl };

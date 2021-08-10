@@ -43,12 +43,22 @@
 
         <p>
           <mat-form-field>
-            <input type="number" formControlName="layIn" matInput placeholder="渐入时间(秒)" />
+            <input
+              type="number"
+              formControlName="layIn"
+              matInput
+              placeholder="渐入时间(秒)"
+            />
           </mat-form-field>
         </p>
         <p>
           <mat-form-field>
-            <input type="number" formControlName="layOut" matInput placeholder="渐出时间(秒)" />
+            <input
+              type="number"
+              formControlName="layOut"
+              matInput
+              placeholder="渐出时间(秒)"
+            />
           </mat-form-field>
         </p>
 
@@ -81,7 +91,9 @@
               matInput
               placeholder="单首歌错误重试次数"
             />
-            <mat-hint align="start"><strong>超出重试次数后, 播放下一首</strong> </mat-hint>
+            <mat-hint align="start"
+              ><strong>超出重试次数后, 播放下一首</strong>
+            </mat-hint>
           </mat-form-field>
         </p>
         <p>
@@ -92,7 +104,9 @@
               formControlName="playerRetries"
               placeholder="播放列表错误重试次数"
             />
-            <mat-hint align="start"><strong>超出重试次数后, 暂停播放</strong> </mat-hint>
+            <mat-hint align="start"
+              ><strong>超出重试次数后, 暂停播放</strong>
+            </mat-hint>
           </mat-form-field>
         </p>
       </mat-expansion-panel>
@@ -108,8 +122,29 @@
 
         <p>
           <mat-form-field>
-            <input type="number" matInput formControlName="preloadLen" placeholder="预载入长度" />
-            <mat-hint align="start"><strong>预载入越多, 内存消耗越大</strong> </mat-hint>
+            <input
+              type="number"
+              matInput
+              formControlName="preloadLen"
+              placeholder="预载入长度"
+            />
+            <mat-hint align="start"
+              ><strong>预载入越多, 内存消耗越大</strong>
+            </mat-hint>
+          </mat-form-field>
+        </p>
+
+        <p>
+          <mat-form-field>
+            <input
+              type="text"
+              matInput
+              formControlName="proxyUrl"
+              placeholder="下载歌曲代理URL"
+            />
+            <mat-hint align="start">
+              <strong>请勿随意修改</strong>
+            </mat-hint>
           </mat-form-field>
         </p>
       </mat-expansion-panel>
