@@ -66,10 +66,7 @@ export class PlayerAction extends PlayerStatus {
     const start = this.position2index(position);
 
     // 再加入歌单
-    this.songList.splice(start, 0, {
-      ...song,
-      url: getSongUrl(song),
-    });
+    this.songList.splice(start, 0, { ...song });
 
     // 更正游标
     this.currentIndex = this.song2index(oldSong);
@@ -110,7 +107,7 @@ export class PlayerAction extends PlayerStatus {
   public updateSongs(songs: Omit<PlayerSong, 'url'>[]) {
     const wrapList = songs.map((song) => ({
       ...song,
-      url: getSongUrl(song),
+      url: getSongUrl(song, 'ignore'),
     }));
 
     // 更新列表

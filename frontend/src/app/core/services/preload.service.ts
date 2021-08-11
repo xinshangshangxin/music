@@ -138,10 +138,7 @@ export class PreloadService {
           }
           const { song } = result.data;
 
-          return of({
-            ...song,
-            url: getSongUrl(song),
-          });
+          return of(song);
         })
       );
   }
@@ -153,7 +150,9 @@ export class PreloadService {
     song: PlayerSong;
     peakConfig: PeakConfig;
   }): Observable<number> {
-    return from(this.audioPeak.get(song.url, peakConfig.duration, peakConfig.precision)).pipe(
+    return from(
+      this.audioPeak.get(getSongUrl(song, 'buildPeak'), peakConfig.duration, peakConfig.precision)
+    ).pipe(
       tap(({ peaks, precision }) => {
         this.addPeakTimeGQL
           .mutate({

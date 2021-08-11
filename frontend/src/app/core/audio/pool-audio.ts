@@ -18,6 +18,10 @@ interface PoolItem {
 }
 
 export class PoolAudio {
+  public static getSongKey({ id, provider }: Pick<PlayerSong, 'id' | 'provider'>) {
+    return `${id}|${provider}`;
+  }
+
   // 已用池
   private pool: {
     [key: string]: PoolItem;
@@ -41,7 +45,9 @@ export class PoolAudio {
   }) {
     const poolKeys = Object.keys(this.pool);
 
-    const restKeys = poolKeys.filter((poolKey) => !list.some(({ song }) => song.url === poolKey));
+    const restKeys = poolKeys.filter(
+      (poolKey) => !list.some(({ song }) => PoolAudio.getSongKey(song) === poolKey)
+    );
 
     // 删除用不到的
     restKeys.forEach((key) => {
@@ -76,7 +82,7 @@ export class PoolAudio {
   }
 
   private getPoolItem(song: PlayerSong): PoolItem {
-    return this.pool[song.url];
+    return this.pool[PoolAudio.getSongKey(song)];
   }
 
   private checkInPool(song: PlayerSong, peakConfig: PeakConfig): boolean {
@@ -93,15 +99,15 @@ export class PoolAudio {
 
     if (item.peakConfig.duration !== peakConfig.duration) {
       console.info('peakConfig change, rebuild');
-      this.release(song.url);
+      this.release(PoolAudio.getSongKey(song));
       return false;
     }
 
     return true;
   }
 
-  private release(songUrl: string): void {
-    const poolItem = this.pool[songUrl];
+  private release(songKey: string): void {
+    const poolItem = this.pool[songKey];
     if (!poolItem) {
       return;
     }
@@ -112,7 +118,7 @@ export class PoolAudio {
     // unsubscribe
     subscription.unsubscribe();
 
-    delete this.pool[songUrl];
+    delete this.pool[songKey];
     this.restList.push(rxAudio);
   }
 
@@ -148,7 +154,7 @@ export class PoolAudio {
       takeUntil(rxAudio.release$)
     );
 
-    this.pool[song.url] = {
+    this.pool[PoolAudio.getSongKey(song)] = {
       // 先subscribe 执行起来
       subscription: source$.subscribe(({ song: peakSong }) => {
         console.debug(`预载入 ┣ ${peakSong.name} ┫ 成功`, peakSong);

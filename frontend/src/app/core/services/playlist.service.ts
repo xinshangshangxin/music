@@ -8,7 +8,6 @@ import {
   PlaylistComponent,
   PlaylistDialogResult,
 } from '../../modules/dialog/playlist/playlist.component';
-import { getSongUrl } from '../audio/helper';
 import { PlayerSong } from '../audio/interface';
 import { PlaylistPosition } from '../player/interface';
 import { PersistService, Playlist } from './persist.service';
@@ -100,10 +99,7 @@ export class PlaylistService {
       }),
       map((item) => ({
         ...item,
-        newSongs: inputSongs.map((song) => ({
-          ...song,
-          url: getSongUrl(song),
-        })),
+        newSongs: inputSongs,
       })),
       map(({ oldSongs, newSongs, name }) => {
         // 插入到最后
@@ -158,7 +154,7 @@ export class PlaylistService {
       map((playlist) => {
         return {
           playlist,
-          song: { ...inputSong, url: getSongUrl(inputSong) },
+          song: inputSong,
         };
       }),
       map(({ playlist, song }) => {

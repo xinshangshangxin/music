@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 import { merge } from 'lodash';
 import { from, Observable, of, Subject } from 'rxjs';
 import { map, mapTo, shareReplay, switchMap, tap } from 'rxjs/operators';
-
 import { PlayerSong } from '../audio/interface';
 import { DEFAULT_CONFIG, TEMP_PLAYLIST_ID } from '../player/constants';
 import { Config } from '../player/interface';

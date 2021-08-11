@@ -2,12 +2,13 @@ import { EMPTY, from, merge, Observable } from 'rxjs';
 import { catchError, mapTo, switchMap, take, takeUntil, tap, timeout } from 'rxjs/operators';
 
 import { AudioListeners } from './audio-event';
+import { getSongUrl } from './helper';
 import { AudioEvent, PeakConfig, PlayerSong, Setting } from './interface';
 
 export class RxAudio extends AudioListeners {
   private audioContext = new AudioContext();
 
-  private song: PlayerSong | null = null;
+  private song: (Omit<PlayerSong, 'url'> & { url: string }) | null = null;
 
   private source: MediaElementAudioSourceNode;
 
@@ -37,7 +38,10 @@ export class RxAudio extends AudioListeners {
   public set(setting: Setting & { currentTime: number }) {
     const { song, currentTime, peakConfig } = setting;
 
-    this.song = song;
+    this.song = {
+      ...song,
+      url: getSongUrl(song),
+    };
 
     // 标记播放范围
     // https://developer.mozilla.org/zh-CN/docs/Web/Guide/HTML/Using_HTML5_audio_and_video#%E6%A0%87%E8%AE%B0%E6%92%AD%E6%94%BE%E8%8C%83%E5%9B%B4

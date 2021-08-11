@@ -41,7 +41,7 @@ export interface PeakConfig {
 }
 
 export interface PlayerSong extends Omit<Song, 'artists' | 'album' | '__typename'> {
-  url: string;
+  url?: string;
   artists?:
     | {
         id?: string | null;

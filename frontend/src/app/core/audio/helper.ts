@@ -1,14 +1,32 @@
 import { environment } from '../../../environments/environment';
 import { Provider } from '../apollo/graphql';
 
-let { proxyUrl } = environment;
+let proxyUrlList = [environment.proxyUrl];
 
-function setProxyUrl(url: string) {
-  proxyUrl = url;
+const getProxyUrl = (() => {
+  let index = 0;
+
+  return () => {
+    index = (index + 1) % proxyUrlList.length;
+
+    return proxyUrlList[index];
+  };
+})();
+
+function setProxyUrlList(urls: string | string[]) {
+  proxyUrlList = Array.isArray(urls) ? urls : [urls];
 }
 
-function getSongUrl(song: { id: string; provider: Provider; name?: string }) {
-  return `${proxyUrl}?id=${song.id}&provider=${song.provider}`;
+function getSongUrl(
+  song: { id: string; provider: Provider; name?: string },
+  from: any = 'default'
+) {
+  const url = getProxyUrl();
+
+  if (from !== 'ignore') {
+    console.log('==getSongUrl==', `┣ ${from} ┫ ┣ ${song.name} ┫ ┣ ${song.id} ┫ ┣ ${url} ┫`);
+  }
+  return `${url}?id=${song.id}&provider=${song.provider}`;
 }
 
-export { getSongUrl, setProxyUrl };
+export { getSongUrl, setProxyUrlList };
