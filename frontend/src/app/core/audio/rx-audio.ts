@@ -40,7 +40,7 @@ export class RxAudio extends AudioListeners {
 
     this.song = {
       ...song,
-      url: getSongUrl(song),
+      url: getSongUrl(song, 'rx-audio'),
     };
 
     // 标记播放范围

@@ -23,9 +23,7 @@ function getSongUrl(
 ) {
   const url = getProxyUrl();
 
-  if (from !== 'ignore') {
-    console.log('==getSongUrl==', `┣ ${from} ┫ ┣ ${song.name} ┫ ┣ ${song.id} ┫ ┣ ${url} ┫`);
-  }
+  console.log('==getSongUrl==', `┣ ${from} ┫ ┣ ${song.name} ┫ ┣ ${song.id} ┫ ┣ ${url} ┫`);
   return `${url}?id=${song.id}&provider=${song.provider}`;
 }
 

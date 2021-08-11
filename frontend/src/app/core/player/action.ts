@@ -1,4 +1,3 @@
-import { getSongUrl } from '../audio/helper';
 import { PlayerSong } from '../audio/interface';
 import { Position, Status } from './interface';
 import { PlayerStatus } from './status';
@@ -105,14 +104,11 @@ export class PlayerAction extends PlayerStatus {
   }
 
   public updateSongs(songs: Omit<PlayerSong, 'url'>[]) {
-    const wrapList = songs.map((song) => ({
-      ...song,
-      url: getSongUrl(song, 'ignore'),
-    }));
+    const temp = [...songs];
 
     // 更新列表
     this.songList.length = 0;
-    this.songList.push(...wrapList);
+    this.songList.push(...temp);
   }
 
   protected loadSongList(
