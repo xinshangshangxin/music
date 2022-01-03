@@ -57,6 +57,13 @@ export class SearchService {
       };
     }
 
+    if (/^\s*\d{6,}/.test(keyword)) {
+      return {
+        type: SearchType.parse,
+        data: keyword,
+      };
+    }
+
     return {
       type: SearchType.search,
       data: keyword,
