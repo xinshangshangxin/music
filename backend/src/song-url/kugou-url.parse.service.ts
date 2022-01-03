@@ -22,6 +22,7 @@ export class KugouUrlParseService {
     chainShare: /https?:\/\/m\.kugou\.com\/share\/\?chain=(\w+)/,
     zlistShare: /https?:\/\/\w+\.kugou\.com\/share\/zlist.html/,
     userListShare: /https?:\/\/\w+\.kugou\.com\/\w+/,
+    codeShare: /^\s*\d{6,6}\s*/,
   };
 
   private client: request.RequestAPI<
@@ -55,6 +56,89 @@ export class KugouUrlParseService {
     }
 
     return Privilege.unknown;
+  }
+
+  async codeShare(code: string) {
+    if (!this.supportedUrlReg.codeShare.test(code)) {
+      throw new Error('not match codeShare');
+    }
+
+    const tmp = await this.client('http://t.kugou.com/command/', {
+      method: 'POST',
+      headers: {
+        'KG-RC': 1,
+        'User-Agent': '',
+        'KG-THash': 'network_super_call.cpp:3676261689:391',
+
+        'content-type': 'application/x-www-form-urlencoded',
+      },
+      body: JSON.stringify({
+        appid: 1001,
+        clientver: 9229,
+        mid: 'db2bf0a9911e27465383773ba8c53869',
+        clienttime: 694548331,
+        key: 'a3b4977a744be166bca338717f88eae2',
+        data: code,
+      }),
+      json: true,
+    });
+
+    const info = tmp?.data?.info;
+
+    if (!info) {
+      throw new Error('parse code failed');
+    }
+
+    const r = await this.client(
+      'http://www2.kugou.kugou.com/apps/kucodeAndShare/app/',
+      {
+        method: 'POST',
+        headers: {
+          'KG-RC': 1,
+          'User-Agent': '',
+          'KG-THash': 'network_super_call.cpp:3676261689:391',
+
+          'content-type': 'application/x-www-form-urlencoded',
+        },
+        body: JSON.stringify({
+          appid: 1001,
+          clientver: 9229,
+          mid: 'db2bf0a9911e27465383773ba8c53869',
+          clienttime: 694548331,
+          key: 'a3b4977a744be166bca338717f88eae2',
+          data: {
+            id: info.id,
+            type: 3,
+            userid: info.userid,
+            collect_type: info.collect_type,
+            page: 1,
+            pagesize: info.count,
+          },
+        }),
+        json: true,
+      },
+    );
+
+    const songs = r?.data;
+
+    if (!songs) {
+      throw new Error('parse code data failed');
+    }
+
+    return songs.map(item => {
+      return {
+        privilege: Privilege.unknown,
+        provider: Provider.kugou,
+        id: item.hash,
+        name: ((item.filename || '').split('-')[1] || '').trim(),
+        artists: [
+          {
+            name: ((item.filename || '').split('-')[0] || '').trim(),
+          },
+        ],
+        duration: item.duration,
+      };
+    });
   }
 
   async rawShare(url: string): Promise<SearchSong[]> {
