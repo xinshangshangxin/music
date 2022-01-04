@@ -126,16 +126,16 @@ export class KugouUrlParseService {
     }
 
     return songs.map(item => {
+      const [n1, n2] = item?.filename
+        ?.replace(/(.*)(\.[^.]*)/, '$1')
+        ?.split('-');
+
       return {
         privilege: Privilege.unknown,
         provider: Provider.kugou,
         id: item.hash,
-        name: ((item.filename || '').split('-')[1] || '').trim(),
-        artists: [
-          {
-            name: ((item.filename || '').split('-')[0] || '').trim(),
-          },
-        ],
+        name: (n2 || '').trim(),
+        artists: [{ name: (n1 || '').trim() }],
         duration: item.duration,
       };
     });
