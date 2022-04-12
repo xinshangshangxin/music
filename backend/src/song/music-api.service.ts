@@ -1,11 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { album, getSong, playlist, search, Adapter } from '@s4p/music-api';
-
+import { album, getSong, playlist, search } from '@s4p/music-api';
+import { qqAdapter } from './adapters';
 import { SearchSong } from './fields/SearchSong';
 import { BitRate, Provider } from './register-type';
-import qq from './adapters/qq';
-
-const qqAdapter = new Adapter(qq as any);
 
 @Injectable()
 export class MusicApiService {

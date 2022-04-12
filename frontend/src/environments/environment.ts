@@ -4,13 +4,13 @@
 
 export const environment = {
   production: false,
-  // backendUrl: 'http://127.0.0.1:3000',
-  backendUrl: 'https://music.xinshangshangxin.com',
+  backendUrl: 'http://127.0.0.1:3000',
+  // backendUrl: 'https://music.xinshangshangxin.com',
   proxyUrl: '//proxy.music.xinshangshangxin.com',
 
   build: {
     when: new Date().toISOString(),
-    sha: process.env.SHA || 'no-sha',
+    sha: 'no-sha',
   },
 };
 

@@ -1,14 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { BitRate, getSong, Provider } from '@s4p/music-api';
+import { BitRate, getSong } from '@s4p/music-api';
 import omit from 'lodash/omit';
 import { Repository } from 'typeorm';
-
 import { createOrUpdate } from '../util/helper';
+import { qqAdapter } from './adapters';
 import { Album } from './entities/Album.entity';
 import { Artist } from './entities/Artist.entity';
 import { Song } from './entities/Song.entity';
-import { Privilege } from './register-type';
+import { Privilege, Provider } from './register-type';
 
 @Injectable()
 export class SongService {
@@ -81,7 +81,14 @@ export class SongService {
       return song;
     }
 
-    const baseSong = await getSong(id, provider, br);
+    let baseSong;
+
+    if (provider === Provider.adapterQQ) {
+      baseSong = await qqAdapter.getSong(id);
+    } else {
+      baseSong = await getSong(id, provider, br);
+    }
+
     logger.debug({ baseSong });
 
     if (!baseSong.artists) {
@@ -109,7 +116,7 @@ export class SongService {
       saveSong = {
         provider,
         ...omit(baseSong, ['album', 'artists']),
-      };
+      } as any;
     }
 
     saveSong.artists = await Promise.all(
