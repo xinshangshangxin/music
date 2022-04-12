@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { ISearchItem } from '@s4p/music-api';
-import { Provider } from 'src/song/register-type';
+import { Provider } from '../song/register-type';
 import { KugouUrlParseService } from './kugou-url.parse.service';
 import { QQUrlParseService } from './qq-url.parse.service';
 
