@@ -1,7 +1,9 @@
 name: Deploy to ALI Docker
 
 on:
-  - push
+  push:
+    branches:
+      - develop
 
 jobs:
   build:
