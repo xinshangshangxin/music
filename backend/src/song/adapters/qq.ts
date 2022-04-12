@@ -35,7 +35,11 @@ const qq = {
       id: .songinfo.data.track_info.mid, 
       name: .songinfo.data.track_info.name, 
       artists: .songinfo.data.track_info.singer, 
-      picture: ("https://y.qq.com/music/photo_new/T002R300x300M000" + .songinfo.data.track_info.album.mid + ".jpg"),  
+      album: {
+        id: .songinfo.data.track_info.album.mid,
+        name: .songinfo.data.track_info.album.name,
+        img: ("https://y.qq.com/music/photo_new/T002R300x300M000" + .songinfo.data.track_info.album.mid + ".jpg")
+      }
     }`,
   },
   url: {
