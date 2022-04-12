@@ -13,6 +13,7 @@ import { RectSvgController } from './rect-svg/rect-svg.controller';
 import { AudioService } from './song-peak/audio.service';
 import { SongPeakService } from './song-peak/song-peak.service';
 import { KugouUrlParseService } from './song-url/kugou-url.parse.service';
+import { QQUrlParseService } from './song-url/qq-url.parse.service';
 import { SongUrlParseService } from './song-url/song-url-parse.service';
 import { Album } from './song/entities/Album.entity';
 import { Artist } from './song/entities/Artist.entity';
@@ -41,6 +42,7 @@ import { SongService } from './song/song.service';
     AppService,
     AudioService,
     KugouUrlParseService,
+    QQUrlParseService,
     MusicApiService,
     SongPeakService,
     SongResolver,

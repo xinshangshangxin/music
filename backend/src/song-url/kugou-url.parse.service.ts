@@ -22,7 +22,7 @@ export class KugouUrlParseService {
     chainShare: /https?:\/\/m\.kugou\.com\/share\/\?chain=(\w+)/,
     zlistShare: /https?:\/\/\w+\.kugou\.com\/share\/zlist.html/,
     userListShare: /https?:\/\/\w+\.kugou\.com\/\w+/,
-    codeShare: /^\s*\d{6,6}\s*/,
+    codeShare: /^\d{6,6}$/,
   };
 
   private client: request.RequestAPI<
