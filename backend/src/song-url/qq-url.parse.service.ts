@@ -8,6 +8,7 @@ import { Privilege, Provider } from '../song/register-type';
 @Injectable()
 export class QQUrlParseService {
   supportedUrlReg = {
+    pcShare: /https:\/\/c.y.qq.com\/base\/fcgi-bin\/u\?__/,
     playlist: /^https?:\/\/y.qq.com\/n\/ryqq\/playlist\/(\d+)$/,
     rawShare: /^https?:\/\/i.y.qq.com\/n2\/m\/share\/details\/taoge.html.*id=(\d+)/,
     codeShare: /^\d{10,10}$/,
@@ -76,5 +77,21 @@ export class QQUrlParseService {
     const code = RegExp.$1;
 
     return this.codeShare(code);
+  }
+
+  async pcShare(url: string) {
+    if (!this.supportedUrlReg.pcShare.test(url)) {
+      throw new Error('not match pcShare');
+    }
+
+    const {
+      headers: { location },
+    } = await this.client(url, {
+      followRedirect: false,
+      simple: false,
+      resolveWithFullResponse: true,
+    });
+
+    return this.rawShare(location);
   }
 }
