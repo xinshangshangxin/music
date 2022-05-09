@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { album, getSong, playlist, search } from '@s4p/music-api';
+import { groupBy } from 'lodash';
 import { qqAdapter } from './adapters';
 import { SearchSong } from './fields/SearchSong';
 import { BitRate, Provider } from './register-type';
@@ -26,6 +27,12 @@ export class MusicApiService {
       providers = Object.values(Provider);
     }
 
+    const len = providers.length;
+
+    providers = providers.filter(p => {
+      return p !== Provider.adapterQQ;
+    });
+
     const data = await search(
       {
         keyword,
@@ -35,7 +42,48 @@ export class MusicApiService {
       providers as Provider[],
     );
 
-    return data;
+    let result: typeof data = [];
+
+    // adapterQQ
+    if (len > providers.length) {
+      const temp = await qqAdapter.search({ keyword });
+
+      // 按 provider 分类
+      const obj = groupBy(data, ({ provider }) => {
+        return provider;
+      });
+
+      // 把 adapterQQ 加入分类
+      obj[Provider.adapterQQ] = temp.map(item => {
+        return {
+          provider: Provider.adapterQQ,
+          ...item,
+        };
+      });
+
+      // 按照 provider 顺序, 间隔加入 result
+      const keys = Object.keys(obj);
+      while (true) {
+        let len = 0;
+
+        for (const key of keys) {
+          const item = obj[key].shift();
+          if (item) {
+            len += 1;
+            result.push(item);
+          }
+        }
+
+        // 每个 provider 都没有歌曲了
+        if (len === 0) {
+          break;
+        }
+      }
+    } else {
+      result = [...data];
+    }
+
+    return result;
   }
 
   async getUrl(id: string, provider: Provider, br?: BitRate): Promise<string> {
