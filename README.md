@@ -19,6 +19,12 @@
 
 基于 `nestjs` 调用 `@s4p/music-api` 提供 `graphql` 接口的后台服务
 
+### [android](./android)
+
+基于 [androidjs](https://github.com/android-js/androidjs) 和 [frontend](./frontend) 和 [proxy](https://github.com/xinshangshangxin/music/tree/5.x/proxy) 实现安卓应用
+
+> [debug apk 下载](https://github.com/xinshangshangxin/music/releases/download/v6.1.0/high-music.apk.zip)
+
 ### [kugou-lrc](https://github.com/xinshangshangxin/music/tree/5.x/kugou-lrc)
 
 酷狗歌词搜索/下载/解析
