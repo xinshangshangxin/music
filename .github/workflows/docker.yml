@@ -1,12 +1,10 @@
 name: Deploy to ALI Docker
 
-on:
-  push:
-    branches:
-      - develop
+on: push
 
 jobs:
   build:
+    if: startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
 
     steps:

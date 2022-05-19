@@ -1,0 +1,61 @@
+name: Android build
+
+on: push
+
+jobs:
+  build:
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+
+    env:
+      ACTIONS_ALLOW_UNSECURE_COMMANDS: true
+
+    strategy:
+      matrix:
+        node-version: [16]
+
+    steps:
+      - uses: actions/checkout@v1
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Get npm cache directory
+        id: npm-cache
+        run: |
+          echo "::set-output name=dir::$(npm config get cache)"
+
+      - uses: actions/cache@v2
+        with:
+          path: ${{ steps.npm-cache.outputs.dir }}
+          key: ${{ runner.os }}-npm-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-npm-
+
+      - name: build
+        working-directory: ./
+        run: |
+          cd frontend
+          npm ci
+          npm run build:android
+          cd ../
+          cd android
+          npm ci
+          npm run build:front
+          npm run build:action
+
+      - name: set asset_path env
+        run: |
+          ls -lah android/dist
+          asset_path=$(ls ./android\/dist/*.apk)
+          asset_name=${asset_path#*android\/dist/}
+          echo "::set-env name=ASSET_PATH::${asset_path}"
+          echo "::set-env name=ASSET_NAME::${asset_name}"
+      
+      - name: Upload apk
+        uses: actions/upload-artifact@v1
+        with:
+          name: ${{ env.ASSET_NAME }}
+          path: ${{ env.ASSET_PATH }}

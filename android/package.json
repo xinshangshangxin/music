@@ -16,6 +16,7 @@
   "scripts": {
     "start:dev": "node .",
     "build": "androidjs build",
+    "build:action": "node devtools/action build",
     "build:front": "node devtools/build-front"
   },
   "author": "",
@@ -28,5 +29,8 @@
   },
   "theme": {
     "fullScreen": true
+  },
+  "devDependencies": {
+    "androidjs-builder": "^2.2.4"
   }
 }
