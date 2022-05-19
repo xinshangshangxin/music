@@ -1,0 +1,58 @@
+name: Android build
+
+on:
+  push:
+    branches:
+      - develop
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [16]
+
+    steps:
+      - uses: actions/checkout@v1
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: build
+        working-directory: ./
+        run: |
+          # cd frontend
+          # npm ci
+          # npm run build:android
+          # cd ../
+          # cd android
+          # npm ci
+          # npm run build:front
+          npm run build:action
+      
+      - uses: actions/download-artifact@v1
+        with:
+          name: high-music
+      
+      - name: set asset_path env
+        run: |
+          ls -lah android/dist
+          asset_path=$(ls ./android\/dist/*.apk)
+          asset_name=${asset_path#*android\/dist/}
+          echo "::set-env name=ASSET_PATH::${asset_path}"
+          echo "::set-env name=ASSET_NAME::${asset_name}"
+      
+      - name: Upload Release Asset
+        uses: actions/upload-release-asset@v1.0.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ${{ env.ASSET_PATH }}
+          asset_name: ${{ env.ASSET_NAME }}
+          asset_content_type: application/octet-stream
+
+

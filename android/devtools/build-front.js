@@ -25,7 +25,7 @@ const appDir = `
 const dist = resolve(__dirname, "../views/");
 
 fs.emptyDirSync(dist);
-fs.copySync(resolve(__dirname, "../../../frontend/dist/"), dist);
+fs.copySync(resolve(__dirname, "../../frontend/dist/"), dist);
 
 const indexHtmlPath = resolve(dist, "index.html");
 
