@@ -5,6 +5,7 @@
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build --prod --build--optimizer --aot --output-path dist",
+    "build:android": "ng build --base-href ./ --prod --configuration=android --build--optimizer --aot --output-path dist",
     "test": "ng test",
     "lint": "eslint --ext .ts ./",
     "lint-fix": "eslint --ext .ts ./ --fix",

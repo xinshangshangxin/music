@@ -1,0 +1,32 @@
+{
+  "version": "1.0.0",
+  "name": "high-music",
+  "project-type": "webview",
+  "app-name": "High Music",
+  "project-name": "high-music",
+  "package-name": "highmusic",
+  "icon": "./assets/icon/icon.png",
+  "dist-path": "./dist",
+  "permission": [
+    "android.permission.INTERNET",
+    "android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS"
+  ],
+  "description": "",
+  "main": "main.js",
+  "scripts": {
+    "start:dev": "node .",
+    "build": "androidjs build",
+    "build:front": "node devtools/build-front"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "androidjs": "^2.0.2",
+    "fs-extra": "^10.1.0",
+    "request": "^2.88.2",
+    "request-promise": "^4.2.6"
+  },
+  "theme": {
+    "fullScreen": true
+  }
+}
