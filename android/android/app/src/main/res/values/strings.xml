@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">high-music</string>
+    <string name="title_activity_main">high-music</string>
+    <string name="package_name">com.shang.highMusic</string>
+    <string name="custom_url_scheme">com.shang.highMusic</string>
+</resources>

@@ -1,7 +1,7 @@
 const fs = require("fs-extra");
 const { resolve } = require("path");
 
-const distDir = resolve(__dirname, "../www/capacitor/");
+const distDir = resolve(__dirname, "../www/static/capacitor/");
 
 const core = resolve(
   __dirname,

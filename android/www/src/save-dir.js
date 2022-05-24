@@ -1,4 +1,4 @@
-const { channel } = require("bridge");
+const { channel } = require("./bridge");
 
 function defer() {
   let resolve;
@@ -45,26 +45,5 @@ let getDir = async (timeout = 3000) => {
       .catch(rj);
   });
 };
-
-
-
-
-
-
-channel.addListener('msg-from-capacitor', message => {
-    console.log('[node] Message from Capacitor code: ' + message);
-    channel.send("msg-from-nodejs", "Replying to this message: " + message, "And optionally add further args");
-});
-
-
-
-
-
-
-
-
-
-
-
 
 module.exports = getDir;

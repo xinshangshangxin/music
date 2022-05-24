@@ -4,8 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "build:static": "node devtools/cp-runtime && node devtools/build-front"
+    "dev:static": "cd www/static && live-server --no-browser --cors",
+    "build:static": "node devtools/cp-runtime && node devtools/build-front && npm run sync",
+    "sync": "cap sync android"
   },
   "keywords": [],
   "author": "",

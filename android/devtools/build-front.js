@@ -1,16 +1,23 @@
 const fs = require("fs-extra");
 const { resolve } = require("path");
 
-const eruda = `
-<script src="../capacitor/eruda.js"></script>
-<script>
-  eruda.init();
-</script>
-`;
+// const devtools = `
+// <script src="capacitor/eruda.js"></script>
+// <script>
+//   eruda.init();
+// </script>
+// `;
+
+// const devtools = `
+// <script src="https://unpkg.com/vconsole@latest/dist/vconsole.min.js"></script>
+// <script>
+// var vConsole = new window.VConsole();
+// </script>
+// `;
 
 const appDir = `
-<script type="text/javascript" src="../capacitor/core.js"></script>
-<script type="text/javascript" src="../capacitor/filesystem.js"></script>
+<script type="text/javascript" src="capacitor/core.js"></script>
+<script type="text/javascript" src="capacitor/filesystem.js"></script>
 <script>
   const { Capacitor, CapacitorCustomPlatform } = capacitorExports;
   const { Directory, Filesystem } = capacitorFilesystem;
@@ -147,7 +154,7 @@ const media = `
 </script>
 `
 
-const dist = resolve(__dirname, "../www/");
+const dist = resolve(__dirname, "../www/static/");
 
 const list = fs.readdirSync(dist);
 
@@ -169,17 +176,17 @@ list.forEach((name) => {
 fs.copySync(resolve(__dirname, "../../frontend/dist/"), dist);
 
 const indexHtmlPath = resolve(dist, "index.html");
+const outputIndexHtmlPath = resolve(dist, "../index.html");
 
 const content = fs.readFileSync(indexHtmlPath, "utf8");
 
 fs.writeFileSync(
-  indexHtmlPath,
+  outputIndexHtmlPath,
   content.replace(
     "<body>",
     `
 <body>
 
-${eruda}
 ${appDir}
 ${media}
 

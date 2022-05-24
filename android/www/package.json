@@ -10,9 +10,11 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "finalhandler": "^1.2.0",
     "fs-extra": "^10.1.0",
     "request": "^2.88.2",
-    "request-promise": "^4.2.6"
+    "request-promise": "^4.2.6",
+    "serve-static": "^1.15.0"
   },
   "devDependencies": {}
 }

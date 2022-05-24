@@ -4,7 +4,7 @@ on: push
 
 jobs:
   build:
-    if: startsWith(github.ref, 'refs/tags/v')
+    # if: startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
 
     env:
@@ -34,23 +34,38 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-npm-
 
+      - uses: actions/setup-java@v3
+        with:
+          distribution: 'zulu' # See 'Supported distributions' for available options
+          java-version: '11'
+
       - name: build
         working-directory: ./
         run: |
+          # 先构建前端项目
           cd frontend
           npm ci
           npm run build:android
+          # 复制前端项目
           cd ../
           cd android
           npm ci
-          npm run build:front
-          npm run build:action
+          npm run build:static
+          # 安装 nodejs 依赖
+          cd www
+          npm ci
+          # cap sync 
+          cd ..
+          npm run sync
+          # apk build
+          cd android
+          gradle assembleDebug
 
       - name: set asset_path env
         run: |
-          ls -lah android/dist
-          asset_path=$(ls ./android\/dist/*.apk)
-          asset_name=${asset_path#*android\/dist/}
+          ls -lah android/app/build/outputs/apk/debug
+          asset_path=$(ls ./android/app/build/outputs/apk/debug/*.apk)
+          asset_name=${asset_path#*debug/}
           echo "::set-env name=ASSET_PATH::${asset_path}"
           echo "::set-env name=ASSET_NAME::${asset_name}"
       

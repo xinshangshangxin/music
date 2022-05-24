@@ -1,4 +1,4 @@
-android
 node_modules
-www/*
-!www/nodejs
+
+www/static
+www/index.html
