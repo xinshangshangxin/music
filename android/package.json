@@ -1,0 +1,23 @@
+{
+  "name": "high-music",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build:static": "node devtools/cp-runtime && node devtools/build-front"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@capacitor/android": "^3.5.1",
+    "@capacitor/core": "^3.5.1",
+    "@capacitor/filesystem": "^1.1.0",
+    "capacitor-nodejs": "github:hampoelz/capacitor-nodejs"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^3.5.1",
+    "fs-extra": "^9.1.0"
+  }
+}

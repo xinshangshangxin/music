@@ -1,0 +1,15 @@
+{
+  "appId": "com.shang.highMusic",
+  "appName": "high-music",
+  "webDir": "www",
+  "bundledWebRuntime": true,
+  "plugins": {
+    "NodeJS": {
+      "nodeDir": "nodejs"
+    }
+  },
+  "server": {
+    "url": "http://192.168.2.101:8080",
+    "cleartext": true
+  }
+}
