@@ -51,10 +51,12 @@ jobs:
           cd android
           npm ci
           npm run build:static
+          # action 构建出现问题, 临时修复
+          cp node_modules/capacitor-nodejs/android/src/main/cpp/Bridge.h node_modules/capacitor-nodejs/android/src/main/cpp/bridge.h || true
           # 安装 nodejs 依赖
           cd www
           npm ci
-          # cap sync 
+          # cap sync
           cd ..
           npm run sync
           # apk build
@@ -63,8 +65,8 @@ jobs:
 
       - name: set asset_path env
         run: |
-          ls -lah android/app/build/outputs/apk/debug
-          asset_path=$(ls ./android/app/build/outputs/apk/debug/*.apk)
+          ls -lah android/android/app/build/outputs/apk/debug
+          asset_path=$(ls ./android/android/app/build/outputs/apk/debug/*.apk)
           asset_name=${asset_path#*debug/}
           echo "::set-env name=ASSET_PATH::${asset_path}"
           echo "::set-env name=ASSET_NAME::${asset_name}"

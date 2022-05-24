@@ -1,5 +1,5 @@
-import { tap } from "rxjs/operators";
-import { PlayerPlay } from "./play";
+import { tap } from 'rxjs/operators';
+import { PlayerPlay } from './play';
 
 export class Player extends PlayerPlay {
   constructor() {
@@ -10,26 +10,26 @@ export class Player extends PlayerPlay {
 
   private tryAddMediaSession() {
     try {
-      navigator.mediaSession.setActionHandler("play", () => {
+      navigator.mediaSession.setActionHandler('play', () => {
         this.play();
       });
-      navigator.mediaSession.setActionHandler("pause", () => {
+      navigator.mediaSession.setActionHandler('pause', () => {
         this.pause();
-        navigator.mediaSession.playbackState = "paused";
+        navigator.mediaSession.playbackState = 'paused';
       });
 
-      navigator.mediaSession.setActionHandler("nexttrack", () => {
+      navigator.mediaSession.setActionHandler('nexttrack', () => {
         this.next();
       });
 
-      navigator.mediaSession.setActionHandler("previoustrack", () => {
+      navigator.mediaSession.setActionHandler('previoustrack', () => {
         this.previous();
       });
 
       this.play$
         .pipe(
           tap(() => {
-            navigator.mediaSession.playbackState = "playing";
+            navigator.mediaSession.playbackState = 'playing';
 
             const song = this.currentSong;
             if (!song) {
@@ -45,9 +45,9 @@ export class Player extends PlayerPlay {
                     .map(({ name }) => {
                       return name;
                     })
-                    .join("&")) ||
-                "",
-              album: (song.album && song.album.name) || "",
+                    .join('&')) ||
+                '',
+              album: (song.album && song.album.name) || '',
               artwork: song.album ? [{ src: song.album.img }] : []
             });
           })
@@ -55,11 +55,20 @@ export class Player extends PlayerPlay {
         .subscribe(
           () => {},
           e => {
-            console.warn("play watch failed", e);
+            console.warn('play watch failed', e);
           }
         );
+
+      // @ts-ignore
+      navigator.mediaSession.setActionHandler('togglePlay', () => {
+        if (this.status === 'paused') {
+          this.play();
+        } else {
+          this.pause();
+        }
+      });
     } catch (e) {
-      console.warn("add mediaSession failed", e);
+      console.warn('add mediaSession failed', e);
     }
   }
 }
