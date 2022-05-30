@@ -23,7 +23,7 @@
 
 基于 [capacitor](https://github.com/ionic-team/capacitor) 和 [frontend](./frontend) 和 [proxy](https://github.com/xinshangshangxin/music/tree/5.x/proxy) 实现安卓应用
 
-> [debug apk 下载](https://github.com/xinshangshangxin/music/releases/download/v6.2.0/high-music.apk.zip)
+> [debug apk 下载](https://github.com/xinshangshangxin/music/releases/download/v6.2.0/high-music.apk)
 
 ### [kugou-lrc](https://github.com/xinshangshangxin/music/tree/5.x/kugou-lrc)
 
