@@ -1,6 +1,45 @@
 apply plugin: 'com.android.application'
 
+def getProperties = {
+    Properties properties = new Properties()
+
+    if(file('../local.properties').exists()) {
+        InputStream inputStream = project.rootProject.file('local.properties').newDataInputStream()
+        properties.load(inputStream)
+    } else {
+        project.logger.lifecycle('处理 环境 变量')
+        project.logger.lifecycle(System.getenv("KEYSTORE_FILE_PATH"))
+        project.logger.lifecycle(System.getenv("STORE_PASSWORD"))
+        project.logger.lifecycle(System.getenv("KEY_PASSWORD"))
+        project.logger.lifecycle(System.getenv("KEY_ALIAS"))
+
+        properties.setProperty('storeFile', System.getenv("KEYSTORE_FILE_PATH"))
+        properties.setProperty('storePassword', System.getenv("STORE_PASSWORD"))
+        properties.setProperty('keyPassword', System.getenv("KEY_PASSWORD"))
+
+        if (System.getenv('KEY_ALIAS')) {
+            properties.setProperty('keyAlias', System.getenv("KEY_ALIAS"))
+        }
+    }
+
+    if (properties.getProperty('keyAlias') == null) {
+        properties.setProperty('keyAlias', 'debug')
+    }
+
+    return properties
+}
+
 android {
+    def properties = getProperties()
+
+    signingConfigs {
+        debug {
+            storeFile file(properties.getProperty('storeFile'))
+            storePassword properties.getProperty('storePassword')
+            keyAlias properties.getProperty('keyAlias')
+            keyPassword properties.getProperty('keyPassword')
+        }
+    }
     compileSdkVersion rootProject.ext.compileSdkVersion
     defaultConfig {
         applicationId "com.shang.highMusic"
@@ -19,6 +58,11 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+        debug {
+            signingConfig signingConfigs.debug
+            applicationIdSuffix '.debug'
+            debuggable true
         }
     }
 }

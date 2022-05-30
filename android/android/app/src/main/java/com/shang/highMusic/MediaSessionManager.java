@@ -59,15 +59,27 @@ public class MediaSessionManager extends Plugin {
         Log.v("action", "updateSongMeta");
         String name = call.getString("title");
         String artist = call.getString("artist");
+        String album = call.getString("album");
+        String artworkUrl = call.getString("artworkUrl");
 
         if (name == null || artist == null) {
             mMediaSession.setMetadata(null);
             return;
         }
 
+        if (album == null) {
+            album = "";
+        }
+
+        if (artworkUrl == null) {
+            artworkUrl = "";
+        }
+
         mMediaSession.setMetadata(
                 new MediaMetadataCompat.Builder()
                         .putString(MediaMetadataCompat.METADATA_KEY_TITLE, name)
+                        .putString(MediaMetadataCompat.METADATA_KEY_ALBUM, album)
+                        .putString(MediaMetadataCompat.METADATA_KEY_ALBUM_ART_URI, artworkUrl)
                         .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, artist).build()
         );
     }

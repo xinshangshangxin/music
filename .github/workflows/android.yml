@@ -36,16 +36,32 @@ jobs:
 
       - uses: actions/setup-java@v3
         with:
-          distribution: 'zulu' # See 'Supported distributions' for available options
-          java-version: '11'
+          distribution: "zulu" # See 'Supported distributions' for available options
+          java-version: "11"
+
+      - name: Decode Keystore
+        env:
+          KEYSTORE: ${{ secrets.KEYSTORE }}
+        run: |
+          KEYSTORE_FILE_PATH="${RUNNER_TEMP}"/keystore.jks
+          echo ${KEYSTORE} | base64 -di > "${KEYSTORE_FILE_PATH}"
+          echo "::set-env name=KEYSTORE_FILE_PATH::${KEYSTORE_FILE_PATH}"
 
       - name: build
+        env:
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+          STORE_PASSWORD: ${{ secrets.STORE_PASSWORD }}
         working-directory: ./
         run: |
           # 先构建前端项目
           cd frontend
           npm ci
           npm run build:android
+
+          # mkdir dist
+          # echo "" > dist/index.html
+
           # 复制前端项目
           cd ../
           cd android
@@ -70,7 +86,7 @@ jobs:
           asset_name=${asset_path#*debug/}
           echo "::set-env name=ASSET_PATH::${asset_path}"
           echo "::set-env name=ASSET_NAME::${asset_name}"
-      
+
       - name: Upload apk
         uses: actions/upload-artifact@v1
         with:
