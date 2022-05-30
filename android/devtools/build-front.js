@@ -75,7 +75,10 @@ const media = `
 
   window.MediaMetadata = class MediaMetadata {
     constructor(info) {
-      this.info;
+      Object.assign(this, {
+        ...info,
+        artworkUrl: info?.artwork?.[0]?.src,
+      });
     }
   };
 
