@@ -6,6 +6,7 @@ const { resolve } = require("path");
 const download = require("./download");
 const audioPipe = require("./audio-pipe");
 const config = require("./config");
+const qm = require("./qq");
 
 const serve = serveStatic(resolve(__dirname, "../static"));
 
@@ -41,6 +42,24 @@ async function run(port = config.port, host = "0.0.0.0") {
         );
 
         console.log("==================", { pathname });
+
+        // qq cookie 写入更新
+        if (pathname === "/qq") {
+          const cookie = searchParams.get("cookie");
+
+          qm.updateCookie(cookie)
+            .then(() => {
+              res.statusCode = 200;
+              res.end();
+            })
+            .catch((e) => {
+              console.warn(e);
+              res.statusCode = 400;
+              res.end();
+            });
+
+          return;
+        }
 
         // 静态资源返回
         if (pathname !== "/proxy") {

@@ -1,13 +1,20 @@
-const config = require('./config');
+const config = require("./config");
+const qm = require("./qq");
 
-const { createWriteStream, access, ensureDir, move, remove } = require('fs-extra');
-const request = require('request');
-const rp = require('request-promise');
-const { resolve: pathResolve } = require('path');
-const { pipeline: originPipeline } = require('stream');
-const { promisify } = require('util');
+const {
+  createWriteStream,
+  access,
+  ensureDir,
+  move,
+  remove,
+} = require("fs-extra");
+const request = require("request");
+const rp = require("request-promise");
+const { resolve: pathResolve } = require("path");
+const { pipeline: originPipeline } = require("stream");
+const { promisify } = require("util");
 
-const getDir = require('./save-dir');
+const getDir = require("./save-dir");
 
 const pipeline = promisify(originPipeline);
 
@@ -20,11 +27,14 @@ const awaitWrap = (promise) => {
 async function getDownloadUrl({ id, provider, br }) {
   const saveDir = await getDir();
 
-  const tmpDir = pathResolve(saveDir, 'tmp');
+  const tmpDir = pathResolve(saveDir, "tmp");
 
   await ensureDir(tmpDir);
 
-  const tempPath = pathResolve(tmpDir, `${id}-${provider}-${br}-${Date.now()}.tmp`);
+  const tempPath = pathResolve(
+    tmpDir,
+    `${id}-${provider}-${br}-${Date.now()}.tmp`
+  );
 
   const realPath = pathResolve(saveDir, `${id}-${provider}-${br}.mp3`);
 
@@ -32,9 +42,14 @@ async function getDownloadUrl({ id, provider, br }) {
 }
 
 async function getUrl(id, provider, br) {
-  console.debug('==== start getUrl');
+  console.debug("==== start getUrl", provider, id);
+
+  if (provider === "adapterQQ") {
+    return qm.url(id);
+  }
+
   let options = {
-    method: 'POST',
+    method: "POST",
     url: config.songUrl,
     body: {
       query: `
@@ -84,16 +99,16 @@ async function persist(id, provider, br, realPath, tempPath) {
 
   // 获取最新url
   let url = await getUrl(id, provider, br);
-  console.debug('url: ', url);
+  console.debug("url: ", url);
 
   if (!url) {
-    deferred.reject(new Error('download error'));
+    deferred.reject(new Error("download error"));
   } else {
     let statusCode;
 
     try {
       await pipeline(
-        request({ url }).on('response', (response) => {
+        request({ url }).on("response", (response) => {
           ({ statusCode } = response);
         }),
         createWriteStream(tempPath)
@@ -118,7 +133,7 @@ async function persist(id, provider, br, realPath, tempPath) {
     cacheMap[cacheKey] = null;
     delete cacheMap[cacheKey];
 
-    console.info('cacheList Length: ', Object.keys(cacheMap).length);
+    console.info("cacheList Length: ", Object.keys(cacheMap).length);
   }, 0);
 
   return deferred.promise;
@@ -131,7 +146,7 @@ async function download({ id, provider, br }) {
     br,
   });
 
-  console.info('realPath: ', realPath);
+  console.info("realPath: ", realPath);
 
   let [err] = await awaitWrap(access(realPath));
 
