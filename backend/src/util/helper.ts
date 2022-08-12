@@ -13,8 +13,9 @@ async function createOrUpdate<T>(
     return registory.save({ ...item, ...entityLike });
   }
 
-  item = registory.create(entityLike);
-  return registory.save(item);
+  let tmp = registory.create(entityLike) as DeepPartial<T>;
+
+  return registory.save(tmp);
 }
 
 export { createOrUpdate };
