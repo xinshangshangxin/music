@@ -10,19 +10,24 @@ const qq = {
     rejectUnauthorized: false,
   },
   search: {
-    url: 'http://c.y.qq.com/soso/fcgi-bin/client_search_cp',
-    qs: {
-      format: 'json', // 返回json格式
-      n: 10, // 一页显示多少条信息
-      p: 1, // 第几页
-      w: '{{keyword}}', // 搜索关键词
-      cr: 1, // 不知道这个参数什么意思，但是加上这个参数你会对搜索结果更满意的
-      g_tk: 5381,
-      t: 0,
+    url: 'https://u.y.qq.com/cgi-bin/musicu.fcg',
+    method: 'POST',
+    json: true,
+    body: {
+      'music.search.SearchCgiService': {
+        method: 'DoSearchForQQMusicDesktop',
+        module: 'music.search.SearchCgiService',
+        param: {
+          num_per_page: 10,
+          page_num: 1,
+          query: '{{keyword}}',
+          search_type: 0,
+        },
+      },
     },
 
     result:
-      '[.data.song.list[] | { id: .songmid, name: .songname, artists: .singer, album: {name: .albumname, img: ("https://y.qq.com/music/photo_new/T002R300x300M000" + .albummid + ".jpg") } }]',
+      '[.["music.search.SearchCgiService"].data.body.song.list[] | {id: .mid, name: .name, artists: .singer, album: {name: .album.name, img: ("https://y.qq.com/music/photo_new/T002R300x300M000" + .album.mid + ".jpg")}}]',
   },
   song: {
     url: 'http://u.y.qq.com/cgi-bin/musicu.fcg',
