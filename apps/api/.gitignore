@@ -1,0 +1,36 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+
+# Dependencies
+node_modules/
+
+# JetBrains IDEs
+.idea/
+
+# Optional npm cache directory
+.npm
+
+# Optional eslint cache
+.eslintcache
+
+# Misc
+.DS_Store
+
+# Transpiled files
+build/
+
+# .vscode
+.vscode/
+
+# .swc
+.swc/
+
+# dist
+dist/
+
+# env
+.env.*
+!.env.example
+!.env.public

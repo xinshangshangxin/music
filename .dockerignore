@@ -1,0 +1,28 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+
+# Misc
+.DS_Store
+
+# IDEs
+.idea/
+.vscode/
+
+# Optional npm cache directory
+.npm
+.eslintcache
+
+**/.env
+**/.env.*
+!.env.public
+**/.git
+**/.swc/
+**/dist/
+**/build/
+**/node_modules/
+**/.svelte-kit/
+**/.umi/
+**/.umi-production/
+**/packages/template/

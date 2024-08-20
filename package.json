@@ -1,0 +1,39 @@
+{
+  "name": "app-name",
+  "version": "0.0.1",
+  "description": "",
+  "scripts": {
+    "build": "pnpm run -r build",
+    "cleanup": "rimraf 'packages/*/{dist,node_modules}' && rimraf 'apps/*/{dist,node_modules}' && rimraf node_modules",
+    "dev": "pnpm run --stream -r -F \"./apps/**\" dev",
+    "lint": "pnpm run -r lint",
+    "lint:fix": "pnpm run -r lint:fix",
+    "prettier": "pnpm run -r prettier",
+    "start": "pnpm run build && pnpm run dev"
+  },
+  "devDependencies": {
+    "@antfu/eslint-config": "^2.26.0",
+    "@swc-node/register": "^1.10.9",
+    "@swc/cli": "^0.4.0",
+    "@swc/core": "1.4.11",
+    "@types/node": "^22.4.1",
+    "bunchee": "^5.3.2",
+    "concurrently": "^8.2.0",
+    "cpx2": "^7.0.1",
+    "cross-env": "^7.0.3",
+    "eslint": "^9.1.1",
+    "eslint-plugin-format": "^0.1.1",
+    "nodemon": "^3.1.0",
+    "prettier": "^3.0.1",
+    "prettier-plugin-packagejson": "^2.4.5",
+    "rimraf": "^6.0.1",
+    "typescript": "5.5.4"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "volta": {
+    "node": "22.6.0",
+    "pnpm": "9.7.0"
+  }
+}

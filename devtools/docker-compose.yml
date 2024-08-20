@@ -1,0 +1,17 @@
+services:
+  api:
+    restart: unless-stopped
+    image: '${ALI_CONTAINER_HOST}/${ALI_CONTAINER_NAMESPACE}/app-name-api:latest'
+    environment:
+      - NODE_ENV=prod
+      - PORT=80
+    volumes:
+      - ./.env.prod:/app/.env.prod
+      - ./db:/db
+  console:
+    restart: always
+    image: ${ALI_CONTAINER_HOST}/${ALI_CONTAINER_NAMESPACE}/app-name-console:latest
+    depends_on:
+      - api
+    ports:
+      - ${PORT}:80
