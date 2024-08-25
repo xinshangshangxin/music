@@ -1,5 +1,6 @@
 const config = require("./config");
 const qm = require("./qq");
+const sixYinGetUrl = require("./sixyin");
 
 const {
   createWriteStream,
@@ -45,7 +46,7 @@ async function getUrl(id, provider, br) {
   console.debug("==== start getUrl", provider, id);
 
   if (provider === "adapterQQ") {
-    return qm.url(id);
+    return sixYinGetUrl(id);
   }
 
   let options = {
