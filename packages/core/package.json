@@ -1,0 +1,41 @@
+{
+  "name": "core",
+  "type": "module",
+  "version": "0.0.1",
+  "description": "",
+  "author": "SHANG",
+  "license": "MIT",
+  "keywords": [],
+  "exports": {
+    "import": {
+      "types": "./dist/es/index.d.ts",
+      "default": "./dist/es/index.js"
+    },
+    "require": {
+      "types": "./dist/cjs/index.d.cts",
+      "default": "./dist/cjs/index.cjs"
+    }
+  },
+  "main": "./dist/cjs/index.js",
+  "module": "./dist/es/index.mjs",
+  "types": "./dist/cjs/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "pnpm run clean && concurrently npm:build:*",
+    "build:bundle": "bunchee --no-clean --sourcemap --runtime node",
+    "clean": "rimraf dist",
+    "dev": "pnpm run clean && bunchee --no-clean --sourcemap --runtime node -w",
+    "lint": "eslint ./src",
+    "lint:fix": "eslint ./src --fix",
+    "prettier": "prettier '**/*.{ts,json,md}'",
+    "prettier:fix": "prettier --write '**/*.{ts,json,md}'",
+    "start": "node --import @swc-node/register/esm-register src/index.ts"
+  },
+  "dependencies": {
+    "axios": "^1.7.5",
+    "node-helper": "workspace:^",
+    "radash": "^12.1.0"
+  }
+}
