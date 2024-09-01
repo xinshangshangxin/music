@@ -2,7 +2,7 @@ import { readDirDeep } from 'node-helper';
 import { tryit } from 'radash';
 import { type Source, loadLxSource } from './vm';
 
-function getValidSources(list: ([Error, undefined] | [undefined, Source])[]): Record<string, Source['getUrl']> {
+function getValidSources(list: ([Error, undefined] | [undefined, Source])[]): [string, Source['getUrl']][] {
   const arr = list.map(([err, item]) => {
     if (err || !item) {
       return undefined;
@@ -13,9 +13,7 @@ function getValidSources(list: ([Error, undefined] | [undefined, Source])[]): Re
     return !!v;
   });
 
-  return Object.fromEntries(
-    arr,
-  );
+  return arr as any;
 }
 
 async function load(dir: string) {
