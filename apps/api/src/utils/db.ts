@@ -2,7 +2,7 @@ import { SubsetMongo } from '@s4p/smdb';
 import DataStore from '@s4p/nedb';
 
 import { objectify, unique } from 'radash';
-import { env } from '@/env';
+import { env } from 'node-helper';
 
 const smdb = new SubsetMongo(DataStore);
 smdb.connect(env.DATABASE_URL, { timestamp: true });

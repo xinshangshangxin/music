@@ -1,6 +1,6 @@
+import { env } from 'node-helper';
 import '../utils/logger';
 
-import { env } from '../env';
 import { app } from './app';
 import { v1 } from './routes';
 
