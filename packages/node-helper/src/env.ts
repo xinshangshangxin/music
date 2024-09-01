@@ -31,6 +31,10 @@ const ENV_NAME = (() => {
 
 interface Env {
   HEADLESS_FILE_ROOT?: string;
+
+  PORT: number;
+  DATABASE_URL: string;
+  LX_SOURCE_DIR?: string;
 }
 
 function getEnvPath() {
@@ -63,6 +67,21 @@ const env = config({
 
 if (!env) {
   throw new Errors.EnvInvalid({ envPath }, 'env解析失败');
+}
+
+// 获取后端启动的端口
+if (process.env.PORT) {
+  env.PORT = Number(process.env.PORT);
+}
+
+if (!env.PORT) {
+  throw new Errors.EnvInvalid(env, 'PORT未找到');
+}
+
+env.PORT = Number(env.PORT);
+
+if (!env.DATABASE_URL) {
+  throw new Errors.EnvInvalid(env, 'DATABASE_URL未找到');
 }
 
 export type { Env };

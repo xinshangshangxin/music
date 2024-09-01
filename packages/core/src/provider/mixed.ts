@@ -15,10 +15,10 @@ const kuwo = new Kuwo();
 
 class Mixed {
   private providers = {
+    [Provider.kuwo]: kuwo,
+    [Provider.migu]: migu,
     [Provider.kugou]: kugou,
     [Provider.qq]: qq,
-    [Provider.migu]: migu,
-    [Provider.kuwo]: kuwo,
   };
 
   public getProvider(provider: Provider) {
@@ -45,29 +45,40 @@ class Mixed {
     return this.providers[provider].coverImg(coverId);
   }
 
-  public async candidate({ name, artist, albumName }: Pick<Song, 'name' | 'artist' | 'albumName'>) {
+  public async candidate(
+    { name, artist, albumName }: Pick<Song, 'name' | 'artist' | 'albumName'>,
+    providers: Provider[] = [Provider.kuwo, Provider.migu],
+  ): Promise<Record<Provider, SearchItem>> {
     const list: [string, SearchItem][] = await Promise.all(
-      Object.entries(this.providers).map(async ([providerName, provider]) => {
-        const [song] = await provider.search({
-          keyword: `${name} ${artist} ${albumName}`,
-          limit: 1,
-          skip: 0,
-        });
+      providers
+        .map((n) => {
+          return [n, this.providers[n]] as const;
+        })
+        .map(async ([providerName, provider]) => {
+          const [song] = await provider.search({
+            keyword: `${name} ${artist} ${albumName}`,
+            limit: 1,
+            skip: 0,
+          });
 
-        return [providerName, song];
-      }),
+          return [providerName, song];
+        }),
     );
 
     return Object.fromEntries(
       list.filter(([_, song]) => {
         return song.name === name && song.artist === artist && song.albumName === albumName;
       }),
-    );
+    ) as any;
   }
 
-  private async searchList(query: SearchQuery) {
+  private async searchList(query: SearchQuery, providers: Provider[] = Object.keys(this.providers) as Provider[]) {
+    const searchProviders = providers.map((key) => {
+      return this.providers[key];
+    });
+
     const list = await Promise.all(
-      Object.values(this.providers).map((provider) => {
+      searchProviders.map((provider) => {
         return provider.search(query);
       }),
     );
@@ -91,4 +102,6 @@ class Mixed {
   }
 }
 
-export { Mixed };
+const mixed = new Mixed();
+
+export { Mixed, mixed };

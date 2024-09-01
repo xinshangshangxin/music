@@ -22,15 +22,17 @@ const ERROR_MAP = {
   CreatedFailed: {
     message: '创建失败',
   },
+  NotSupported: 'NotSupported',
+  EnvInvalid: 'EnvInvalid',
 
   ParamsRequired: '缺少参数',
   PathNotFound: '路径未找到',
   PathIsNotDirectory: '不是文件夹',
 
-  NotSupported: 'NotSupported',
-  MessageActionNotFound: 'MessageActionNotFound',
+  NoChromeFound: '没有找到Chrome',
 
-  EnvInvalid: 'EnvInvalid',
+  UrlParseFailed: '解析url失败',
+  DownloadFailed: '下载失败',
 };
 
 export type ERROR_CODES = keyof typeof ERROR_MAP;
